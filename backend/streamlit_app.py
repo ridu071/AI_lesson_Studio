@@ -24,7 +24,7 @@ st.set_page_config(page_title="AI Lesson Studio", page_icon="🎓", layout="wide
 
 st.markdown("""
 <style>
-.block-container {padding-top: 2rem; max-width: 1100px;}
+.block-container {padding-top: 1.2rem; max-width: 1200px;}
 .hero {background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%); color: white;
        padding: 2rem 2.2rem; border-radius: 18px; margin-bottom: 1.5rem;}
 .hero h1 {color: white; margin: 0 0 .4rem 0; font-size: 2.1rem;}
@@ -47,12 +47,13 @@ st.markdown("""
 .minutes {color: #6B7280; font-size: .9rem;}
 
 /* ---- landing ---- */
-.landing-title {text-align: center; font-size: 2.4rem; font-weight: 800; margin: 3.5rem 0 .3rem 0;
+.landing-title {text-align: center; font-size: 2.2rem; font-weight: 800; margin: 1.2rem 0 .2rem 0;
+  white-space: nowrap;
   background: linear-gradient(135deg, #4F46E5, #7C3AED); -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;}
-.landing-sub {text-align: center; color: #6B7280; font-size: 1.05rem; margin-bottom: 1.6rem;}
+.landing-sub {text-align: center; color: #6B7280; font-size: 1rem; margin-bottom: 1rem;}
 .features {display: flex; justify-content: center; gap: 1.6rem; color: #6B7280; font-size: .9rem;
-  margin-top: 1rem; flex-wrap: wrap;}
+  margin-top: .6rem; flex-wrap: wrap;}
 
 /* ---- duck pond loading screen ---- */
 .pond {position: relative; border-radius: 22px; padding: 2.2rem 1rem 1.2rem 1rem; overflow: hidden;
@@ -80,7 +81,7 @@ st.markdown("""
 .duck.active .label {color: #4338CA;}
 .duck.failed .label {color: #B91C1C;}
 /* ---- build screen: the student's title as the headline, everything on one screen ---- */
-.build-wrap {text-align: center; margin: 1.2rem 0 1.4rem 0; animation: rise .7s ease-out both;}
+.build-wrap {text-align: center; margin: 0 0 1.2rem 0; animation: rise .7s ease-out both;}
 .build-wrap .eyebrow {text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; font-weight: 700;
   color: #7C3AED;}
 .build-wrap .build-title {font-size: 2.7rem; font-weight: 800; line-height: 1.15; margin: .35rem 0 .45rem 0;
@@ -381,42 +382,53 @@ def start_building(project_id: str) -> None:
 # ------------------------------------------------------------ build screen
 # Shown on its own: the input box is gone and the student's title is the headline.
 
+def go_home() -> None:
+    """Back to the first screen, with the student's topic and goal still filled in.
+    Work finished so far is saved in the lesson and can be continued later."""
+    st.session_state.pop("building", None)
+    st.session_state["project_id"] = None
+    st.session_state["in_title"] = st.session_state.get("last_title", "")
+    st.session_state["in_objective"] = st.session_state.get("last_objective", "")
+
+
 if project is not None and st.session_state.get("building") == project.meta["project_id"]:
     st.session_state.pop("building")
+    st.session_state.setdefault("last_title", project.inputs.title)
+    st.session_state.setdefault("last_objective", project.inputs.objective)
+    st.button("← Back", on_click=go_home, help="Stop and go back to the first screen. "
+              "Anything already finished is saved.")
     if generate_with_progress(project):
         time.sleep(1.5)
         st.rerun()
     _, middle, _ = st.columns([1, 6, 1])
     with middle:
-        c1, c2 = st.columns(2)
-        c1.button("🔁 Try again", type="primary", use_container_width=True,
+        st.button("🔁 Try again", type="primary", use_container_width=True,
                   on_click=start_building, args=(project.meta["project_id"],))
-        c2.button("Back to the lesson page", use_container_width=True)
     st.stop()
 
 # ---------------------------------------------------------------- landing
 
 if project is None:
-    _, middle, _ = st.columns([1, 2.2, 1])
+    _, middle, _ = st.columns([0.6, 4, 0.6])
     with middle:
         st.markdown('<div class="landing-title">What do you want to learn today?</div>'
                     '<div class="landing-sub">Give a topic and a goal. We research trusted sources and '
                     'build a 45-minute lesson, double-checked for accuracy.</div>', unsafe_allow_html=True)
         with st.container(border=True):
             example_title, example_objective = EXAMPLES[0]
-            ex1, ex2 = st.columns([1, 2.4], vertical_alignment="center")
-            ex1.markdown("**💡 Try an example:**")
+            ex1, ex2, _ = st.columns([1.1, 2.2, 1.7], vertical_alignment="center")
+            ex1.markdown("💡 **Try an example:**")
             if ex2.button(example_title, use_container_width=True):
                 st.session_state["in_title"] = example_title
                 st.session_state["in_objective"] = example_objective
                 st.rerun()
-            st.divider()
-            title = st.text_input("📌 Lesson topic", key="in_title", placeholder="e.g. Photosynthesis")
+            c_topic, c_level = st.columns([3, 1.2])
+            title = c_topic.text_input("📌 Lesson topic", key="in_title", placeholder="e.g. Photosynthesis")
+            level = c_level.select_slider("🎚 Your level", ["beginner", "intermediate", "advanced"],
+                                          value="beginner")
             objective = st.text_area("🎯 What should you be able to do after the lesson?", key="in_objective",
                                      placeholder="e.g. Describe the inputs and outputs of photosynthesis.",
-                                     height=100)
-            level = st.select_slider("🎚 Your level", ["beginner", "intermediate", "advanced"],
-                                     value="beginner")
+                                     height=78)
             submitted = st.button("🚀 Create my lesson", type="primary", use_container_width=True)
         st.markdown('<div class="features"><span>🔎 Researched from trusted sources</span>'
                     '<span>⏱ Finish in 45 minutes</span><span>✅ Double-checked</span></div>',
@@ -429,6 +441,7 @@ if project is None:
         except InputError as exc:
             problem.warning(f"Please check your input: {exc}")
             st.stop()
+        st.session_state["last_title"], st.session_state["last_objective"] = title, objective
         start_building(new.meta["project_id"])
         st.rerun()
     st.stop()
