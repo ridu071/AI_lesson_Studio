@@ -20,6 +20,7 @@ import io
 import json
 import re
 import secrets
+import shutil
 import time
 import zipfile
 from datetime import UTC, datetime
@@ -136,6 +137,32 @@ class Project:
                 if attempt == 19:
                     raise
                 time.sleep(0.05)
+
+    @staticmethod
+    def find_existing(inputs: LessonInputs, root: Path = DATA_DIR) -> "Project | None":
+        """A lesson on the same topic at the same level, if one already exists."""
+        def norm(text: str) -> str:
+            return " ".join(text.casefold().split())
+        return next((p for p in Project.list_all(root)
+                     if norm(p.inputs.title) == norm(inputs.title)
+                     and p.inputs.learner_level == inputs.learner_level), None)
+
+    # ------------------------------------------------------- name and delete
+
+    @property
+    def display_name(self) -> str:
+        return self.meta.get("display_name") or self.inputs.title
+
+    def rename(self, name: str) -> None:
+        name = " ".join((name or "").split())
+        if not 1 <= len(name) <= 80:
+            raise InputError("A lesson name must be 1-80 characters.")
+        self.meta["display_name"] = name
+        self.save_meta()
+
+    def delete(self) -> None:
+        """Permanently remove this lesson and all its versions."""
+        shutil.rmtree(self.folder)
 
     # ---------------------------------------------------------------- reading
 

@@ -6,11 +6,13 @@ Run from the backend folder:
 
 import random
 import time
+from datetime import UTC, datetime, timedelta
 from html import escape
 
 import streamlit as st
 
 from app.core.config import get_settings
+from app.generation.goal import suggest_goal
 from app.generation.render import render_lesson_markdown, render_references
 from app.llm.base import LLMConfigError
 from app.llm.factory import create_llm_client
@@ -51,8 +53,8 @@ st.markdown("""
   white-space: nowrap;
   background: linear-gradient(135deg, #4F46E5, #7C3AED); -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;}
-.landing-sub {text-align: center; color: #6B7280; font-size: 1rem; margin-bottom: 1rem;}
-.features {display: flex; justify-content: center; gap: 1.6rem; color: #6B7280; font-size: .9rem;
+.landing-sub {text-align: center; color: #374151; font-size: 1rem; margin-bottom: 1rem;}
+.features {display: flex; justify-content: center; gap: 1.6rem; color: #374151; font-size: .9rem;
   margin-top: .6rem; flex-wrap: wrap;}
 
 /* ---- duck pond loading screen ---- */
@@ -92,6 +94,20 @@ st.markdown("""
 @keyframes rise {from {opacity: 0; transform: translateY(46px);} to {opacity: 1; transform: none;}}
 .pond-status {text-align: center; margin: 1.1rem 0 .3rem 0; font-size: 1.15rem; font-weight: 700; color: #1F2937;}
 .pond-detail {text-align: center; color: #4B5563; font-size: .95rem;}
+.features span {cursor: help;}
+.you-get {font-size: .9rem; color: #374151; background: #F5F3FF; border-radius: 10px; padding: .55rem .8rem;
+  margin: .2rem 0 .5rem 0;}
+.group-label {font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: #4B5563; margin: .8rem 0 .3rem 0;}
+[data-testid="stVerticalBlockBorderWrapper"] {box-shadow: 0 6px 24px rgba(79, 70, 229, .08);}
+[data-testid="stDecoration"] {display: none;}
+button:focus-visible, input:focus-visible, textarea:focus-visible, [role="radio"]:focus-visible,
+[role="tab"]:focus-visible {outline: 3px solid #A78BFA !important; outline-offset: 2px;}
+@media (max-width: 760px) {
+  .landing-title {white-space: normal; font-size: 1.7rem;}
+  .build-wrap .build-title {font-size: 1.9rem;}
+  .duck .body {font-size: 2.2rem;}
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -113,6 +129,12 @@ TIPS = [
 EXAMPLES = [
     ("HTTP Requests and Responses",
      "Explain GET and POST methods and distinguish between 2xx, 4xx, and 5xx response status categories."),
+    ("Photosynthesis",
+     "Describe the inputs and outputs of photosynthesis and explain the role of chlorophyll and sunlight."),
+    ("Newton's Laws of Motion",
+     "Explain Newton's three laws of motion and apply them to everyday examples."),
+    ("The French Revolution",
+     "Describe the main causes of the French Revolution and explain how it changed French government."),
 ]
 DECISION_BADGE = {
     ReleaseDecision.ELIGIBLE: ("green", "✔ Checked: accurate and well structured"),
@@ -353,16 +375,73 @@ def render_learn(project: Project, lesson, research) -> None:
 
 # ----------------------------------------------------------------- sidebar
 
+
+def _when(created_at: str) -> tuple[str, str]:
+    """(group, relative label) for a creation timestamp."""
+    created = datetime.fromisoformat(created_at)
+    age = datetime.now(UTC) - created
+    if age < timedelta(minutes=1):
+        label = "just now"
+    elif age < timedelta(hours=1):
+        label = f"{int(age.total_seconds() // 60)} min ago"
+    elif age < timedelta(days=1):
+        label = f"{int(age.total_seconds() // 3600)} h ago"
+    else:
+        label = f"{age.days} day{'s' * (age.days > 1)} ago"
+    if created.date() == datetime.now(UTC).date():
+        return "Today", label
+    return ("This week" if age < timedelta(days=7) else "Earlier"), label
+
+
+def _lesson_row(p: Project) -> None:
+    pid = p.meta["project_id"]
+    group_label = _when(p.meta["created_at"])[1]
+    failed = any(s["status"] == "failed" for s in p.meta["steps"].values())
+    state = "" if p.next_step() is None else (" · ⚠ needs retry" if failed else " · unfinished")
+    version = f" · v{p.current_version}" if p.current_version and p.current_version > 1 else ""
+    c1, c2 = st.columns([6, 1], vertical_alignment="center")
+    current = st.session_state.get("project_id") == pid
+    if c1.button(p.display_name, key=f"open-{pid}", use_container_width=True,
+                 type="primary" if current else "secondary"):
+        go(pid)
+    c1.caption(f"{p.inputs.learner_level.capitalize()} · {group_label}{version}{state}")
+    with c2.popover("⋯", help="Rename or delete"):
+        new_name = st.text_input("Rename", p.display_name, key=f"rn-{pid}")
+        if st.button("Save name", key=f"rn-save-{pid}"):
+            try:
+                p.rename(new_name)
+                st.rerun()
+            except InputError as exc:
+                st.error(str(exc))
+        st.divider()
+        sure = st.checkbox("Yes, delete this lesson and all its versions", key=f"del-ok-{pid}")
+        if st.button("Delete lesson", key=f"del-{pid}", disabled=not sure):
+            p.delete()
+            if current:
+                st.session_state["project_id"] = None
+            st.rerun()
+
+
 with st.sidebar:
-    st.markdown("## 🎓 AI Lesson Studio")
+    st.markdown("### AI Lesson Studio")
     if st.button("✨ New lesson", use_container_width=True, type="primary"):
         go(None)
-    st.markdown("#### My lessons")
-    for p in Project.list_all():
-        ready = p.next_step() is None
-        icon = "📗" if ready else ("⚠️" if any(s["status"] == "failed" for s in p.meta["steps"].values()) else "⏳")
-        if st.button(f"{icon} {p.inputs.title}", key=f"open-{p.meta['project_id']}", use_container_width=True):
-            go(p.meta["project_id"])
+    lessons = Project.list_all()
+    if len(lessons) > 5:
+        query = st.text_input("Search lessons", placeholder="Search by topic...", key="lesson_search",
+                              label_visibility="collapsed")
+        if query.strip():
+            lessons = [p for p in lessons if query.casefold() in p.display_name.casefold()
+                       or query.casefold() in p.inputs.objective.casefold()]
+    with st.container(height=560, border=False):
+        if not lessons:
+            st.caption("No lessons yet. Create your first one!")
+        for group in ("Today", "This week", "Earlier"):
+            members = [p for p in lessons if _when(p.meta["created_at"])[0] == group]
+            if members:
+                st.markdown(f'<div class="group-label">{group}</div>', unsafe_allow_html=True)
+                for p in members:
+                    _lesson_row(p)
 
 try:
     llm()
@@ -409,6 +488,33 @@ if project is not None and st.session_state.get("building") == project.meta["pro
 
 # ---------------------------------------------------------------- landing
 
+LEVELS = {
+    "Beginner": "New to the topic: plain words, every term explained.",
+    "Intermediate": "Know the basics: more detail and connections between ideas.",
+    "Advanced": "Comfortable with the field: precise terms and deeper reasoning.",
+}
+
+
+def _fill_example() -> None:
+    picked = st.session_state.get("example_pick")
+    goal = dict(EXAMPLES).get(picked)
+    if goal:
+        st.session_state["in_title"], st.session_state["in_objective"] = picked, goal
+
+
+def _suggest_goal() -> None:
+    topic = (st.session_state.get("in_title") or "").strip()
+    if len(topic) < 3:
+        st.session_state["goal_hint"] = "Type a topic first, then I can suggest a goal."
+        return
+    level = (st.session_state.get("in_level") or "Beginner").lower()
+    try:
+        st.session_state["in_objective"] = suggest_goal(topic, level, llm()[1])
+        st.session_state["goal_hint"] = "Suggested goal added. Edit it if you like."
+    except Exception as exc:  # noqa: BLE001 - any failure: just tell the user
+        st.session_state["goal_hint"] = f"Couldn't suggest a goal right now ({type(exc).__name__}). Try again."
+
+
 if project is None:
     _, middle, _ = st.columns([0.6, 4, 0.6])
     with middle:
@@ -416,32 +522,75 @@ if project is None:
                     '<div class="landing-sub">Give a topic and a goal. We research trusted sources and '
                     'build a 45-minute lesson, double-checked for accuracy.</div>', unsafe_allow_html=True)
         with st.container(border=True):
-            example_title, example_objective = EXAMPLES[0]
-            ex1, ex2, _ = st.columns([1.1, 2.2, 1.7], vertical_alignment="center")
-            ex1.markdown("💡 **Try an example:**")
-            if ex2.button(example_title, use_container_width=True):
-                st.session_state["in_title"] = example_title
-                st.session_state["in_objective"] = example_objective
-                st.rerun()
-            c_topic, c_level = st.columns([3, 1.2])
-            title = c_topic.text_input("📌 Lesson topic", key="in_title", placeholder="e.g. Photosynthesis")
-            level = c_level.select_slider("🎚 Your level", ["beginner", "intermediate", "advanced"],
-                                          value="beginner")
-            objective = st.text_area("🎯 What should you be able to do after the lesson?", key="in_objective",
-                                     placeholder="e.g. Describe the inputs and outputs of photosynthesis.",
-                                     height=78)
-            submitted = st.button("🚀 Create my lesson", type="primary", use_container_width=True)
-        st.markdown('<div class="features"><span>🔎 Researched from trusted sources</span>'
-                    '<span>⏱ Finish in 45 minutes</span><span>✅ Double-checked</span></div>',
-                    unsafe_allow_html=True)
+            st.pills("Try an example", [t for t, _ in EXAMPLES], key="example_pick", on_change=_fill_example)
+            c_topic, c_level = st.columns([3, 2])
+            title = c_topic.text_input("Topic", key="in_title",
+                                       placeholder="e.g. Photosynthesis, Binary search, The French Revolution")
+            level_name = c_level.segmented_control("Level", list(LEVELS), key="in_level",
+                                                   default="Beginner") or "Beginner"
+            c_level.caption(f"**{level_name}:** {LEVELS[level_name]}")
+            g1, g2 = st.columns([3, 1], vertical_alignment="bottom")
+            objective = g1.text_area("After this lesson, I want to be able to...", key="in_objective",
+                                     placeholder="e.g. Describe the inputs and outputs of photosynthesis "
+                                                 "and explain the role of chlorophyll.", height=76)
+            g2.button("✨ Suggest a goal", on_click=_suggest_goal, use_container_width=True,
+                      help="Drafts a clear goal from your topic and level")
+            if st.session_state.get("goal_hint"):
+                st.caption(st.session_state.pop("goal_hint"))
+            st.markdown('<div class="you-get"><b>You\'ll get:</b> clear explanations · worked examples · '
+                        'a hands-on activity · quiz questions with instant feedback · a summary · '
+                        'videos and references</div>', unsafe_allow_html=True)
+            submitted = st.button("Create my lesson", type="primary", use_container_width=True)
+            if not (title or "").strip() or not (objective or "").strip():
+                st.caption("Add a topic and a goal to start - or pick an example above.")
+        st.markdown(
+            '<div class="features">'
+            '<span title="Facts come from Wikipedia articles, quoted word for word; books and YouTube '
+            'videos are added as references and extra viewing.">🔎 Researched from trusted sources ⓘ</span>'
+            '<span title="Sections, activities and quizzes are timed so the whole lesson takes at most '
+            '45 minutes.">⏱ Finish in 45 minutes ⓘ</span>'
+            '<span title="Check 1 compares every fact with its source. Check 2 makes sure the lesson '
+            'really teaches your goal, clearly and in a good order.">✅ Double-checked ⓘ</span></div>',
+            unsafe_allow_html=True)
         problem = st.empty()
+
+        duplicate = st.session_state.get("duplicate")
+        if duplicate:
+            existing = next((p for p in Project.list_all() if p.meta["project_id"] == duplicate), None)
+            if existing:
+                with problem.container(border=True):
+                    st.markdown(f"You already have a **{existing.inputs.learner_level}** lesson on "
+                                f"**{escape(existing.display_name)}**.")
+                    d1, d2 = st.columns(2)
+                    if d1.button("Open existing lesson", type="primary", use_container_width=True):
+                        st.session_state.pop("duplicate")
+                        go(existing.meta["project_id"])
+                    if d2.button("Create a new one anyway", use_container_width=True):
+                        st.session_state.pop("duplicate")
+                        st.session_state["force_new"] = True
+                        submitted = True
+
+        recent = [p for p in Project.list_all() if p.next_step() is None][:3]
+        if recent and not duplicate:
+            st.markdown('<div class="group-label" style="text-align:center;margin-top:1rem">'
+                        'Continue where you left off</div>', unsafe_allow_html=True)
+            cols = st.columns(len(recent))
+            for col, p in zip(cols, recent):
+                if col.button(p.display_name, key=f"recent-{p.meta['project_id']}", use_container_width=True,
+                              help=f"{p.inputs.learner_level.capitalize()} · {_when(p.meta['created_at'])[1]}"):
+                    go(p.meta["project_id"])
 
     if submitted:
         try:
-            new = Project.create(validate_inputs(title, objective, level))
+            inputs = validate_inputs(title, objective, level_name.lower())
         except InputError as exc:
             problem.warning(f"Please check your input: {exc}")
             st.stop()
+        existing = None if st.session_state.pop("force_new", False) else Project.find_existing(inputs)
+        if existing:
+            st.session_state["duplicate"] = existing.meta["project_id"]
+            st.rerun()
+        new = Project.create(inputs)
         st.session_state["last_title"], st.session_state["last_objective"] = title, objective
         start_building(new.meta["project_id"])
         st.rerun()
@@ -450,7 +599,7 @@ if project is None:
 # ------------------------------------------------------------ lesson page
 
 inputs = project.inputs
-st.markdown(f'<div class="hero"><h1>{escape(inputs.title)}</h1><p>🎯 {escape(inputs.objective)}</p></div>',
+st.markdown(f'<div class="hero"><h1>{escape(project.display_name)}</h1><p>🎯 {escape(inputs.objective)}</p></div>',
             unsafe_allow_html=True)
 
 if project.next_step():

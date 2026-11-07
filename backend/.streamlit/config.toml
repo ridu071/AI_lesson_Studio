@@ -7,3 +7,7 @@ font = "sans serif"
 
 [browser]
 gatherUsageStats = false
+
+[client]
+# Hide Streamlit's developer menu (Deploy, rerun, settings) so the app feels like a product.
+toolbarMode = "minimal"

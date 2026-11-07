@@ -187,3 +187,34 @@ def test_model_id_slips_are_renumbered_consistently(lesson_data):
     assert [c.claim_id for c in lesson.claims][:2] == ["CL-01", "CL-02"]
     assert lesson.sections[2].section_id == "SEC-03"
     assert {c.section_id for c in lesson.claims} <= {s.section_id for s in lesson.sections}
+
+
+# --- lesson management ---
+
+
+def test_rename_and_delete(project):
+    project.rename("  My   HTTP lesson ")
+    assert Project(project.folder).display_name == "My HTTP lesson"
+    with pytest.raises(InputError):
+        project.rename("   ")
+    folder = project.folder
+    project.delete()
+    assert not folder.exists()
+
+
+def test_same_topic_and_level_is_detected(project, tmp_path):
+    same = validate_inputs("  machine   LEARNING ", OBJECTIVE)
+    assert Project.find_existing(same, root=tmp_path).folder == project.folder
+    other_level = validate_inputs("Machine learning", OBJECTIVE, "advanced")
+    assert Project.find_existing(other_level, root=tmp_path) is None
+
+
+def test_goal_suggestion_uses_the_model():
+    from app.generation.goal import suggest_goal
+
+    class GoalLLM:
+        model = "fake"
+        def generate_json(self, *, system, user, schema):
+            assert '"topic": "Volcanoes"' in user
+            return {"goal": "Explain how volcanoes form and describe why they erupt."}
+    assert suggest_goal("Volcanoes", "beginner", GoalLLM()).startswith("Explain how volcanoes")
