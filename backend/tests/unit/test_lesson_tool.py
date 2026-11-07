@@ -21,7 +21,24 @@ OBJECTIVE = "Differentiate supervised and unsupervised learning and identify app
 
 
 def draft_from(lesson_data: dict) -> dict:
+    """The fixture lesson as a model answer in the current lesson format:
+    a visual in every section, 3 practice tasks and 5 final questions."""
     lesson_data = copy.deepcopy(lesson_data)
+    for section in lesson_data["sections"]:
+        section["content_blocks"].append({
+            "type": "visual", "visual_type": "flowchart",
+            "elements": ["Labelled data", "Train model", "Predict"],
+            "connections": ["Labelled data -> Train model", "Train model -> Predict"],
+            "caption": "Notice the order of the steps.", "alt_text": "Three boxes joined by arrows.",
+        })
+    practice = lesson_data["activities"][0]
+    practice.update(duration_minutes=2, hint="Ask: does the data have labels?",
+                    answer="Labelled data means supervised.")
+    for n in (2, 3):
+        lesson_data["activities"].append(practice | {"activity_id": f"ACT-0{n}", "title": f"Task {n}"})
+    final = next(q for q in lesson_data["assessments"] if q["kind"] == "final")
+    for n in (5, 6, 7):
+        lesson_data["assessments"].append(final | {"question_id": f"Q-0{n}"})
     return {k: v for k, v in lesson_data.items() if k not in ("lesson_id", "version", "videos")}
 
 
@@ -207,3 +224,64 @@ def test_same_topic_and_level_is_detected(project, tmp_path):
     assert Project.find_existing(same, root=tmp_path).folder == project.folder
     other_level = validate_inputs("Machine learning", OBJECTIVE, "advanced")
     assert Project.find_existing(other_level, root=tmp_path) is None
+
+
+def test_misplaced_block_text_is_repaired(lesson_data):
+    draft = draft_from(lesson_data)
+    draft["sections"][0]["content_blocks"] += [
+        {"type": "callout", "label": "Tip: What do you already know about learning from data?"},
+        {"type": "callout", "label": "Common mistake", "caption": "Thinking clusters are given in advance."},
+    ]
+    lesson = generator.GeneratedLesson.model_validate(draft)
+    tip, mistake = lesson.sections[0].content_blocks[-2:]
+    assert (tip.label, tip.content) == ("Tip", "What do you already know about learning from data?")
+    assert (mistake.label, mistake.content) == ("Common mistake", "Thinking clusters are given in advance.")
+
+
+def test_empty_callout_is_dropped_not_fatal(lesson_data):
+    draft = draft_from(lesson_data)
+    before = len(draft["sections"][0]["content_blocks"])
+    draft["sections"][0]["content_blocks"].append({"type": "callout", "label": "Tip"})
+    lesson = generator.GeneratedLesson.model_validate(draft)
+    assert len(lesson.sections[0].content_blocks) == before
+
+
+# --- visuals ---
+
+
+def test_visual_specs_become_drawable_output():
+    from app.generation.visuals import chart_data, table_markdown, to_dot
+    from app.schemas.lesson import ContentBlock
+
+    flow = ContentBlock(type="visual", visual_type="flowchart", elements=["Client sends request", "Server replies"],
+                        connections=['Client sends request -> Server replies: "200 OK"'],
+                        caption="Order matters.", alt_text="Two boxes and an arrow.")
+    dot = to_dot(flow)
+    assert dot.startswith("digraph") and "rankdir=LR" in dot and "->" in dot and '\\"200 OK\\"' in dot
+    assert table_markdown([["Code", "Meaning"], ["404", "Not found | missing"]]).splitlines()[2] == \
+        "| 404 | Not found \| missing |"
+    assert chart_data([["Year", "Count"], ["2020", "3"], ["2021", "5.5"]]) == ("Count", ["2020", "2021"], [3.0, 5.5])
+    assert chart_data([["A", "B"], ["x", "not a number"]]) is None
+
+
+def test_visual_block_needs_caption_and_alt_text():
+    from pydantic import ValidationError as VE
+    from app.schemas.lesson import ContentBlock
+    with pytest.raises(VE, match="caption and alt_text"):
+        ContentBlock(type="visual", visual_type="table", rows=[["a"], ["b"]])
+
+
+def test_markdown_export_includes_rich_blocks(lesson_data, research_data):
+    from app.schemas.lesson import LessonVersion
+    draft = draft_from(lesson_data)
+    draft["sections"][0]["content_blocks"] += [
+        {"type": "takeaway", "content": "Labels make learning supervised."},
+        {"type": "bullets", "items": ["Input", "Label"]},
+        {"type": "callout", "label": "Common mistake", "content": "Thinking clusters are given."},
+    ]
+    lesson = LessonVersion(lesson_id="LES-001", version=1, **draft)
+    text = render_lesson_markdown(lesson, ResearchPackage.model_validate(research_data))
+    assert "**Labels make learning supervised.**" in text and "- Input" in text
+    assert "> **Common mistake:** Thinking clusters are given." in text
+    assert "*Visual (flowchart): Notice the order of the steps.*" in text
+    assert "*Hint:* Ask: does the data have labels?" in text and "## Practice answers" in text

@@ -9,15 +9,18 @@ import time
 from datetime import UTC, datetime, timedelta
 from html import escape
 
+import pandas as pd
 import streamlit as st
 
 from app.core.config import get_settings
 from app.generation.render import render_lesson_markdown, render_references
+from app.generation.visuals import GRAPH_TYPES, chart_data, table_markdown, to_dot
 from app.llm.base import LLMConfigError
 from app.llm.factory import create_llm_client
 from app.modules.qc.enums import ReleaseDecision, severity_rank
 from app.modules.qc.reporting import render_audit_report
-from app.schemas.enums import AssessmentKind, ContentBlockType, QuestionType, SectionType, SourceType
+from app.schemas.enums import (AssessmentKind, ContentBlockType, QuestionType, SectionType, SourceType,
+                               VisualType)
 from app.workflow import InputError, Project, StepFailed, validate_inputs
 
 st.set_page_config(page_title="AI Lesson Studio", page_icon="🎓", layout="wide",
@@ -230,6 +233,19 @@ button[kind="primary"]:disabled {background: #BBF7D0 !important; border-color: #
 .callout.def {background: #F0FDF4; border-left: 4px solid #047857;}
 .callout.ex {background: #FFFBEB; border-left: 4px solid #F59E0B;}
 .callout b {color: #064E3B;}
+
+/* ---- lesson blocks ---- */
+.takeaway {font-weight: 700; font-size: 1.05rem; color: #064E3B; margin: .9rem 0 .25rem 0;}
+.callout.key {background: #F0FDF4; border-left: 4px solid #047857;}
+.callout.tip {background: #FFFBEB; border-left: 4px solid #F59E0B;}
+.callout.mistake {background: #FEF2F2; border-left: 4px solid #DC2626;}
+.callout.mistake b {color: #B91C1C;}
+.formula {font-family: ui-monospace, Consolas, monospace; font-size: 1.35rem; font-weight: 700; color: #064E3B;
+  background: #F0FDF4; border-radius: 10px; padding: .6rem .9rem; display: inline-block; margin-bottom: .4rem;}
+.analogy {background: #FFFBEB; border-radius: 10px; padding: .7rem 1rem;}
+.analogy ul {margin: .3rem 0 0 0;}
+.viz-caption {font-size: .88rem; color: #57534E; font-style: italic; margin-top: .2rem;}
+.sr-only {position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -438,29 +454,86 @@ def render_question(q, key: str, number: int) -> None:
             st.markdown(f"**{q.answer_key}**\n\n{q.explanation}")
 
 
+def render_visual(block) -> None:
+    vt = block.visual_type
+    with st.container(border=True, key=None):
+        if vt in GRAPH_TYPES:
+            st.graphviz_chart(to_dot(block), width="stretch")
+        elif vt is VisualType.TABLE and block.rows:
+            st.markdown(table_markdown(block.rows))
+        elif vt is VisualType.CHART and block.rows:
+            data = chart_data(block.rows)
+            if data:
+                name, labels, values = data
+                st.bar_chart(pd.DataFrame({name: values}, index=labels), color="#047857", height=240)
+            else:
+                st.markdown(table_markdown(block.rows))
+        elif vt is VisualType.FORMULA_CARD and block.elements:
+            formula, *symbols = block.elements
+            st.markdown(f'<div class="formula">{escape(formula)}</div>', unsafe_allow_html=True)
+            if symbols:
+                st.markdown("\n".join(f"- {s}" for s in symbols))
+        elif vt is VisualType.CODE_SNIPPET:
+            st.code(block.content or "\n".join(block.elements))
+            if block.content and block.elements:
+                st.markdown("\n".join(f"- {e}" for e in block.elements))
+        elif vt is VisualType.ANALOGY_SCENE:
+            parts = "".join(f"<li>{escape(e)}</li>" for e in block.elements)
+            st.markdown(f'<div class="analogy"><b>🧩 Think of it like this</b><ul>{parts}</ul></div>',
+                        unsafe_allow_html=True)
+        else:  # any other shape: list what we have
+            st.markdown("\n".join(f"- {e}" for e in block.elements + block.connections) or block.content)
+        st.markdown(f'<div class="viz-caption">{escape(block.caption or "")}</div>'
+                    f'<span class="sr-only">{escape(block.alt_text or "")}</span>', unsafe_allow_html=True)
+
+
+def render_block(block) -> None:
+    kind = block.type
+    if kind is ContentBlockType.VISUAL:
+        render_visual(block)
+    elif kind is ContentBlockType.TAKEAWAY:
+        st.markdown(f'<div class="takeaway">{escape(block.content)}</div>', unsafe_allow_html=True)
+    elif kind is ContentBlockType.BULLETS:
+        st.markdown("\n".join(f"- {item}" for item in block.items))
+    elif kind is ContentBlockType.CALLOUT:
+        label = block.label or "Key idea"
+        style = {"Common mistake": "mistake", "Tip": "tip"}.get(label, "key")
+        mark = {"mistake": "✗", "tip": "💡", "key": "★"}[style]
+        st.markdown(f'<div class="callout {style}"><b>{mark} {escape(label)}</b> - {escape(block.content)}</div>',
+                    unsafe_allow_html=True)
+    elif kind is ContentBlockType.DEFINITION:
+        st.markdown(f'<div class="callout def"><b>Definition</b> - {escape(block.content)}</div>',
+                    unsafe_allow_html=True)
+    elif kind is ContentBlockType.EXAMPLE:
+        st.markdown(f'<div class="callout ex"><b>Example</b> - {escape(block.content)}</div>',
+                    unsafe_allow_html=True)
+    elif kind is ContentBlockType.CODE:
+        st.code(block.content)
+    elif kind is ContentBlockType.NOTE:
+        st.caption(block.content)
+    else:
+        st.markdown(block.content)
+
+
 def _render_section(s, lesson, base: str) -> None:
     st.markdown(f'<div class="section-head"><h4 style="margin:0">{escape(s.title)}</h4>'
                 f'<span class="minutes">⏱ {s.duration_minutes} min</span></div>', unsafe_allow_html=True)
     for block in s.content_blocks:
-        if block.type is ContentBlockType.DEFINITION:
-            st.markdown(f'<div class="callout def"><b>Definition</b> - {escape(block.content)}</div>',
-                        unsafe_allow_html=True)
-        elif block.type is ContentBlockType.EXAMPLE:
-            st.markdown(f'<div class="callout ex"><b>Example</b> - {escape(block.content)}</div>',
-                        unsafe_allow_html=True)
-        elif block.type is ContentBlockType.CODE:
-            st.code(block.content)
-        elif block.type is ContentBlockType.NOTE:
-            st.caption(block.content)
-        else:
-            st.markdown(block.content)
+        render_block(block)
     for a in [a for a in lesson.activities if a.section_id == s.section_id]:
-        with st.expander(f"🛠 Activity: {a.title} ({a.duration_minutes} min)", expanded=True):
+        with st.container(border=True):
+            st.markdown(f"**🛠 {escape(a.title)}** · {a.duration_minutes} min")
             st.markdown(a.instructions)
             store = f"act-{base}-{a.activity_id}-saved"
-            st.text_area("Your work", value=st.session_state.get(store, ""), height=110,
+            st.text_area("Your work", value=st.session_state.get(store, ""), height=90,
                          key=f"act-{base}-{a.activity_id}", on_change=_keep,
                          args=(f"act-{base}-{a.activity_id}", store))
+            if a.hint:
+                with st.expander("Hint"):
+                    st.markdown(a.hint)
+            if a.answer:
+                with st.expander("Show the answer"):
+                    st.markdown(a.answer)
     for number, q in enumerate(lesson.assessments, start=1):
         if q.section_id == s.section_id:
             render_question(q, f"q-{base}-{q.question_id}", number)
@@ -477,14 +550,14 @@ def render_learn(project: Project, lesson, research) -> None:
     package = research[0]
     base = f"{project.meta['project_id']}-v{lesson.version}"
     sections = [s for s in lesson.sections if s.section_type is not SectionType.LEARNING_OBJECTIVES]
-    steps = ["By the end of this lesson"] + [s.title for s in sections] + ["Finish"]
+    steps = [s.title for s in sections] + ["Finish"]
     step_key = f"step-{base}"
     index = min(st.session_state.get(step_key, 0), len(steps) - 1)
 
     st.progress((index + 1) / len(steps), text=f"Step {index + 1} of {len(steps)} · {steps[index]}")
 
     with st.container(border=True):
-        if index == 0:
+        if index == 0:  # lesson facts once, at the top of the first step
             minutes = sum(s.duration_minutes for s in lesson.sections)
             audits = project.audits()
             badge = ""
@@ -494,12 +567,8 @@ def render_learn(project: Project, lesson, research) -> None:
             st.markdown(f'<span class="badge">⏱ {minutes} min</span>'
                         f'<span class="badge">{lesson.learner_level.capitalize()}</span>'
                         f'<span class="badge">{len(sections)} sections</span>{badge}', unsafe_allow_html=True)
-            st.markdown("#### 🎯 By the end of this lesson you will be able to")
-            for o in lesson.learning_objectives:
-                st.markdown(f'<div class="objective">☐ {escape(o.description)}</div>', unsafe_allow_html=True)
-            st.caption("Work through one section at a time. Press Next when you're ready to move on.")
-        elif index <= len(sections):
-            _render_section(sections[index - 1], lesson, base)
+        if index < len(sections):
+            _render_section(sections[index], lesson, base)
         else:
             st.markdown("#### 🎉 You've completed the lesson. Great work!")
             st.markdown("Go back with **Previous** to review any section.")
@@ -514,14 +583,14 @@ def render_learn(project: Project, lesson, research) -> None:
                 st.markdown("\n".join(render_references(lesson, package)[1:]))
 
     prev_col, _, next_col = st.columns([1, 2, 1])
-    prev_col.button("← Previous", key=f"prev-{base}", use_container_width=True, disabled=index == 0,
+    prev_col.button("← Previous", key=f"prev-{base}", width="stretch", disabled=index == 0,
                     on_click=_step_to, args=(step_key, index - 1))
     if index < len(steps) - 1:
-        label = "Start the lesson →" if index == 0 else ("Finish →" if index == len(steps) - 2 else "Next →")
-        next_col.button(label, key=f"next-{base}", type="primary", use_container_width=True,
+        label = "Finish →" if index == len(steps) - 2 else "Next →"
+        next_col.button(label, key=f"next-{base}", type="primary", width="stretch",
                         on_click=_step_to, args=(step_key, index + 1))
     else:
-        next_col.button("↺ Start again", key=f"restart-{base}", use_container_width=True,
+        next_col.button("↺ Start again", key=f"restart-{base}", width="stretch",
                         on_click=_step_to, args=(step_key, 0))
 
 
@@ -570,7 +639,7 @@ def _lesson_card(p: Project) -> None:
     with st.container(key=f"{'lcardsel' if current else 'lcard'}-{pid}"):
         c1, c2 = st.columns([9, 1], vertical_alignment="center", gap="small")
         with c1:
-            if st.button(_fit(p.display_name), key=f"open-{pid}", type="tertiary", use_container_width=True,
+            if st.button(_fit(p.display_name), key=f"open-{pid}", type="tertiary", width="stretch",
                          help=p.display_name):
                 go(pid)
             st.markdown(f'<div class="lmeta">{escape(" · ".join(meta))}</div>', unsafe_allow_html=True)
@@ -600,7 +669,7 @@ def _lesson_card(p: Project) -> None:
 with st.sidebar:
     st.markdown('<div class="side-brand">AI Lesson Studio</div>', unsafe_allow_html=True)
     with st.container(key="newlesson"):
-        if st.button("New lesson", use_container_width=True, type="primary", icon=":material/add:"):
+        if st.button("New lesson", width="stretch", type="primary", icon=":material/add:"):
             go(None)
     lessons = Project.list_all()
     with st.container(key="lsearch"):
@@ -658,7 +727,7 @@ if project is not None and st.session_state.get("building") == project.meta["pro
         st.rerun()
     _, middle, _ = st.columns([1, 6, 1])
     with middle:
-        st.button("🔁 Try again", type="primary", use_container_width=True,
+        st.button("🔁 Try again", type="primary", width="stretch",
                   on_click=start_building, args=(project.meta["project_id"],))
     st.stop()
 
@@ -694,7 +763,7 @@ def landing_form() -> None:
                                              "and explain the role of chlorophyll.", height=76)
         st.pills(":material/lightbulb: Try an example", [t for t, _ in EXAMPLES], key="example_pick",
                  on_change=_fill_example)
-        submitted = st.button("Create my lesson", type="primary", use_container_width=True)
+        submitted = st.button("Create my lesson", type="primary", width="stretch")
         if not (title or "").strip() or not (objective or "").strip():
             st.caption("Add a topic and a goal to start - or pick an example above.")
 
@@ -727,10 +796,10 @@ def landing_form() -> None:
             st.markdown(f"You already have a **{existing.inputs.learner_level}** lesson on "
                         f"**{escape(existing.display_name)}**.")
             d1, d2 = st.columns(2)
-            if d1.button("Open existing lesson", type="primary", use_container_width=True):
+            if d1.button("Open existing lesson", type="primary", width="stretch"):
                 st.session_state.pop("duplicate")
                 go(existing.meta["project_id"])  # full-page rerun
-            if d2.button("Create a new one anyway", use_container_width=True):
+            if d2.button("Create a new one anyway", width="stretch"):
                 st.session_state.pop("duplicate")
                 create_and_build()
 
@@ -762,7 +831,7 @@ if project is None:
                         'Continue where you left off</div>', unsafe_allow_html=True)
             cols = st.columns(len(recent))
             for col, p in zip(cols, recent):
-                if col.button(p.display_name, key=f"recent-{p.meta['project_id']}", use_container_width=True,
+                if col.button(p.display_name, key=f"recent-{p.meta['project_id']}", width="stretch",
                               help=f"{p.inputs.learner_level.capitalize()} · {_when(p.meta['created_at'])[1]}"):
                     go(p.meta["project_id"])
     st.stop()
@@ -890,7 +959,7 @@ with tabs[6]:
     cols = st.columns(2)
     for i, (name, content) in enumerate(project.export_files().items()):
         cols[i % 2].download_button(f"⬇ {name}", content, file_name=name, key=f"dl-{name}",
-                                    use_container_width=True)
+                                    width="stretch")
 
 with tabs[7]:
     for entry in reversed(project.meta["versions"]):

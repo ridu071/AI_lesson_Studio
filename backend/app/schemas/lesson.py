@@ -39,6 +39,7 @@ from app.schemas.enums import (
     LearnerLevel,
     QuestionType,
     SectionType,
+    VisualType,
 )
 
 Minutes = Field(ge=0, le=240)
@@ -51,8 +52,35 @@ class LearningObjective(ContractModel):
 
 
 class ContentBlock(ContractModel):
+    """One chunk of a section. Text blocks use `content`; bullets use `items`;
+    visuals use `visual_type` + `elements` / `connections` / `rows` (+ `content` for code)."""
+
     type: ContentBlockType
-    content: NonEmptyStr
+    content: str = ""
+    items: list[NonEmptyStr] = []
+    label: str | None = None  # callouts: Key idea | Common mistake | Tip
+    visual_type: VisualType | None = None
+    elements: list[NonEmptyStr] = []  # nodes, parts, events, formula lines, scene parts
+    connections: list[NonEmptyStr] = []  # "A -> B" or "A -> B: label"
+    rows: list[list[str]] = []  # tables and charts; first row is the header
+    caption: str | None = None  # one line: what to notice
+    alt_text: str | None = None  # describes the visual for screen readers
+
+    @model_validator(mode="after")
+    def _has_what_its_type_needs(self) -> "ContentBlock":
+        kind = self.type
+        if kind is ContentBlockType.BULLETS and not self.items:
+            raise ValueError("a bullets block needs items")
+        if kind is ContentBlockType.VISUAL:
+            if self.visual_type is None:
+                raise ValueError("a visual block needs a visual_type")
+            if not (self.elements or self.rows or self.content.strip()):
+                raise ValueError("a visual block needs elements, rows or content")
+            if not (self.caption and self.alt_text):
+                raise ValueError("a visual block needs a caption and alt_text")
+        elif kind is not ContentBlockType.BULLETS and not self.content.strip():
+            raise ValueError(f"a {kind} block needs content")
+        return self
 
 
 class LessonSection(ContractModel):
@@ -85,6 +113,8 @@ class Activity(ContractModel):
     duration_minutes: int = Minutes
     objective_ids: list[ObjectiveId] = []
     is_mandatory: bool = True
+    hint: str | None = None  # shown in a collapsible "Hint"
+    answer: str | None = None  # shown in a collapsible "Answer"
 
 
 class AssessmentQuestion(ContractModel):

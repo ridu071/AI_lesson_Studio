@@ -15,7 +15,7 @@ from app.llm.base import LLMClient, LLMInvalidOutputError, call_structured, to_p
 from app.llm.prompts import load_prompt
 from app.modules.qc.schemas import QCIssue
 from app.schemas.common import ContractModel
-from app.schemas.enums import AssessmentKind, ClaimType, LearnerLevel, SourceType
+from app.schemas.enums import AssessmentKind, ClaimType, ContentBlockType, LearnerLevel, SourceType
 from app.schemas.lesson import (
     Activity,
     AssessmentQuestion,
@@ -29,6 +29,7 @@ from app.schemas.research import ResearchPackage
 
 MIN_MINUTES, MAX_MINUTES = 40, 45
 MIN_EVIDENCE_CLAIMS = 5
+MIN_CHECKS, MIN_FINALS, MIN_PRACTICE = 2, 4, 2
 # A whole lesson is a large answer; allow two corrections before giving up.
 GENERATION_ATTEMPTS = 3
 EVIDENCE_CLAIMS = {ClaimType.FACTUAL, ClaimType.DEFINITION}
@@ -37,6 +38,31 @@ EVIDENCE_CLAIMS = {ClaimType.FACTUAL, ClaimType.DEFINITION}
 _ID_PREFIX = {"learning_objectives": ("id", "LO"), "sections": ("section_id", "SEC"),
               "claims": ("claim_id", "CL"), "activities": ("activity_id", "ACT"),
               "assessments": ("question_id", "Q")}
+
+
+CALLOUT_LABELS = ("Key idea", "Common mistake", "Tip")
+
+
+def _repair_block(block: Any) -> Any:
+    """Move text the model put in the wrong field into `content`, so a misplaced field
+    (e.g. a callout's text in `label` or `caption`) never fails a whole lesson."""
+    if not isinstance(block, dict) or block.get("type") in ("visual", "bullets"):
+        return block
+    block = dict(block)
+    if (block.get("content") or "").strip():
+        return block
+    label = (block.get("label") or "").strip()
+    if block.get("type") == "callout" and label and label not in CALLOUT_LABELS:
+        known = next((k for k in CALLOUT_LABELS if label.lower().startswith(k.lower())), None)
+        block["label"] = known or "Key idea"
+        block["content"] = label[len(known):].lstrip(" :-") if known else label
+    elif (block.get("caption") or "").strip():
+        block["content"] = block["caption"]
+    elif block.get("items"):
+        block["content"] = " ".join(str(i) for i in block["items"])
+    if not (block.get("content") or "").strip():
+        return None  # an empty text block teaches nothing: drop it rather than fail the lesson
+    return block
 
 
 def normalize_ids(raw: Any) -> Any:
@@ -63,6 +89,8 @@ def normalize_ids(raw: Any) -> Any:
 
     for section in data.get("sections", []):
         section["objective_ids"] = [remap("LO", o) for o in section.get("objective_ids") or []]
+        repaired = (_repair_block(b) for b in section.get("content_blocks") or [])
+        section["content_blocks"] = [b for b in repaired if b is not None]
     for claim in data.get("claims", []):
         claim["section_id"] = remap("SEC", claim.get("section_id"))
     for item in data.get("activities", []) + data.get("assessments", []):
@@ -155,10 +183,17 @@ def _validator(lesson_id: str, version: int, research: ResearchPackage, videos: 
             problems.append(f"factual/definition claims must cite a source: {uncited}")
         kinds = [q.kind for q in lesson.assessments]
         checks, finals = kinds.count(AssessmentKind.KNOWLEDGE_CHECK), kinds.count(AssessmentKind.FINAL)
-        if checks < 2 or finals < 2:
-            problems.append(f"you wrote {checks} knowledge_check and {finals} final questions; write at "
-                            "least 2 of each (put knowledge_check questions in the knowledge_check section "
-                            "and final questions in the final_assessment section)")
+        if checks < MIN_CHECKS or finals < MIN_FINALS:
+            problems.append(f"you wrote {checks} knowledge_check and {finals} final questions; write one "
+                            f"check question in each core idea section and {MIN_FINALS}+ final multiple-choice "
+                            "questions in the Practice and test section")
+        if len(lesson.activities) < MIN_PRACTICE:
+            problems.append(f"you wrote {len(lesson.activities)} practice tasks; write 3 activities with a "
+                            "hint and an answer in the Practice and test section")
+        no_visual = [s.section_id for s in lesson.sections
+                     if not any(b.type is ContentBlockType.VISUAL for b in s.content_blocks)]
+        if no_visual:
+            problems.append(f"every section needs at least one visual block; missing in {no_visual}")
         facts = sum(c.claim_type in EVIDENCE_CLAIMS for c in lesson.claims)
         if facts < MIN_EVIDENCE_CLAIMS:
             problems.append(f"you recorded {facts} factual/definition claims; record at least "

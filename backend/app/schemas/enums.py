@@ -45,12 +45,32 @@ class SectionType(StrEnum):
 
 
 class ContentBlockType(StrEnum):
-    EXPLANATION = "explanation"
+    EXPLANATION = "explanation"  # short paragraph (max ~40 words)
     DEFINITION = "definition"
     EXAMPLE = "example"
     CODE = "code"
     DIAGRAM = "diagram"
     NOTE = "note"
+    TAKEAWAY = "takeaway"  # one bold line that starts a chunk
+    BULLETS = "bullets"  # list in `items`
+    CALLOUT = "callout"  # `label` = Key idea | Common mistake | Tip
+    VISUAL = "visual"  # drawn by the app from `visual_type` + structured spec
+
+
+class VisualType(StrEnum):
+    """How a visual is drawn. Chosen by content: process -> flowchart, parts -> labeled_diagram,
+    differences -> table, events -> timeline, relationships -> concept_map, numbers -> chart,
+    formulas -> formula_card, code -> code_snippet, abstract ideas -> analogy_scene."""
+
+    FLOWCHART = "flowchart"
+    LABELED_DIAGRAM = "labeled_diagram"
+    TABLE = "table"
+    TIMELINE = "timeline"
+    CONCEPT_MAP = "concept_map"
+    CHART = "chart"
+    FORMULA_CARD = "formula_card"
+    CODE_SNIPPET = "code_snippet"
+    ANALOGY_SCENE = "analogy_scene"
 
 
 class ClaimType(StrEnum):

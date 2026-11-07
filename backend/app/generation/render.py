@@ -5,6 +5,7 @@ lesson cites, books, videos), never written by the model, so every link in
 the lesson is a real link that research actually found.
 """
 
+from app.generation.visuals import visual_markdown
 from app.schemas.enums import AssessmentKind, ContentBlockType, SectionType, SourceType
 from app.schemas.lesson import LessonVersion
 from app.schemas.research import ResearchPackage
@@ -14,6 +15,21 @@ _BLOCK_PREFIX = {
     ContentBlockType.EXAMPLE: "**Example:** ",
     ContentBlockType.NOTE: "> ",
 }
+
+
+def _block_markdown(block) -> str:
+    kind = block.type
+    if kind is ContentBlockType.VISUAL:
+        return visual_markdown(block)
+    if kind is ContentBlockType.CODE:
+        return f"```\n{block.content}\n```"
+    if kind is ContentBlockType.BULLETS:
+        return "\n".join(f"- {item}" for item in block.items)
+    if kind is ContentBlockType.TAKEAWAY:
+        return f"**{block.content}**"
+    if kind is ContentBlockType.CALLOUT:
+        return f"> **{block.label or 'Key idea'}:** {block.content}"
+    return _BLOCK_PREFIX.get(kind, "") + block.content
 
 
 def render_lesson_markdown(lesson: LessonVersion, research: ResearchPackage, *,
@@ -36,13 +52,12 @@ def render_lesson_markdown(lesson: LessonVersion, research: ResearchPackage, *,
             continue
         lines += [f"## {section.title}  *({section.duration_minutes} min)*", ""]
         for block in section.content_blocks:
-            if block.type is ContentBlockType.CODE:
-                lines += ["```", block.content, "```", ""]
-            else:
-                lines += [_BLOCK_PREFIX.get(block.type, "") + block.content, ""]
+            lines += [_block_markdown(block), ""]
         for activity in [a for a in lesson.activities if a.section_id == section.section_id]:
-            lines += [f"### Activity: {activity.title} ({activity.duration_minutes} min)", "",
+            lines += [f"### Practice: {activity.title} ({activity.duration_minutes} min)", "",
                       activity.instructions, ""]
+            if activity.hint:
+                lines += [f"*Hint:* {activity.hint}", ""]
         for q in [q for q in lesson.assessments if q.section_id == section.section_id]:
             number += 1
             lines += [f"**Q{number}. {q.prompt}**", ""]
@@ -54,6 +69,11 @@ def render_lesson_markdown(lesson: LessonVersion, research: ResearchPackage, *,
         for n, q in enumerate(lesson.assessments, start=1):
             kind = "final" if q.kind is AssessmentKind.FINAL else "check"
             lines += [f"{n}. ({kind}) **{q.answer_key}** - {q.explanation}"]
+        lines.append("")
+    answered = [a for a in lesson.activities if a.answer]
+    if answered:
+        lines += ["## Practice answers", ""]
+        lines += [f"- **{a.title}:** {a.answer}" for a in answered]
         lines.append("")
 
     if lesson.videos:

@@ -62,7 +62,7 @@ Title + objective ──► validate inputs
 |---|---|
 | Title and objective inputs, empty or invalid input rejected | `app/workflow.py` `validate_inputs` |
 | Research books, websites, YouTube | `app/research/` (Open Library, Wikipedia, YouTube Data API) |
-| Explanations, examples, practical application, knowledge checks | `prompts/generation/lesson.md`, enforced by `app/generation/generator.py` |
+| Explanations, examples, practical application, knowledge checks | 7-segment visual lesson (intro 4, overview 3, two core ideas 8+8, worked example 7, practice and test 10, recap 5 min) with check questions, 3 practice tasks with hints, a 5-question quiz and visuals drawn by the app (flowcharts, concept maps, tables, timelines, charts, formula cards, code, analogy scenes): `prompts/generation/lesson.md`, `app/generation/` |
 | YouTube videos as supplementary resources | Attached by code from research; optional, not counted in the 45 minutes |
 | Reference links at the end | Built by code from research (`app/generation/render.py`) |
 | 45-minute limit | The generator rejects drafts outside 40-45 min; QC2 enforces it as a hard rule |

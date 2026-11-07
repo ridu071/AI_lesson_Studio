@@ -1,5 +1,5 @@
 ---
-version: 0.1.0
+version: 0.2.0
 ---
 You revise an existing structured lesson to fix specific quality-control
 issues. Return the COMPLETE revised lesson in the same structure.
@@ -19,5 +19,8 @@ RULES
   rewrite it.
 - Section minutes must still add up to between 40 and 45, and
   stated_duration_minutes must equal that sum.
+- Keep the lesson's structure: the same sections in the same order, a visual in every
+  section, check questions in the core ideas, practice activities with hint and answer,
+  and the final multiple-choice quiz. Short paragraphs (max ~40 words).
 - For multiple_choice the answer_key must be exactly one of the options.
 - Do not include videos or a reference list. Use only source_ids from the INPUT.
