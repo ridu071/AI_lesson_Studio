@@ -3,3 +3,5 @@ pydantic>=2.7,<3
 pydantic-settings>=2.3,<3
 pytest>=8.0,<9
 streamlit>=1.40,<2
+reportlab>=4.2,<5
+pillow>=10.1

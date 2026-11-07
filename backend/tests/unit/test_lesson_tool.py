@@ -340,3 +340,34 @@ def test_book_citations_are_removed_and_missing_hints_filled(lesson_data, resear
     assert lesson.claims[0].source_ids == ["SRC-001"]
     filled = next(q for q in lesson.assessments if q.kind == "final")
     assert filled.hint.startswith("Think back to the section")
+
+
+# --- student downloads ---
+
+
+def test_pdf_notes_and_summary_image(lesson_data, research_data):
+    import io as _io
+    from PIL import Image
+    from app.generation.exports import lesson_pdf, summary_image, summary_points
+    from app.schemas.lesson import LessonVersion
+
+    lesson = LessonVersion(lesson_id="LES-001", version=1, **draft_from(lesson_data))
+    pdf = lesson_pdf(lesson, ResearchPackage.model_validate(research_data))
+    assert pdf.startswith(b"%PDF-") and len(pdf) > 5_000
+    png = summary_image(lesson)
+    image = Image.open(_io.BytesIO(png))
+    assert image.format == "PNG" and image.size == (1080, 1350)
+    assert summary_points(lesson)["takeaways"]  # falls back to section takeaways for older lessons
+
+
+def test_pdf_text_contains_every_section_and_the_answer_key(lesson_data, research_data):
+    pypdf = pytest.importorskip("pypdf")
+    import io as _io
+    from app.generation.exports import lesson_pdf
+    from app.schemas.lesson import LessonVersion
+
+    lesson = LessonVersion(lesson_id="LES-001", version=1, **draft_from(lesson_data))
+    text = " ".join(page.extract_text() for page in pypdf.PdfReader(_io.BytesIO(
+        lesson_pdf(lesson, ResearchPackage.model_validate(research_data)))).pages)
+    assert all(s.title[:20] in text for s in lesson.sections if s.section_type != "learning_objectives")
+    assert "Answer key" in text

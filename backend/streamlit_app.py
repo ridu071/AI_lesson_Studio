@@ -14,6 +14,7 @@ import streamlit as st
 
 from app.core.config import get_settings
 from app.generation.render import render_lesson_markdown, render_references
+from app.generation.exports import lesson_pdf, summary_image
 from app.generation.grading import (CHOICE_TYPES, PAIR_TYPES, chosen_misconception, is_correct,
                                     personal_line, score_objectives, final_questions)
 from app.generation.visuals import GRAPH_TYPES, chart_data, table_markdown, to_dot
@@ -1036,6 +1037,30 @@ if project is None:
 
 # ------------------------------------------------------------ lesson page
 
+TEACHER_VIEWS = {
+    "qc1": ("Fact check (QC1)", ":material/fact_check:"),
+    "qc2": ("Teaching check (QC2)", ":material/school:"),
+    "improve": ("Improve with AI", ":material/auto_fix_high:"),
+    "edit": ("Edit lesson", ":material/edit:"),
+    "history": ("Version history", ":material/history:"),
+    "evidence": ("Sources & evidence", ":material/source:"),
+    "files": ("Reports & files", ":material/folder_zip:"),
+}
+
+
+def _open_view(view_key: str, view: str | None) -> None:
+    st.session_state[view_key] = view
+
+
+# Top-right: teacher tools dropdown
+view_key = f"view-{project.meta['project_id']}"
+current_view = st.session_state.get(view_key)
+_, tools_col = st.columns([5, 1])
+with tools_col.popover("Teacher tools", icon=":material/settings:", width="stretch"):
+    for key, (label, icon) in TEACHER_VIEWS.items():
+        st.button(label, icon=icon, key=f"tv-{key}", width="stretch", on_click=_open_view, args=(view_key, key),
+                  type="primary" if current_view == key else "secondary")
+
 inputs = project.inputs
 st.markdown(f'<div class="hero"><h1>{escape(project.display_name)}</h1><p>🎯 {escape(inputs.objective)}</p></div>',
             unsafe_allow_html=True)
@@ -1057,55 +1082,56 @@ if project.step("qc")["status"] != "done":
     st.button("✅ Run quality checks", type="primary",
               on_click=start_building, args=(project.meta["project_id"],))
 
-tabs = st.tabs(["📖 Learn", "✅ Fact check (QC1)", "🎓 Teaching check (QC2)", "🛠 Improve",
-                "✏️ Edit", "📚 Sources", "⬇ Export", "🕘 History"])
+@st.cache_data(show_spinner=False, max_entries=20)
+def _cached_pdf(project_id: str, version: int) -> bytes:
+    p = next(x for x in Project.list_all() if x.meta["project_id"] == project_id)
+    return lesson_pdf(p.lesson(version), p.research()[0])
 
-with tabs[0]:
-    render_learn(project, lesson, research)
 
-for tab, index in ((tabs[1], 0), (tabs[2], 1)):
-    with tab:
-        if audits:
-            st.markdown(render_audit_report(project.qc_input(), audits[index]))
-        else:
-            st.info("Run the quality checks to see this report.")
+def view_qc(index: int) -> None:
+    if audits:
+        st.markdown(render_audit_report(project.qc_input(), audits[index]))
+    else:
+        st.info("Run the quality checks to see this report.")
 
-with tabs[3]:
-    st.caption("For teachers: pick QC suggestions (or write your own instruction) and let the AI "
-               "create an improved version. The new version is checked again automatically.")
+
+def view_improve() -> None:
+    st.caption("Pick QC suggestions (or write your own instruction) and let the AI create an improved "
+               "version. The new version is checked again automatically.")
     if not audits:
         st.info("Run the quality checks first.")
-    else:
-        dismissed = project.dismissed()
-        issues = sorted(audits[0].issues + audits[1].issues, key=lambda i: -severity_rank(i.severity))
-        open_issues = [i for i in issues if i.issue_id not in dismissed]
-        if not open_issues:
-            st.success("No open suggestions for this version. 🎉")
-        selected = []
-        for issue in open_issues:
-            with st.container(border=True):
-                c1, c2 = st.columns([9, 1])
-                fix = issue.recommendation.action if issue.recommendation else "-"
-                if c1.checkbox(f"**{issue.issue_id} · {issue.severity} · {issue.issue_type}**  \n"
-                               f"{issue.explanation}  \n💡 *{fix}*", key=f"sel-{lesson.version}-{issue.issue_id}"):
-                    selected.append(issue.issue_id)
-                if c2.button("Dismiss", key=f"dis-{lesson.version}-{issue.issue_id}"):
-                    project.dismiss(issue.issue_id)
-                    st.rerun()
-        note = st.text_area("Your own instruction for the AI (optional)",
-                            placeholder="e.g. Add a real-world example about online shopping.")
-        if st.button("✨ Improve the lesson", type="primary"):
-            settings, client = llm()
-            with st.spinner("Improving the lesson and checking it again..."):
-                try:
-                    project.apply_recommendations(selected, note, client, settings)
-                    st.toast("Improved version created and checked.", icon="✅")
-                    st.rerun()
-                except StepFailed as exc:
-                    st.error(f"{exc} The current version is unchanged.")
+        return
+    dismissed = project.dismissed()
+    issues = sorted(audits[0].issues + audits[1].issues, key=lambda i: -severity_rank(i.severity))
+    open_issues = [i for i in issues if i.issue_id not in dismissed]
+    if not open_issues:
+        st.success("No open suggestions for this version. 🎉")
+    selected = []
+    for issue in open_issues:
+        with st.container(border=True):
+            c1, c2 = st.columns([9, 1])
+            fix = issue.recommendation.action if issue.recommendation else "-"
+            if c1.checkbox(f"**{issue.issue_id} · {issue.severity} · {issue.issue_type}**  \n"
+                           f"{issue.explanation}  \n💡 *{fix}*", key=f"sel-{lesson.version}-{issue.issue_id}"):
+                selected.append(issue.issue_id)
+            if c2.button("Dismiss", key=f"dis-{lesson.version}-{issue.issue_id}"):
+                project.dismiss(issue.issue_id)
+                st.rerun()
+    note = st.text_area("Your own instruction for the AI (optional)",
+                        placeholder="e.g. Add a real-world example about online shopping.")
+    if st.button("✨ Improve the lesson", type="primary"):
+        settings, client = llm()
+        with st.spinner("Improving the lesson and checking it again..."):
+            try:
+                project.apply_recommendations(selected, note, client, settings)
+                st.toast("Improved version created and checked.", icon="✅")
+                st.rerun()
+            except StepFailed as exc:
+                st.error(f"{exc} The current version is unchanged.")
 
-with tabs[4]:
-    st.caption("Edits are saved as a new version; the old version stays in History. "
+
+def view_edit() -> None:
+    st.caption("Edits are saved as a new version; the old version stays in the history. "
                "Run the quality checks again after saving.")
     data = lesson.model_dump(mode="json")
     v = lesson.version
@@ -1115,19 +1141,28 @@ with tabs[4]:
             s["duration_minutes"] = st.number_input("Minutes", 0, 60, s["duration_minutes"],
                                                     key=f"m-{v}-{s['section_id']}")
             for n, block in enumerate(s["content_blocks"]):
-                block["content"] = st.text_area(block["type"], block["content"],
-                                                key=f"b-{v}-{s['section_id']}-{n}")
+                if block["type"] == "bullets":
+                    block["items"] = [i for i in st.text_area("bullets (one per line)", "\n".join(block["items"]),
+                                      key=f"b-{v}-{s['section_id']}-{n}").splitlines() if i.strip()]
+                elif block["type"] != "visual":
+                    block["content"] = st.text_area(block["type"], block["content"],
+                                                    key=f"b-{v}-{s['section_id']}-{n}")
+                else:
+                    block["caption"] = st.text_input(f"visual ({block['visual_type']}) caption", block["caption"],
+                                                     key=f"b-{v}-{s['section_id']}-{n}")
     for a in data["activities"]:
         with st.expander(f"Activity {a['activity_id']} - {a['title']}"):
             a["instructions"] = st.text_area("Instructions", a["instructions"], key=f"a-{v}-{a['activity_id']}")
     for q in data["assessments"]:
-        with st.expander(f"Question {q['question_id']} ({q['kind']})"):
+        with st.expander(f"Question {q['question_id']} ({q['kind']}, {q['question_type']})"):
             q["prompt"] = st.text_area("Question", q["prompt"], key=f"qp-{v}-{q['question_id']}")
             if q["options"]:
                 q["options"] = [o for o in st.text_area("Options (one per line)", "\n".join(q["options"]),
                                 key=f"qo-{v}-{q['question_id']}").splitlines() if o.strip()]
             q["answer_key"] = st.text_input("Answer key", q["answer_key"], key=f"qa-{v}-{q['question_id']}")
             q["explanation"] = st.text_area("Explanation", q["explanation"], key=f"qe-{v}-{q['question_id']}")
+            if q.get("hint") is not None:
+                q["hint"] = st.text_input("Hint", q["hint"], key=f"qh-{v}-{q['question_id']}")
     data["stated_duration_minutes"] = sum(s["duration_minutes"] for s in data["sections"])
     note = st.text_input("What did you change? (saved in history)", key=f"note-{v}")
     if st.button("💾 Save as new version", type="primary"):
@@ -1138,7 +1173,19 @@ with tabs[4]:
         except InputError as exc:
             st.error(str(exc))
 
-with tabs[5]:
+
+def view_history() -> None:
+    for entry in reversed(project.meta["versions"]):
+        a = project.audits(entry["version"])
+        decision = a[2].decision if a and a[2] else "not checked"
+        st.markdown(f"**v{entry['version']}** · {entry['origin']} · {entry['created_at']} · "
+                    f"QC: {decision}  \n{entry['note']}")
+    old = st.selectbox("Preview an older version", [e["version"] for e in project.meta["versions"]][::-1])
+    if old != lesson.version:
+        st.markdown(render_lesson_markdown(project.lesson(old), research[0]))
+
+
+def view_evidence() -> None:
     package, plan, _ = research
     st.markdown("**Key concepts researched:** " + " · ".join(plan.key_concepts))
     for s in package.sources:
@@ -1150,21 +1197,79 @@ with tabs[5]:
     for limitation in package.limitations:
         st.caption("ℹ " + limitation)
 
-with tabs[6]:
-    st.caption(f"Exports version {lesson.version}: lesson, references and both QC reports.")
+
+def view_files() -> None:
+    st.caption(f"Version {lesson.version}: lesson, references and both QC reports as Markdown/JSON.")
     st.download_button("⬇ Download everything (zip)", project.export_zip(),
                        file_name=f"lesson-v{lesson.version}.zip", type="primary")
     cols = st.columns(2)
     for i, (name, content) in enumerate(project.export_files().items()):
-        cols[i % 2].download_button(f"⬇ {name}", content, file_name=name, key=f"dl-{name}",
-                                    width="stretch")
+        cols[i % 2].download_button(f"⬇ {name}", content, file_name=name, key=f"dl-{name}", width="stretch")
 
-with tabs[7]:
-    for entry in reversed(project.meta["versions"]):
-        a = project.audits(entry["version"])
-        decision = a[2].decision if a and a[2] else "not checked"
-        st.markdown(f"**v{entry['version']}** · {entry['origin']} · {entry['created_at']} · "
-                    f"QC: {decision}  \n{entry['note']}")
-    old = st.selectbox("Preview an older version", [e["version"] for e in project.meta["versions"]][::-1])
-    if old != lesson.version:
-        st.markdown(render_lesson_markdown(project.lesson(old), research[0]))
+
+def tab_sources() -> None:
+    package = research[0]
+    cited = {sid for s in lesson.sections for sid in s.source_ids} | {sid for c in lesson.claims for sid in c.source_ids}
+    websites = [s for s in package.sources if s.source_type is SourceType.WEBSITE]
+    books = [s for s in package.sources if s.source_type is SourceType.BOOK]
+    st.markdown("#### 🌐 Websites")
+    st.caption("The facts in this lesson come from these pages; each one was checked against them.")
+    for s in websites:
+        used = "used as evidence" if s.source_id in cited else "researched"
+        st.markdown(f"- **[{s.title}]({s.url})** · {s.publisher or 'website'} · {used}")
+    if lesson.videos:
+        st.markdown("#### 🎬 YouTube videos")
+        st.caption("Optional extra viewing - not part of the 45 minutes.")
+        cols = st.columns(2)
+        sources = {s.source_id: s for s in package.sources}
+        for i, v in enumerate(lesson.videos):
+            with cols[i % 2]:
+                st.video(str(v.url))
+                channel = sources.get(v.source_id).publisher if v.source_id in sources else None
+                length = f" · {v.duration_minutes} min" if v.duration_minutes else ""
+                st.markdown(f"**[{v.title}]({v.url})**  \n{channel or 'YouTube'}{length}")
+    if books:
+        st.markdown("#### 📕 Books for further reading")
+        st.caption("Suggested from Open Library. Their content was not read by the tool.")
+        for b in books:
+            author = f" · {b.author}" if b.author else ""
+            st.markdown(f"- **[{b.title}]({b.url})**{author}")
+
+
+def tab_export() -> None:
+    with st.container(border=True):
+        st.markdown("#### 📄 Full notes (PDF)")
+        st.caption("Every section, the visuals as tables and steps, the test questions with an answer key "
+                   "at the end, and the videos and references.")
+        st.download_button("⬇ Download the notes as PDF", _cached_pdf(project.meta["project_id"], lesson.version),
+                           file_name=f"{project.display_name} - notes.pdf", mime="application/pdf",
+                           type="primary", key="dl-pdf")
+    with st.container(border=True):
+        st.markdown("#### 🖼 Summary image")
+        st.caption("A one-page picture of the goal, key takeaways, common mistakes and next steps - "
+                   "handy for revision or sharing.")
+        image_key = f"summary-img-{project.meta['project_id']}-v{lesson.version}"
+        if st.button("Create summary image", key="make-img"):
+            st.session_state[image_key] = summary_image(lesson)
+        if st.session_state.get(image_key):
+            st.image(st.session_state[image_key], width=420)
+            st.download_button("⬇ Download the image (PNG)", st.session_state[image_key],
+                               file_name=f"{project.display_name} - summary.png", mime="image/png", key="dl-img")
+
+
+if current_view in TEACHER_VIEWS:
+    label, icon = TEACHER_VIEWS[current_view]
+    b1, b2 = st.columns([1, 4], vertical_alignment="center")
+    b1.button("← Back to the lesson", on_click=_open_view, args=(view_key, None), key="tv-back")
+    b2.markdown(f"#### {label}")
+    {"qc1": lambda: view_qc(0), "qc2": lambda: view_qc(1), "improve": view_improve, "edit": view_edit,
+     "history": view_history, "evidence": view_evidence, "files": view_files}[current_view]()
+    st.stop()
+
+tabs = st.tabs(["📖 Learn", "📚 Sources", "⬇ Export"])
+with tabs[0]:
+    render_learn(project, lesson, research)
+with tabs[1]:
+    tab_sources()
+with tabs[2]:
+    tab_export()
