@@ -1127,6 +1127,28 @@ def view_improve() -> None:
                 st.error(f"{exc} The current version is unchanged.")
 
 
+def _lines(text: str) -> list[str]:
+    return [line.strip() for line in (text or "").splitlines() if line.strip()]
+
+
+def _edit_visual(block: dict, key: str) -> None:
+    """Visuals are edited as plain text: labels, arrows ("A -> B") and table rows ("a | b")."""
+    st.markdown(f"**Visual: {block['visual_type'].replace('_', ' ')}**")
+    block["caption"] = st.text_input("Caption (what to notice)", block.get("caption") or "", key=f"{key}-cap")
+    if block["visual_type"] in ("table", "chart"):
+        rows = st.text_area("Rows (one per line, cells separated by |; first row is the header)",
+                            "\n".join(" | ".join(r) for r in block["rows"]), key=f"{key}-rows")
+        block["rows"] = [[c.strip() for c in line.split("|")] for line in _lines(rows)]
+    elif block["visual_type"] == "code_snippet":
+        block["content"] = st.text_area("Code", block.get("content") or "", key=f"{key}-code")
+        block["elements"] = _lines(st.text_area("Notes (one per line)", "\n".join(block["elements"]), key=f"{key}-el"))
+    else:
+        block["elements"] = _lines(st.text_area("Labels (one per line)", "\n".join(block["elements"]), key=f"{key}-el"))
+        if block["visual_type"] in ("flowchart", "timeline", "concept_map", "labeled_diagram"):
+            block["connections"] = _lines(st.text_area("Arrows (one per line: A -> B, or A -> B: label)",
+                                                       "\n".join(block["connections"]), key=f"{key}-con"))
+
+
 def view_edit() -> None:
     st.caption("Edits are saved as a new version; the old version stays in the history. "
                "Run the quality checks again after saving.")
@@ -1145,11 +1167,13 @@ def view_edit() -> None:
                     block["content"] = st.text_area(block["type"], block["content"],
                                                     key=f"b-{v}-{s['section_id']}-{n}")
                 else:
-                    block["caption"] = st.text_input(f"visual ({block['visual_type']}) caption", block["caption"],
-                                                     key=f"b-{v}-{s['section_id']}-{n}")
+                    _edit_visual(block, f"b-{v}-{s['section_id']}-{n}")
     for a in data["activities"]:
         with st.expander(f"Activity {a['activity_id']} - {a['title']}"):
+            a["title"] = st.text_input("Title", a["title"], key=f"at-{v}-{a['activity_id']}")
             a["instructions"] = st.text_area("Instructions", a["instructions"], key=f"a-{v}-{a['activity_id']}")
+            a["hint"] = st.text_input("Hint", a.get("hint") or "", key=f"ah-{v}-{a['activity_id']}") or None
+            a["answer"] = st.text_area("Answer", a.get("answer") or "", key=f"aa-{v}-{a['activity_id']}") or None
     for q in data["assessments"]:
         with st.expander(f"Question {q['question_id']} ({q['kind']}, {q['question_type']})"):
             q["prompt"] = st.text_area("Question", q["prompt"], key=f"qp-{v}-{q['question_id']}")
@@ -1158,6 +1182,17 @@ def view_edit() -> None:
                                 key=f"qo-{v}-{q['question_id']}").splitlines() if o.strip()]
             q["answer_key"] = st.text_input("Answer key", q["answer_key"], key=f"qa-{v}-{q['question_id']}")
             q["explanation"] = st.text_area("Explanation", q["explanation"], key=f"qe-{v}-{q['question_id']}")
+            if q["question_type"] == "order_steps":
+                q["correct_order"] = _lines(st.text_area("Steps in the correct order (one per line)",
+                                                         "\n".join(q["correct_order"]), key=f"qso-{v}-{q['question_id']}"))
+            if q["question_type"] in ("match_pairs", "label_visual"):
+                text = st.text_area("Pairs (one per line: left = right)",
+                                    "\n".join(f"{a} = {b}" for a, b in q["pairs"]), key=f"qpr-{v}-{q['question_id']}")
+                q["pairs"] = [[x.strip() for x in line.split("=", 1)] for line in _lines(text) if "=" in line]
+            if q["question_type"] == "fill_blank":
+                q["accepted_answers"] = _lines(st.text_area("Other accepted answers (one per line)",
+                                                            "\n".join(q["accepted_answers"]),
+                                                            key=f"qaa-{v}-{q['question_id']}"))
             if q.get("hint") is not None:
                 q["hint"] = st.text_input("Hint", q["hint"], key=f"qh-{v}-{q['question_id']}")
     data["stated_duration_minutes"] = sum(s["duration_minutes"] for s in data["sections"])

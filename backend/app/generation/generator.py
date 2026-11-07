@@ -11,10 +11,10 @@ from typing import Any
 
 from pydantic import Field, ValidationInfo, model_validator
 
-from app.llm.base import LLMClient, LLMInvalidOutputError, call_structured, to_prompt_json
+from app.llm.base import LLMClient, LLMError, LLMInvalidOutputError, call_structured, to_prompt_json
 from app.llm.prompts import load_prompt
 from app.modules.qc.schemas import QCIssue
-from app.schemas.common import ContractModel
+from app.schemas.common import ContractModel, NonEmptyStr
 from app.schemas.enums import AssessmentKind, ClaimType, ContentBlockType, LearnerLevel, SectionType, SourceType
 from app.schemas.lesson import (
     Activity,
@@ -280,7 +280,7 @@ def generate_lesson(
         attempts=GENERATION_ATTEMPTS,
         context={"evidence_sources": {s.source_id for s in research.sources if s.evidence_passages}},
     )
-    return _to_lesson(draft, lesson_id, 1, videos), prompt.version
+    return complete_lesson(_to_lesson(draft, lesson_id, 1, videos), client), prompt.version
 
 
 def revise_lesson(
@@ -308,4 +308,113 @@ def revise_lesson(
         attempts=GENERATION_ATTEMPTS,
         context={"evidence_sources": {s.source_id for s in research.sources if s.evidence_passages}},
     )
-    return _to_lesson(draft, lesson.lesson_id, next_version, list(lesson.videos)), prompt.version
+    revised = _to_lesson(draft, lesson.lesson_id, next_version, list(lesson.videos))
+    return complete_lesson(revised, client), prompt.version
+
+
+# ------------------------------------------------- completing missing pieces
+
+
+class _Check(ContractModel):
+    section_id: str
+    prompt: NonEmptyStr
+    answer: NonEmptyStr
+    why: NonEmptyStr
+
+
+class _TryIt(ContractModel):
+    title: NonEmptyStr
+    instructions: NonEmptyStr
+    hint: NonEmptyStr
+    answer: NonEmptyStr
+
+
+class _Completion(ContractModel):
+    checks: list[_Check] = []
+    activity: _TryIt | None = None
+
+
+_S = {"type": "string"}
+COMPLETION_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "checks": {"type": "array", "items": {"type": "object", "properties": {
+            "section_id": _S, "prompt": _S, "answer": _S, "why": _S},
+            "required": ["section_id", "prompt", "answer", "why"]}},
+        "activity": {"type": ["object", "null"], "properties": {
+            "title": _S, "instructions": _S, "hint": _S, "answer": _S},
+            "required": ["title", "instructions", "hint", "answer"]},
+    },
+    "required": ["checks", "activity"],
+}
+
+
+def core_idea_sections(lesson: LessonVersion) -> list:
+    """The two core-idea sections: titled 'Core idea ...', else the concept sections after the overview."""
+    concepts = [s for s in lesson.sections if s.section_type is SectionType.CONCEPT_EXPLANATION]
+    titled = [s for s in concepts if s.title.lower().startswith("core idea")]
+    return titled or concepts[1:3]
+
+
+def missing_parts(lesson: LessonVersion) -> tuple[list[str], bool]:
+    """(core-idea sections without a check question, whether the 'Try it' activity is missing)."""
+    checked = {q.section_id for q in lesson.assessments if q.kind is AssessmentKind.KNOWLEDGE_CHECK}
+    sections = [s.section_id for s in core_idea_sections(lesson) if s.section_id not in checked]
+    has_activity = any(a.is_mandatory for a in lesson.activities)
+    has_worked = any(s.section_type is SectionType.WORKED_EXAMPLES for s in lesson.sections)
+    return sections, has_worked and not has_activity
+
+
+def complete_lesson(lesson: LessonVersion, client: LLMClient) -> LessonVersion:
+    """Add the core-idea check questions and the 'Try it' activity if the model left them out.
+    One small extra call, only when needed. If it fails, the lesson is kept as it is."""
+    check_ids, need_activity = missing_parts(lesson)
+    if not check_ids and not need_activity:
+        return lesson
+    worked = next((s for s in lesson.sections if s.section_type is SectionType.WORKED_EXAMPLES), None)
+    shown = [s for s in lesson.sections if s.section_id in check_ids or (need_activity and s is worked)]
+    request = {
+        "learner_level": lesson.learner_level,
+        "needed": {"check_sections": check_ids, "activity": need_activity},
+        "sections": [s.model_dump(mode="json", include={"section_id", "title", "content_blocks"}) for s in shown],
+    }
+
+    def validate(out: _Completion) -> None:
+        got = sorted(c.section_id for c in out.checks)
+        if got != sorted(check_ids):
+            raise LLMInvalidOutputError(f"write exactly one check for each of {check_ids}; got {got}")
+        if need_activity and out.activity is None:
+            raise LLMInvalidOutputError("needed.activity is true: write the activity")
+
+    try:
+        out = call_structured(client, system=load_prompt("generation/complete.md").text,
+                              user="INPUT:\n" + to_prompt_json(request), schema=COMPLETION_SCHEMA,
+                              output_model=_Completion, validate=validate)
+    except LLMError:
+        return lesson
+
+    data = lesson.model_dump(mode="json")
+    sections = {s.section_id: s for s in lesson.sections}
+    all_objectives = [o.id for o in lesson.learning_objectives]
+    next_q = max((int(q.question_id.split("-")[1]) for q in lesson.assessments), default=0)
+    checks = []
+    for c in out.checks:
+        next_q += 1
+        checks.append({
+            "question_id": f"Q-{next_q:02d}", "section_id": c.section_id, "kind": "knowledge_check",
+            "question_type": "short_answer", "prompt": c.prompt, "answer_key": c.answer, "explanation": c.why,
+            "objective_ids": list(sections[c.section_id].objective_ids) or all_objectives[:1],
+            "bloom_level": "understand",
+        })
+    data["assessments"] = checks + data["assessments"]
+    if need_activity and out.activity and worked:
+        data["activities"].append({
+            "activity_id": f"ACT-{len(data['activities']) + 1:02d}", "section_id": worked.section_id,
+            "title": out.activity.title, "instructions": out.activity.instructions, "duration_minutes": 2,
+            "objective_ids": all_objectives, "is_mandatory": True,
+            "hint": out.activity.hint, "answer": out.activity.answer,
+        })
+    try:
+        return LessonVersion.model_validate(data)
+    except ValueError:
+        return lesson

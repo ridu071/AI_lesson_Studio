@@ -371,3 +371,55 @@ def test_pdf_text_contains_every_section_and_the_answer_key(lesson_data, researc
         lesson_pdf(lesson, ResearchPackage.model_validate(research_data)))).pages)
     assert all(s.title[:20] in text for s in lesson.sections if s.section_type != "learning_objectives")
     assert "Answer key" in text
+
+
+# --- completing missing knowledge checks and the "Try it" activity ---
+
+
+class CompletionLLM:
+    model = "fake"
+
+    def __init__(self, answer):
+        self.answer, self.calls = answer, 0
+
+    def generate_json(self, *, system, user, schema):
+        self.calls += 1
+        if isinstance(self.answer, Exception):
+            raise self.answer
+        return self.answer
+
+
+def _lesson_missing_parts(lesson_data):
+    from app.schemas.lesson import LessonVersion
+    data = draft_from(lesson_data)
+    data["sections"][2]["title"] = "Core idea 1: Learning from labels"
+    data["assessments"] = [q for q in data["assessments"] if q["kind"] != "knowledge_check"]
+    data["activities"] = []
+    return LessonVersion(lesson_id="LES-001", version=1, **data)
+
+
+def test_missing_check_and_activity_are_completed(lesson_data):
+    lesson = _lesson_missing_parts(lesson_data)
+    assert generator.missing_parts(lesson) == (["SEC-03"], True)
+    llm = CompletionLLM({
+        "checks": [{"section_id": "SEC-03", "prompt": "What makes learning supervised?",
+                    "answer": "Labelled examples.", "why": "Labels are the answers."}],
+        "activity": {"title": "Try it: sort three tasks", "instructions": "Label each task supervised or not.",
+                     "hint": "Look for labels.", "answer": "Supervised, unsupervised, supervised."}})
+    completed = generator.complete_lesson(lesson, llm)
+    checks = [q for q in completed.assessments if q.kind == "knowledge_check"]
+    assert [(q.section_id, q.question_type) for q in checks] == [("SEC-03", "short_answer")]
+    assert completed.activities[0].title.startswith("Try it") and completed.activities[0].hint
+    assert generator.missing_parts(completed) == ([], False)
+
+
+def test_nothing_missing_means_no_extra_call(lesson_data):
+    from app.schemas.lesson import LessonVersion
+    lesson = LessonVersion(lesson_id="LES-001", version=1, **draft_from(lesson_data))
+    llm = CompletionLLM({"checks": [], "activity": None})
+    assert generator.complete_lesson(lesson, llm) is lesson and llm.calls == 0
+
+
+def test_failed_completion_keeps_the_lesson(lesson_data):
+    lesson = _lesson_missing_parts(lesson_data)
+    assert generator.complete_lesson(lesson, CompletionLLM(LLMUnavailableError("down"))) is lesson
