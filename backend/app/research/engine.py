@@ -111,10 +111,13 @@ def plan_research(title: str, objective: str, client: LLMClient) -> tuple[Resear
 
 
 def run_research(
-    title: str, objective: str, client: LLMClient, *, youtube_api_key: str = "", today: date | None = None
+    title: str, objective: str, client: LLMClient, *, youtube_api_key: str = "", today: date | None = None,
+    progress=None,
 ) -> ResearchResult:
     today = today or date.today()
     plan, prompt_version = plan_research(title, objective, client)
+    if progress:
+        progress("sources", plan)
     terms = providers.keywords(title, objective, *plan.key_concepts)
     raw: list[dict] = []
     limitations: list[str] = []

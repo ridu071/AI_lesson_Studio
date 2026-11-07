@@ -173,3 +173,17 @@ def test_export_contains_lesson_references_and_both_reports(project, lesson_data
     qc1 = project.export_files()["qc1_factual_audit.md"]
     assert qc1.startswith("# QC1 - Factual accuracy - audit report")
     assert json.loads(project.export_files()["qc_audits.json"])["release"]["decision"]
+
+
+def test_model_id_slips_are_renumbered_consistently(lesson_data):
+    draft = draft_from(lesson_data)
+    for n, claim in enumerate(draft["claims"], start=1):
+        claim["claim_id"] = f"CLM-{n}"          # wrong prefix, as a model once produced
+    draft["sections"][2]["section_id"] = "S3"    # and a wrong section id ...
+    for item in draft["claims"] + draft["activities"] + draft["assessments"]:
+        if item["section_id"] == "SEC-03":
+            item["section_id"] = "S3"            # ... with its references
+    lesson = generator.GeneratedLesson.model_validate(draft)
+    assert [c.claim_id for c in lesson.claims][:2] == ["CL-01", "CL-02"]
+    assert lesson.sections[2].section_id == "SEC-03"
+    assert {c.section_id for c in lesson.claims} <= {s.section_id for s in lesson.sections}

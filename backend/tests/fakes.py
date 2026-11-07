@@ -12,14 +12,18 @@ Answer = dict | Callable[[dict], dict]
 
 def clean_qc1(request: dict) -> dict:
     """Every claim supported by the passage the fixture intends for it."""
-    intended = {"CL-001": "EV-001", "CL-002": "EV-002", "CL-003": "EV-003",
-                "CL-004": "EV-004", "CL-005": "EV-005"}
+    # Claim N is supported by passage EV-00N (matched by number, so "CL-001" and "CL-01" both work).
+    intended = {n: f"EV-00{n}" for n in range(1, 6)}
+
+    def number(claim_id: str) -> int:
+        return int(claim_id.split("-")[1])
+
     return {
         "claims": [
             {"claim_id": c["claim_id"],
-             "relations": [{"passage_id": intended[c["claim_id"]], "relation": "supports",
+             "relations": [{"passage_id": intended[number(c["claim_id"])], "relation": "supports",
                             "reason": "The passage states this."}]
-             if c["claim_id"] in intended else []}
+             if number(c["claim_id"]) in intended else []}
             for c in request["claims_to_verify"]
         ],
         "internal_contradictions": [],

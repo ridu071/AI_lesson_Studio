@@ -206,10 +206,11 @@ class Project:
 
     # ------------------------------------------------------------------ steps
 
-    def run_research(self, client: LLMClient, settings: Settings) -> None:
+    def run_research(self, client: LLMClient, settings: Settings, progress=None) -> None:
         def action() -> None:
             key = settings.youtube_api_key.get_secret_value() if settings.youtube_api_key else ""
-            result = run_research(self.inputs.title, self.inputs.objective, client, youtube_api_key=key)
+            result = run_research(self.inputs.title, self.inputs.objective, client, youtube_api_key=key,
+                                  progress=progress)
             data = {"package": result.package.model_dump(mode="json"), "plan": result.plan.model_dump(),
                     "video_minutes": result.video_minutes, "prompt_version": result.prompt_version}
             (self.folder / "research.json").write_text(json.dumps(data, indent=2), encoding="utf-8")
@@ -225,9 +226,9 @@ class Project:
             self._add_version(lesson, "generated")
         self._run("generation", action)
 
-    def run_qc(self, client: LLMClient, settings: Settings) -> None:
+    def run_qc(self, client: LLMClient, settings: Settings, progress=None) -> None:
         def action() -> None:
-            run = run_full_qc(self.qc_input(), client, settings=settings)
+            run = run_full_qc(self.qc_input(), client, settings=settings, progress=progress)
             data = {"qc1": run.qc1.model_dump(mode="json"), "qc2": run.qc2.model_dump(mode="json"),
                     "release": run.release.model_dump(mode="json") if run.release else None}
             (self.folder / "audits" / f"v{self.current_version}.json").write_text(

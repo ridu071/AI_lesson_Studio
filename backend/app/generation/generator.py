@@ -9,7 +9,7 @@ fails is sent back once with the reasons.
 
 from typing import Any
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from app.llm.base import LLMClient, LLMInvalidOutputError, call_structured, to_prompt_json
 from app.llm.prompts import load_prompt
@@ -29,10 +29,54 @@ from app.schemas.research import ResearchPackage
 
 MIN_MINUTES, MAX_MINUTES = 40, 45
 MIN_EVIDENCE_CLAIMS = 5
+# A whole lesson is a large answer; allow two corrections before giving up.
+GENERATION_ATTEMPTS = 3
 EVIDENCE_CLAIMS = {ClaimType.FACTUAL, ClaimType.DEFINITION}
 
 
+_ID_PREFIX = {"learning_objectives": ("id", "LO"), "sections": ("section_id", "SEC"),
+              "claims": ("claim_id", "CL"), "activities": ("activity_id", "ACT"),
+              "assessments": ("question_id", "Q")}
+
+
+def normalize_ids(raw: Any) -> Any:
+    """Renumber the model's IDs into the standard format (LO-01, SEC-01, CL-01, ...)
+    and rewrite every reference to them, so a naming slip like 'CLM-01' can
+    never fail a lesson. Unknown references are left alone for validation to catch."""
+    if not isinstance(raw, dict):
+        return raw
+    data = {k: v for k, v in raw.items()}
+    maps: dict[str, dict[str, str]] = {}
+    for field, (key, prefix) in _ID_PREFIX.items():
+        items = [dict(item) for item in data.get(field) or [] if isinstance(item, dict)]
+        maps[prefix] = {}
+        for n, item in enumerate(items, start=1):
+            new_id = f"{prefix}-{n:02d}"
+            if item.get(key) is not None:
+                maps[prefix].setdefault(str(item[key]), new_id)
+            item[key] = new_id
+        if field in data:
+            data[field] = items
+
+    def remap(prefix: str, value: Any) -> Any:
+        return maps[prefix].get(str(value), value) if value is not None else value
+
+    for section in data.get("sections", []):
+        section["objective_ids"] = [remap("LO", o) for o in section.get("objective_ids") or []]
+    for claim in data.get("claims", []):
+        claim["section_id"] = remap("SEC", claim.get("section_id"))
+    for item in data.get("activities", []) + data.get("assessments", []):
+        item["section_id"] = remap("SEC", item.get("section_id"))
+        item["objective_ids"] = [remap("LO", o) for o in item.get("objective_ids") or []]
+    return data
+
+
 class GeneratedLesson(ContractModel):
+    @model_validator(mode="before")
+    @classmethod
+    def _normalize(cls, raw: Any) -> Any:
+        return normalize_ids(raw)
+
     title: str
     learner_level: LearnerLevel = LearnerLevel.BEGINNER
     stated_duration_minutes: int = Field(ge=1, le=240)
@@ -110,11 +154,16 @@ def _validator(lesson_id: str, version: int, research: ResearchPackage, videos: 
         if uncited:
             problems.append(f"factual/definition claims must cite a source: {uncited}")
         kinds = [q.kind for q in lesson.assessments]
-        if kinds.count(AssessmentKind.KNOWLEDGE_CHECK) < 2 or kinds.count(AssessmentKind.FINAL) < 2:
-            problems.append("include at least 2 knowledge_check and 2 final questions")
-        if sum(c.claim_type in EVIDENCE_CLAIMS for c in lesson.claims) < MIN_EVIDENCE_CLAIMS:
-            problems.append(f"record at least {MIN_EVIDENCE_CLAIMS} factual/definition claims; "
-                            "the lesson must explain every part of the objective")
+        checks, finals = kinds.count(AssessmentKind.KNOWLEDGE_CHECK), kinds.count(AssessmentKind.FINAL)
+        if checks < 2 or finals < 2:
+            problems.append(f"you wrote {checks} knowledge_check and {finals} final questions; write at "
+                            "least 2 of each (put knowledge_check questions in the knowledge_check section "
+                            "and final questions in the final_assessment section)")
+        facts = sum(c.claim_type in EVIDENCE_CLAIMS for c in lesson.claims)
+        if facts < MIN_EVIDENCE_CLAIMS:
+            problems.append(f"you recorded {facts} factual/definition claims; record at least "
+                            f"{MIN_EVIDENCE_CLAIMS} - every definition and fact you state in the content "
+                            "must appear in 'claims' with its source_ids")
         if problems:
             raise LLMInvalidOutputError("; ".join(problems))
 
@@ -139,6 +188,7 @@ def generate_lesson(
         client, system=prompt.text, user="INPUT:\n" + to_prompt_json(request),
         schema=LESSON_SCHEMA, output_model=GeneratedLesson,
         validate=_validator(lesson_id, 1, research, videos),
+        attempts=GENERATION_ATTEMPTS,
     )
     return _to_lesson(draft, lesson_id, 1, videos), prompt.version
 
@@ -165,5 +215,6 @@ def revise_lesson(
         client, system=prompt.text, user="INPUT:\n" + to_prompt_json(request),
         schema=LESSON_SCHEMA, output_model=GeneratedLesson,
         validate=_validator(lesson.lesson_id, next_version, research, list(lesson.videos)),
+        attempts=GENERATION_ATTEMPTS,
     )
     return _to_lesson(draft, lesson.lesson_id, next_version, list(lesson.videos)), prompt.version

@@ -18,7 +18,8 @@ from app.modules.qc.reporting import render_audit_report
 from app.schemas.enums import AssessmentKind, ContentBlockType, QuestionType, SectionType, SourceType
 from app.workflow import InputError, Project, StepFailed, validate_inputs
 
-st.set_page_config(page_title="AI Lesson Studio", page_icon="🎓", layout="wide")
+st.set_page_config(page_title="AI Lesson Studio", page_icon="🎓", layout="wide",
+                   initial_sidebar_state="collapsed")
 
 st.markdown("""
 <style>
@@ -43,23 +44,56 @@ st.markdown("""
 .objective {padding: .35rem 0; font-size: 1.02rem;}
 .section-head {display: flex; justify-content: space-between; align-items: center;}
 .minutes {color: #6B7280; font-size: .9rem;}
+
+/* ---- landing ---- */
+.landing-title {text-align: center; font-size: 2.4rem; font-weight: 800; margin: 3.5rem 0 .3rem 0;
+  background: linear-gradient(135deg, #4F46E5, #7C3AED); -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;}
+.landing-sub {text-align: center; color: #6B7280; font-size: 1.05rem; margin-bottom: 1.6rem;}
+.features {display: flex; justify-content: center; gap: 1.6rem; color: #6B7280; font-size: .9rem;
+  margin-top: 1rem; flex-wrap: wrap;}
+
+/* ---- duck pond loading screen ---- */
+.pond {position: relative; border-radius: 22px; padding: 2.2rem 1rem 1.2rem 1rem; overflow: hidden;
+  background: linear-gradient(180deg, #E0F2FE 0%, #BAE6FD 55%, #7DD3FC 100%);}
+.pond::after {content: ""; position: absolute; left: -50%; bottom: 58px; width: 200%; height: 18px;
+  background: radial-gradient(circle at 10px -4px, transparent 12px, rgba(255,255,255,.55) 13px) repeat-x;
+  background-size: 34px 18px; animation: waves 3s linear infinite; opacity: .9;}
+@keyframes waves {from {transform: translateX(0);} to {transform: translateX(34px);}}
+.duck-row {display: flex; justify-content: space-around; align-items: flex-end; position: relative; z-index: 1;}
+.duck {display: flex; flex-direction: column; align-items: center; width: 19%; text-align: center;}
+.duck .body {font-size: 3.1rem; line-height: 1; transform: scaleX(-1); position: relative;}
+.duck .bob {display: inline-block;}
+.duck.waiting .body {filter: grayscale(1); opacity: .35;}
+.duck.active .bob {animation: bob 1.1s ease-in-out infinite, paddle 2.2s ease-in-out infinite;}
+.duck.active .body::after {content: ""; position: absolute; left: 50%; bottom: -6px; width: 70px; height: 12px;
+  margin-left: -35px; border-radius: 50%; border: 2px solid rgba(255,255,255,.8);
+  animation: ripple 1.4s ease-out infinite;}
+.duck.failed .body {filter: grayscale(1) sepia(1) hue-rotate(-50deg) saturate(4); opacity: .8;}
+@keyframes bob {0%,100% {transform: translateY(0) rotate(-4deg);} 50% {transform: translateY(-9px) rotate(4deg);}}
+@keyframes paddle {0%,100% {margin-left: -8px;} 50% {margin-left: 8px;}}
+@keyframes ripple {from {transform: scale(.4); opacity: 1;} to {transform: scale(1.4); opacity: 0;}}
+.duck .badge-done {font-size: .95rem; height: 1.3rem;}
+.duck .label {font-weight: 700; font-size: .9rem; color: #0C4A6E; margin-top: .55rem;}
+.duck .what {font-size: .78rem; color: #075985; min-height: 2.4rem; margin-top: .15rem; padding: 0 .2rem;}
+.duck.active .label {color: #4338CA;}
+.duck.failed .label {color: #B91C1C;}
+.pond-status {text-align: center; margin: 1.1rem 0 .3rem 0; font-size: 1.15rem; font-weight: 700; color: #1F2937;}
+.pond-detail {text-align: center; color: #4B5563; font-size: .95rem;}
 </style>
 """, unsafe_allow_html=True)
 
-STAGES = [
-    ("research", "🔎", "Researching your topic",
-     "Searching Wikipedia, books and YouTube, and keeping the exact passages we can trust."),
-    ("generation", "✍️", "Writing your lesson",
-     "Turning the evidence into explanations, examples, an activity and quizzes - under 45 minutes."),
-    ("qc1", "✅", "Fact-checking every claim",
-     "QC Layer 1 compares each statement with the research evidence."),
-    ("qc2", "🎓", "Checking it teaches well",
-     "QC Layer 2 checks the lesson really covers your objective, clearly and in a good order."),
+DUCKS = [
+    ("plan", "Planning", "Working out the key ideas and what to search for"),
+    ("sources", "Finding sources", "Reading Wikipedia, finding books and YouTube videos"),
+    ("generation", "Writing", "Writing explanations, examples, an activity and quizzes"),
+    ("qc1", "Fact check", "QC Layer 1: checking every fact against the sources"),
+    ("qc2", "Teaching check", "QC Layer 2: checking it teaches the goal clearly"),
 ]
 TIPS = [
     "Tip: try explaining what you learn to a friend - teaching is one of the best ways to remember.",
     "Tip: short breaks every 20-25 minutes help you stay focused.",
-    "Tip: answer the knowledge checks before peeking at the answers - retrieval builds memory.",
+    "Tip: answer the quiz questions before peeking - recalling builds memory.",
     "Tip: write down one question you still have after each section.",
     "Did you know? Every fact in your lesson is linked to the source it came from.",
     "Did you know? Two separate quality checks review your lesson before you see it.",
@@ -67,10 +101,6 @@ TIPS = [
 EXAMPLES = [
     ("HTTP Requests and Responses",
      "Explain GET and POST methods and distinguish between 2xx, 4xx, and 5xx response status categories."),
-    ("Photosynthesis",
-     "Describe the inputs and outputs of photosynthesis and explain the role of chlorophyll and sunlight."),
-    ("The Water Cycle",
-     "Explain the stages of the water cycle and describe how evaporation and condensation drive it."),
 ]
 DECISION_BADGE = {
     ReleaseDecision.ELIGIBLE: ("green", "✔ Checked: accurate and well structured"),
@@ -99,103 +129,122 @@ def current_project() -> Project | None:
 # ----------------------------------------------------------- loading screen
 
 
-def _stage_html(icon: str, title: str, state: str, detail: str) -> str:
-    mark = {"done": "✔", "active": "⏳", "failed": "✖", "waiting": "•"}[state]
-    return (f'<div class="stage {state}"><div class="title">{mark} {icon} {title}</div>'
-            f'<div class="detail">{detail}</div></div>')
+def _pond_html(states: dict[str, str], notes: dict[str, str]) -> str:
+    ducks = []
+    for key, label, blurb in DUCKS:
+        state = states.get(key, "waiting")
+        badge = {"done": "✔", "failed": "✖", "active": "", "waiting": ""}[state]
+        ducks.append(
+            f'<div class="duck {state}"><div class="badge-done">{badge}</div>'
+            f'<div class="body"><span class="bob">🦆</span></div>'
+            f'<div class="label">{label}</div><div class="what">{notes.get(key, blurb)}</div></div>'
+        )
+    return f'<div class="pond"><div class="duck-row">{"".join(ducks)}</div></div>'
 
 
-def _research_summary(project: Project) -> str:
+def _research_note(project: Project) -> str:
     package, _, _ = project.research()
-    articles = [s for s in package.sources if s.evidence_passages]
-    books = [s for s in package.sources if s.source_type is SourceType.BOOK]
-    videos = [s for s in package.sources if s.source_type is SourceType.VIDEO]
-    passages = sum(len(s.evidence_passages) for s in articles)
-    names = ", ".join(s.title.replace(" (Wikipedia)", "") for s in articles)
-    return (f"Found <b>{len(articles)} articles</b> ({names}) with <b>{passages} evidence passages</b>, "
-            f"<b>{len(books)} books</b> and <b>{len(videos)} videos</b>.")
+    passages = sum(len(s.evidence_passages) for s in package.sources)
+    books = sum(s.source_type is SourceType.BOOK for s in package.sources)
+    videos = sum(s.source_type is SourceType.VIDEO for s in package.sources)
+    articles = sum(bool(s.evidence_passages) for s in package.sources)
+    return f"{articles} articles, {passages} passages, {books} books, {videos} videos"
 
 
-def _lesson_summary(project: Project) -> str:
+def _lesson_note(project: Project) -> str:
     lesson = project.lesson()
     minutes = sum(s.duration_minutes for s in lesson.sections)
-    return (f"<b>{len(lesson.sections)} sections</b>, <b>{len(lesson.activities)} activity</b>, "
-            f"<b>{len(lesson.assessments)} quiz questions</b>, <b>{len(lesson.claims)} sourced facts</b> - "
-            f"about <b>{minutes} minutes</b>.")
+    return f"{len(lesson.sections)} sections, {len(lesson.assessments)} quiz questions, {minutes} min"
 
 
-def _qc_summary(project: Project, index: int) -> str:
-    audits = project.audits()
-    if not audits:
-        return ""
-    audit = audits[index]
-    issues = len(audit.issues)
-    found = "no issues" if not issues else f"{issues} suggestion{'s' if issues > 1 else ''} for improvement"
-    return f"Score <b>{audit.score:g} / 100</b> - {found}."
+def _audit_note(audit) -> str:
+    if audit.score is None:
+        return "could not finish"
+    n = len(audit.issues)
+    return f"score {audit.score:g}/100, " + ("no issues" if not n else f"{n} suggestion{'s' * (n > 1)}")
 
 
 def generate_with_progress(project: Project) -> bool:
-    """Run every unfinished step with a live, friendly progress view. Returns True on success."""
+    """Run every unfinished step on the duck-pond screen: one duck per process.
+    Returns True on success."""
     settings, client = llm()
-    st.markdown(f"### Building your lesson: *{project.inputs.title}*")
-    bar = st.progress(0, text="Getting started...")
-    boxes = {key: st.empty() for key, *_ in STAGES}
-    tip_box, clock = st.empty(), st.empty()
-    details: dict[str, str] = {}
+    order = [key for key, *_ in DUCKS]
+    states: dict[str, str] = {}
+    notes: dict[str, str] = {}
     started = time.monotonic()
 
-    def draw(active: str | None, failed: str | None = None) -> None:
-        order = [key for key, *_ in STAGES]
-        done_count = 0
-        for key, icon, title, blurb in STAGES:
-            if key == failed:
-                state = "failed"
-            elif key == active:
-                state = "active"
-            elif key in details:
-                state, done_count = "done", done_count + 1
-            else:
-                state = "waiting"
-            boxes[key].markdown(_stage_html(icon, title, state, details.get(key, blurb)),
-                                unsafe_allow_html=True)
-        label = (f"Step {min(done_count + 1, 4)} of 4 - {dict((k, t) for k, _, t, _ in STAGES)[active]}..."
-                 if active else "All done!")
-        bar.progress(done_count / len(order), text=label)
-        tip_box.markdown(f'<div class="tip">{random.choice(TIPS)}</div>', unsafe_allow_html=True)
-        clock.caption(f"⏱ {time.monotonic() - started:.0f} s elapsed - this usually takes 30-60 seconds.")
+    _, middle, _ = st.columns([1, 6, 1])
+    with middle:
+        st.markdown(f'<div class="landing-title" style="margin-top:1.5rem;font-size:1.9rem">'
+                    f'Building your lesson</div><div class="landing-sub">{project.inputs.title}</div>',
+                    unsafe_allow_html=True)
+        pond, status, bar, tip_box, clock = (st.empty() for _ in range(5))
 
-    # Steps already finished in an earlier attempt are shown as done.
+    def show(active: str | None, failed: str | None = None) -> None:
+        for key in order:
+            if key == failed:
+                states[key] = "failed"
+            elif key == active:
+                states[key] = "active"
+            elif key not in notes:
+                states[key] = "waiting"
+            else:
+                states[key] = "done"
+        pond.markdown(_pond_html(states, notes), unsafe_allow_html=True)
+        done = sum(s == "done" for s in states.values())
+        if active:
+            label, blurb = next((lab, b) for k, lab, b in DUCKS if k == active)
+            status.markdown(f'<div class="pond-status">Duck {order.index(active) + 1} of 5 is swimming: '
+                            f'{label}</div><div class="pond-detail">{blurb}...</div>', unsafe_allow_html=True)
+        bar.progress(done / len(order))
+        tip_box.markdown(f'<div class="tip">{random.choice(TIPS)}</div>', unsafe_allow_html=True)
+        clock.caption(f"⏱ {time.monotonic() - started:.0f} s - usually 30-60 seconds")
+
+    # Steps finished in an earlier attempt are shown as done.
     if project.step("research")["status"] == "done":
-        details["research"] = _research_summary(project)
+        notes["plan"] = ", ".join(project.research()[1].key_concepts[:3])
+        notes["sources"] = _research_note(project)
     if project.step("generation")["status"] == "done" and project.lesson():
-        details["generation"] = _lesson_summary(project)
+        notes["generation"] = _lesson_note(project)
+
+    def research_progress(stage, plan) -> None:
+        notes["plan"] = ", ".join(plan.key_concepts[:3])
+        show("sources")
+
+    def qc_progress(stage, qc1_audit) -> None:
+        notes["qc1"] = _audit_note(qc1_audit)
+        show("qc2")
 
     try:
         if project.step("research")["status"] != "done":
-            draw("research")
-            project.run_research(client, settings)
-            details["research"] = _research_summary(project)
+            show("plan")
+            project.run_research(client, settings, progress=research_progress)
+            notes["sources"] = _research_note(project)
         if project.step("generation")["status"] != "done":
-            draw("generation")
+            show("generation")
             project.run_generation(client)
-            details["generation"] = _lesson_summary(project)
+            notes["generation"] = _lesson_note(project)
         if project.step("qc")["status"] != "done":
-            draw("qc1")
-            boxes["qc2"].markdown(_stage_html("🎓", "Checking it teaches well", "active",
-                                              "Runs together with the fact check."), unsafe_allow_html=True)
-            project.run_qc(client, settings)
-        details["qc1"], details["qc2"] = _qc_summary(project, 0), _qc_summary(project, 1)
-        draw(None)
+            show("qc1")
+            project.run_qc(client, settings, progress=qc_progress)
+        audits = project.audits()
+        notes["qc1"], notes["qc2"] = _audit_note(audits[0]), _audit_note(audits[1])
+        show(None)
+        status.markdown('<div class="pond-status">All five ducks made it across! 🎉</div>'
+                        '<div class="pond-detail">Opening your lesson...</div>', unsafe_allow_html=True)
         tip_box.empty()
         st.balloons()
         return True
     except StepFailed as exc:
-        failed = project.next_step()
-        failed_key = "qc1" if failed == "qc" else failed
-        draw(None, failed=failed_key)
+        failed = next(k for k in order if k not in notes)
+        show(None, failed=failed)
+        label = next(lab for k, lab, _ in DUCKS if k == failed)
+        status.markdown(f'<div class="pond-status">The "{label}" duck got stuck</div>'
+                        f'<div class="pond-detail">Everything before it is saved. '
+                        f'Press <b>Try again</b> to continue from here.</div>', unsafe_allow_html=True)
         tip_box.empty()
-        st.error(f"Something went wrong while **{failed}** was running. Everything finished before it "
-                 f"is saved - press **Try again** to continue from this step.\n\n`{exc}`")
+        with middle:
+            st.error(f"`{exc}`")
         return False
 
 
@@ -312,39 +361,41 @@ project = current_project()
 # ---------------------------------------------------------------- landing
 
 if project is None:
-    st.markdown('<div class="hero"><h1>What do you want to learn today?</h1>'
-                '<p>Give a topic and a goal. We research trusted sources, write a lesson you can finish '
-                'in 45 minutes, and double-check it for accuracy and teaching quality.</p></div>',
-                unsafe_allow_html=True)
-    st.markdown("**Try an example:**")
-    cols = st.columns(len(EXAMPLES))
-    for col, (t, o) in zip(cols, EXAMPLES):
-        if col.button(f"💡 {t}", use_container_width=True):
-            st.session_state["in_title"], st.session_state["in_objective"] = t, o
-            st.rerun()
-
-    with st.form("new"):
-        title = st.text_input("📌 Lesson topic", key="in_title", placeholder="e.g. HTTP Requests and Responses")
-        objective = st.text_area("🎯 What should you be able to do after the lesson?", key="in_objective",
-                                 placeholder="e.g. Explain GET and POST methods and distinguish between "
-                                             "2xx, 4xx, and 5xx response status categories.")
-        level = st.select_slider("🎚 Your level", ["beginner", "intermediate", "advanced"], value="beginner")
-        submitted = st.form_submit_button("🚀 Create my lesson", type="primary", use_container_width=True)
-
-    c1, c2, c3 = st.columns(3)
-    c1.markdown("**🔎 Researched**  \nFrom Wikipedia, books and YouTube - with every fact traced to its source.")
-    c2.markdown("**⏱ 45 minutes**  \nExplanations, examples, a hands-on activity and quizzes.")
-    c3.markdown("**✅ Double-checked**  \nOne check for facts, one for teaching quality.")
+    _, middle, _ = st.columns([1, 2.2, 1])
+    with middle:
+        st.markdown('<div class="landing-title">What do you want to learn today?</div>'
+                    '<div class="landing-sub">Give a topic and a goal. We research trusted sources and '
+                    'build a 45-minute lesson, double-checked for accuracy.</div>', unsafe_allow_html=True)
+        with st.container(border=True):
+            example_title, example_objective = EXAMPLES[0]
+            ex1, ex2 = st.columns([1, 2.4], vertical_alignment="center")
+            ex1.markdown("**💡 Try an example:**")
+            if ex2.button(example_title, use_container_width=True):
+                st.session_state["in_title"] = example_title
+                st.session_state["in_objective"] = example_objective
+                st.rerun()
+            st.divider()
+            title = st.text_input("📌 Lesson topic", key="in_title", placeholder="e.g. Photosynthesis")
+            objective = st.text_area("🎯 What should you be able to do after the lesson?", key="in_objective",
+                                     placeholder="e.g. Describe the inputs and outputs of photosynthesis.",
+                                     height=100)
+            level = st.select_slider("🎚 Your level", ["beginner", "intermediate", "advanced"],
+                                     value="beginner")
+            submitted = st.button("🚀 Create my lesson", type="primary", use_container_width=True)
+        st.markdown('<div class="features"><span>🔎 Researched from trusted sources</span>'
+                    '<span>⏱ Finish in 45 minutes</span><span>✅ Double-checked</span></div>',
+                    unsafe_allow_html=True)
+        problem = st.empty()
 
     if submitted:
         try:
             new = Project.create(validate_inputs(title, objective, level))
         except InputError as exc:
-            st.warning(f"Please check your input: {exc}")
+            problem.warning(f"Please check your input: {exc}")
             st.stop()
         st.session_state["project_id"] = new.meta["project_id"]
         if generate_with_progress(new):
-            time.sleep(1.2)
+            time.sleep(1.5)
             st.rerun()
     st.stop()
 

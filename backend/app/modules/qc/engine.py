@@ -196,6 +196,7 @@ def run_full_qc(
     *,
     settings: Settings | None = None,
     now: datetime | None = None,
+    progress=None,
 ) -> QCRunResult:
     """Deterministic checks + LLM evaluators for both layers, then decide.
 
@@ -206,6 +207,8 @@ def run_full_qc(
     settings = settings or get_settings()
     clock = _clock(now)
     qc1 = _run_qc1_full(qc_input, client, settings, clock)
+    if progress:
+        progress("qc2", qc1)
     qc2 = _run_qc2_full(qc_input, client, settings, clock)
     ready = qc1.status in AUDIT_OUTCOMES and qc2.status in AUDIT_OUTCOMES
     release = decide(qc1, qc2, qc_input.lesson, now=clock()) if ready else None
