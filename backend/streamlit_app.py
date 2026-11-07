@@ -120,6 +120,15 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="radio"
 .st-key-lsearch [data-baseweb="input"]:focus-within {border-color: #4F46E5;
   box-shadow: 0 0 0 3px rgba(79, 70, 229, .18);}
 
+/* One scrollbar only: the sidebar itself never scrolls; the lesson list fills the space left
+   under the brand, "New lesson" and search, and scrolls on its own. */
+[data-testid="stSidebarContent"] {overflow: hidden !important;}
+[data-testid="stSidebarUserContent"] {padding-bottom: .5rem !important;}
+.st-key-llist {max-height: calc(100vh - 250px); overflow-y: auto; overflow-x: hidden; padding: 0 .35rem .6rem 0;
+  scrollbar-width: thin; scrollbar-color: #C7D2FE transparent;}
+.st-key-llist::-webkit-scrollbar {width: 6px;}
+.st-key-llist::-webkit-scrollbar-thumb {background: #C7D2FE; border-radius: 6px;}
+
 /* 6. Small, even gaps between cards */
 .st-key-llist [data-testid="stVerticalBlock"] {gap: .4rem;}
 
@@ -508,7 +517,7 @@ with st.sidebar:
     if query.strip():
         q = query.casefold()
         lessons = [p for p in lessons if q in p.display_name.casefold() or q in p.inputs.objective.casefold()]
-    with st.container(height=600, border=False, key="llist"):
+    with st.container(border=False, key="llist"):  # sized and scrolled by CSS (.st-key-llist)
         if not lessons:
             st.caption("No lessons found." if query.strip() else "No lessons yet. Create your first one!")
         for group in ("Today", "This week", "Earlier"):
