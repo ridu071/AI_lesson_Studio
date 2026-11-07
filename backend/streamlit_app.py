@@ -191,7 +191,8 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="radio"
 [class*="st-key-del-"] button:hover {background: #FEF2F2; border-color: #F87171; color: #B91C1C;}
 
 /* ================= Forest Green components ================= */
-.stApp {background: #FAFAF9;}
+.stApp {background: #F4FBF6;}  /* very light green page; cards and inputs stay white */
+[data-testid="stSidebar"], [data-testid="stSidebarContent"] {background: #E8F6EE !important;}
 [data-testid="stCaptionContainer"], [data-testid="stCaptionContainer"] p {color: #57534E;}
 /* Inputs: white, warm border; green border + soft green ring on focus */
 [data-baseweb="input"], [data-baseweb="textarea"], [data-baseweb="base-input"] {background: #fff !important;
