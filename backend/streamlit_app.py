@@ -177,13 +177,16 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="radio"
 /* Streamlit renders the dropdown arrow as a trailing aria-hidden span after the label: hide only that. */
 [class*="st-key-lmenu-"] button div > [aria-hidden="true"]:last-child:not(:first-child) {display: none;}
 
-/* Menu tile: small square pen and bin buttons beside the name */
-[class*="st-key-lpen-"] button, [class*="st-key-ldel-"] button {width: 2.3rem; height: 2.3rem; min-height: 0;
+/* Menu tile: wider pop-up, less padding, small square pen and bin right beside the name */
+[data-testid="stPopoverBody"]:has([class*="st-key-ltile-"]) {padding: .5rem .55rem !important;
+  width: 26rem !important; min-width: 26rem !important; max-width: 90vw !important;}
+[class*="st-key-ltile-"] {gap: .35rem !important;}
+[class*="st-key-rn-save-"] button, [class*="st-key-del-"] button {width: 2.4rem; height: 2.4rem; min-height: 0;
   padding: 0; border-radius: 8px;}
-[class*="st-key-lpen-"] button {color: #4F46E5; border-color: #C7D2FE;}
-[class*="st-key-lpen-"] button:hover {background: #EEF2FF; border-color: #4F46E5;}
-[class*="st-key-ldel-"] button {color: #B91C1C; border-color: #FECACA;}
-[class*="st-key-ldel-"] button:hover {background: #FEF2F2; border-color: #F87171; color: #991B1B;}
+[class*="st-key-rn-save-"] button {color: #4F46E5; border-color: #C7D2FE;}
+[class*="st-key-rn-save-"] button:hover {background: #EEF2FF; border-color: #4F46E5;}
+[class*="st-key-del-"] button {color: #B91C1C; border-color: #FECACA;}
+[class*="st-key-del-"] button:hover {background: #FEF2F2; border-color: #F87171; color: #991B1B;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -501,19 +504,20 @@ def _lesson_card(p: Project) -> None:
         with c2:
             with st.popover("", icon=":material/more_vert:", type="tertiary", key=f"lmenu-{pid}",
                             help="Rename or delete"):
-                # One small tile: editable name, pen to save it, square bin to delete.
-                n, pen, bin_ = st.columns([6, 1, 1], vertical_alignment="center", gap="small")
-                new_name = n.text_input("Lesson name", p.display_name, key=f"rn-{pid}",
-                                        label_visibility="collapsed")
-                with pen.container(key=f"lpen-{pid}"):
-                    if st.button("", key=f"rn-save-{pid}", icon=":material/edit:", help="Save the new name"):
+                # One tight row: the name stretches, pen and bin sit right next to it.
+                with st.container(horizontal=True, gap="small", vertical_alignment="center",
+                                  key=f"ltile-{pid}"):
+                    new_name = st.text_input("Lesson name", p.display_name, key=f"rn-{pid}",
+                                             label_visibility="collapsed", width="stretch")
+                    if st.button("", key=f"rn-save-{pid}", icon=":material/edit:", help="Save the new name",
+                                 width="content"):
                         try:
                             p.rename(new_name)
                             st.rerun()
                         except InputError as exc:
                             st.toast(str(exc))
-                with bin_.container(key=f"ldel-{pid}"):
-                    if st.button("", key=f"del-{pid}", icon=":material/delete:", help="Delete this lesson"):
+                    if st.button("", key=f"del-{pid}", icon=":material/delete:", help="Delete this lesson",
+                                 width="content"):
                         p.delete()
                         if current:
                             st.session_state["project_id"] = None
