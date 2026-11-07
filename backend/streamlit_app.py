@@ -94,8 +94,6 @@ st.markdown("""
 .pond-status {text-align: center; margin: 1.1rem 0 .3rem 0; font-size: 1.15rem; font-weight: 700; color: #1F2937;}
 .pond-detail {text-align: center; color: #4B5563; font-size: .95rem;}
 .features span {cursor: help;}
-.you-get {font-size: .9rem; color: #374151; background: #F5F3FF; border-radius: 10px; padding: .55rem .8rem;
-  margin: .2rem 0 .5rem 0;}
 .group-label {font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
   color: #4B5563; margin: .8rem 0 .3rem 0;}
 [data-testid="stVerticalBlockBorderWrapper"] {box-shadow: 0 6px 24px rgba(79, 70, 229, .08);}
@@ -617,7 +615,6 @@ def landing_form() -> None:
     """The input box. A fragment: clicking a level, an example or typing re-runs ONLY this box,
     not the whole page (sidebar cards etc.), so it responds immediately."""
     with st.container(border=True):
-        st.pills("Try an example", [t for t, _ in EXAMPLES], key="example_pick", on_change=_fill_example)
         c_topic, c_level = st.columns([3, 2])
         title = c_topic.text_input("Topic", key="in_title",
                                    placeholder="e.g. Photosynthesis, Binary search, The French Revolution")
@@ -627,9 +624,7 @@ def landing_form() -> None:
         objective = st.text_area("After this lesson, I want to be able to...", key="in_objective",
                                  placeholder="e.g. Describe the inputs and outputs of photosynthesis "
                                              "and explain the role of chlorophyll.", height=76)
-        st.markdown('<div class="you-get"><b>You&#39;ll get:</b> clear explanations · worked examples · '
-                    'a hands-on activity · quiz questions with instant feedback · a summary · '
-                    'videos and references</div>', unsafe_allow_html=True)
+        st.pills("Try an example", [t for t, _ in EXAMPLES], key="example_pick", on_change=_fill_example)
         submitted = st.button("Create my lesson", type="primary", use_container_width=True)
         if not (title or "").strip() or not (objective or "").strip():
             st.caption("Add a topic and a goal to start - or pick an example above.")
@@ -672,6 +667,11 @@ def landing_form() -> None:
 
 
 if project is None:
+    st.markdown("""<style>
+    .block-container {padding-top: .6rem !important;}
+    [data-testid="stHeader"] {background: transparent;}
+    .landing-title {margin-top: 0;}
+    </style>""", unsafe_allow_html=True)
     _, middle, _ = st.columns([0.6, 4, 0.6])
     with middle:
         st.markdown('<div class="landing-title">What do you want to learn today?</div>'
