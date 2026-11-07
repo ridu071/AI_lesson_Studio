@@ -1,0 +1,4 @@
+# Step 1 dependencies only. We add more packages in later steps, when we need them.
+pydantic>=2.7,<3
+pydantic-settings>=2.3,<3
+pytest>=8.0,<9
