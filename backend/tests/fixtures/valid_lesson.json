@@ -194,7 +194,7 @@
       "activity_id": "ACT-01",
       "section_id": "SEC-05",
       "title": "Supervised or unsupervised?",
-      "instructions": "For each of the six scenarios, write 'supervised' or 'unsupervised' and one sentence explaining whether the data has labels.",
+      "instructions": "For each scenario, write 'supervised' or 'unsupervised' and one sentence explaining whether the data has labels. (1) Predicting house prices from past sales with known prices. (2) Grouping news articles by topic when no topics are given. (3) Recognising handwritten digits from images labelled 0-9. (4) Finding unusual patterns in network traffic with no examples marked as attacks. (5) Predicting whether a customer will cancel, using past customers marked as stayed or left. (6) Organising a photo library into groups of similar pictures without any tags.",
       "duration_minutes": 8,
       "objective_ids": ["LO-01", "LO-02"]
     }

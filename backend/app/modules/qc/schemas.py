@@ -193,6 +193,10 @@ class AuditReport(ContractModel):
     subscores: list[SubScore] = []
     # Which checks actually ran. Shows the instructor what was NOT checked.
     evaluators: list[Evaluator] = []
+    # Exactly which model and prompt versions produced this audit (workflow
+    # table qc_evaluation_runs), so old audits stay explainable.
+    llm_model: str | None = None
+    prompt_versions: dict[str, str] = {}
     issues: list[QCIssue] = []
     claim_assessments: list[ClaimAssessment] = []  # QC1 only
     coverage: list[ObjectiveCoverage] = []  # QC2 only

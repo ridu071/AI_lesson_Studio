@@ -1,6 +1,6 @@
 # QC Engine Specification
 
-Status: **Milestone 1, Step 5: benchmark dataset.** Rubric version `0.1.0`
+Status: **Milestone 1, Step 6: LLM evaluators.** Rubric version `0.1.0`
 (defined in `scoring/rubrics.py`, next to the weights it describes).
 
 This document defines what the QC engine receives, what it produces, and the
@@ -169,9 +169,9 @@ model evaluator (Step 6).
 | `missing_citation` (factual/definition claim cites nothing) | medium | | det |
 | `unverifiable_claim` (only unreadable sources cited, needs manual review) | medium | | det, LLM |
 | `inaccessible_source` | medium | | det |
-| `low_credibility_source` | medium | | later |
+| `low_credibility_source` (community or unknown authority) | medium | | det |
 | `research_gap` | medium | | LLM |
-| `outdated_source` | low | | later |
+| `outdated_source` (judged per topic) | low | | LLM |
 
 ### QC2: instructional quality
 
@@ -226,6 +226,48 @@ These run without an LLM, so they are fast, free and always give the same result
 - Multiple choice: at least 2 distinct options, and the answer key must be one of them.
 - True/false: options exactly True/False, and the answer key True or False.
 - Answers are compared ignoring case and extra spaces.
+
+## 6b. LLM evaluator rules
+
+Code: `qc1/llm_review.py`, `qc2/llm_review.py`, `app/llm/`. Prompts:
+`prompts/qc1/llm_review.md`, `prompts/qc2/llm_review.md` (versioned; the version
+and model are stored in every audit).
+
+**General**
+- One call per layer per lesson, temperature 0, output constrained to a JSON
+  schema. The answer is validated for shape **and** meaning (every claim
+  answered, no invented IDs). One retry with the rejection reason. If it is
+  still invalid, or the provider is down after retries, the audit is `error`:
+  no decision until it is rerun. It never counts against the lesson.
+- Lesson and research content is passed as untrusted data. The prompts tell
+  the model never to follow instructions found inside it (workflow §16.2).
+- Severity always comes from `policy.py`, never from the model.
+- QC1 and QC2 are separate calls with separate prompts. Neither sees the other's results.
+
+**QC1: claims.** The model only labels how each evidence passage relates to each
+claim (`supports`, `partially_supports`, `contradicts`). Code decides the verdict:
+
+| Relations found | Verdict / issue |
+|---|---|
+| Any passage contradicts the claim | `contradicted_claim` (critical, blocks) |
+| A passage from a **cited** source supports it | supported, no issue |
+| A cited passage only partially supports it | `partially_supported_claim` |
+| Only passages from **uncited** sources support it | `misleading_citation` (or nothing, if `missing_citation` was already reported) |
+| No passage supports it | `unsupported_claim` |
+
+- The model is **not told which sources a claim cites**, so it cannot simply
+  confirm the citation it is meant to check.
+- Claims already settled by the citation check (fabricated or unverifiable
+  citations) are not sent.
+- The same call also reports `internal_contradictions`, `research_gaps` and
+  `outdated_sources` (freshness depends on the topic).
+
+**QC2: instructional review.** The model may report only: unclear_explanation,
+weak_example, unclear_activity, weak_assessment, incorrect_answer_key,
+bloom_mismatch, poor_sequencing, objective_not_explained, accessibility_issue.
+Each issue must point to a real section, question or objective. An issue already
+found by a deterministic check at the same place is not reported twice. The
+prompt asks for material problems only: "could be better" is not an issue.
 
 ## 7. Timing rule
 

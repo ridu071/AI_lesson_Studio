@@ -159,3 +159,31 @@ def test_skipped_case_never_counts_as_passed():
                       DETERMINISTIC_EVALUATORS)
     assert not result.ran and not result.passed
     assert result.skipped_reason == "needs claim_verification"
+
+
+def test_acceptable_extra_issue_is_not_a_false_alarm():
+    mutation = [{"op": "replace", "path": "/lesson/stated_duration_minutes", "value": 40}]
+    strict = run_case(case(mutations=mutation), runner, DETERMINISTIC_EVALUATORS)
+    lenient = run_case(
+        case(mutations=mutation, expected={"decision": "eligible_for_instructor_review",
+                                           "acceptable": [{"issue_type": "duration_mismatch"}]}),
+        runner, DETERMINISTIC_EVALUATORS,
+    )
+    assert not strict.passed
+    assert lenient.passed and lenient.unexpected == []
+
+
+def test_errored_case_is_reported_but_not_scored():
+    from app.llm.base import LLMUnavailableError
+    from app.modules.qc.engine import FULL_EVALUATORS, run_full_qc
+    from tests.fakes import FakeLLM
+
+    broken = FakeLLM(qc1=LLMUnavailableError("timed out"))
+    result = run_case(case(), lambda qi: run_full_qc(qi, broken, settings=SETTINGS, now=NOW),
+                      FULL_EVALUATORS)
+    assert result.ran and not result.scored and not result.passed
+    assert "timed out" in result.error
+
+    from app.evaluation.benchmark import BenchmarkSummary
+    m = BenchmarkSummary([result]).metrics()
+    assert m["cases_errored"] == 1 and m["false_negatives"] == 0

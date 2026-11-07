@@ -1,7 +1,7 @@
 {
   "case_id": "F-008",
   "title": "Definition contradicted by the evidence",
-  "rationale": "The lesson says supervised learning uses unlabelled data; EV-002 says the opposite. Critical.",
+  "rationale": "The lesson says supervised learning uses unlabelled data; EV-002 says the opposite. Critical. Acceptable extras: the edited definition now conflicts with the lesson's own key-question explanation and with Q-01's answer key, so flagging an internal contradiction, an unclear explanation or an answer key that disagrees with the lesson is also correct.",
   "base": "ml_intro",
   "requires_evaluators": [
     "claim_verification"
@@ -24,6 +24,17 @@
       {
         "issue_type": "contradicted_claim",
         "claim_id": "CL-002"
+      }
+    ],
+    "acceptable": [
+      {
+        "issue_type": "internal_contradiction"
+      },
+      {
+        "issue_type": "unclear_explanation"
+      },
+      {
+        "issue_type": "incorrect_answer_key"
       }
     ]
   }

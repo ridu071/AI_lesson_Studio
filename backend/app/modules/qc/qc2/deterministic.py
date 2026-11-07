@@ -30,12 +30,14 @@ class QC2CheckResult:
     evaluators: frozenset[Evaluator] = EVALUATORS
 
 
-def run_qc2_checks(qc_input: QCInput, *, max_minutes: int | None = None) -> QC2CheckResult:
+def run_qc2_checks(
+    qc_input: QCInput, *, max_minutes: int | None = None, issues: IssueCollector | None = None
+) -> QC2CheckResult:
     if max_minutes is None:
         max_minutes = get_settings().max_lesson_minutes
     lesson = qc_input.lesson
 
-    issues = IssueCollector(AuditType.QC2)
+    issues = issues or IssueCollector(AuditType.QC2)
     check_structure(lesson, issues)
     check_duration(lesson, issues, max_minutes)
     coverage = build_coverage(lesson)

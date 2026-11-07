@@ -17,7 +17,7 @@ class QC1CheckResult:
     evaluators: frozenset[Evaluator] = EVALUATORS
 
 
-def run_qc1_checks(qc_input: QCInput) -> QC1CheckResult:
-    issues = IssueCollector(AuditType.QC1)
+def run_qc1_checks(qc_input: QCInput, issues: IssueCollector | None = None) -> QC1CheckResult:
+    issues = issues or IssueCollector(AuditType.QC1)
     check_citations(qc_input.lesson, qc_input.research, issues)
     return QC1CheckResult(issues=issues.issues)

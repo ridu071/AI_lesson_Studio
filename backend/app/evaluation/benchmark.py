@@ -85,6 +85,9 @@ class ExpectedIssue(ContractModel):
 class Expected(ContractModel):
     decision: ReleaseDecision  # what a human reviewer would decide
     issues: list[ExpectedIssue] = []  # exactly the issues QC should report
+    # Defensible extra findings: not required, and not counted as false alarms.
+    # Decided when the case is written, never added to make a run pass.
+    acceptable: list[ExpectedIssue] = []
 
 
 class BenchmarkCase(ContractModel):
@@ -137,10 +140,16 @@ class CaseResult:
     missed: list[ExpectedIssue] = field(default_factory=list)  # false negatives
     unexpected: list[QCIssue] = field(default_factory=list)  # false positives
     decision_checked: bool = False  # exact decision compared only when all evaluators ran
+    error: str | None = None  # an audit could not finish (e.g. LLM timeout)
 
     @property
     def ran(self) -> bool:
         return self.skipped_reason is None
+
+    @property
+    def scored(self) -> bool:
+        """Ran and produced a decision, so its issues can be counted."""
+        return self.ran and self.error is None
 
     @property
     def expected_block(self) -> bool:
@@ -152,7 +161,7 @@ class CaseResult:
 
     @property
     def passed(self) -> bool:
-        if not self.ran or self.missed or self.unexpected:
+        if not self.scored or self.missed or self.unexpected:
             return False
         if self.decision_checked:
             return self.actual_decision is self.case.expected.decision
@@ -170,6 +179,9 @@ def run_case(
         return CaseResult(case, skipped_reason="needs " + ", ".join(sorted(missing)))
 
     run = runner(build_input(case, root))
+    if run.release is None:
+        message = run.qc1.error_message or run.qc2.error_message or "no release decision"
+        return CaseResult(case, error=message)
     remaining = run.qc1.issues + run.qc2.issues
     found, missed = [], []
     for expected in case.expected.issues:
@@ -179,6 +191,7 @@ def run_case(
         else:
             found.append(expected)
             remaining.remove(match)
+    remaining = [i for i in remaining if not any(a.matches(i) for a in case.expected.acceptable)]
 
     return CaseResult(
         case,
@@ -210,7 +223,7 @@ class BenchmarkSummary:
         return [r for r in self.ran if not r.passed]
 
     def metrics(self) -> dict:
-        ran = self.ran
+        ran = [r for r in self.ran if r.scored]  # errored cases are reported, not scored
         tp = sum(len(r.found) for r in ran)
         fn = sum(len(r.missed) for r in ran)
         fp = sum(len(r.unexpected) for r in ran)
@@ -230,7 +243,8 @@ class BenchmarkSummary:
         return {
             "cases_total": len(self.results),
             "cases_run": len(ran),
-            "cases_skipped": len(self.results) - len(ran),
+            "cases_skipped": len(self.results) - len(self.ran),
+            "cases_errored": len(self.ran) - len(ran),
             "cases_passed": sum(r.passed for r in ran),
             "true_positives": tp,
             "false_positives": fp,
@@ -255,8 +269,14 @@ class BenchmarkSummary:
                 {
                     "case_id": r.case.case_id,
                     "title": r.case.title,
-                    "status": "skipped" if not r.ran else ("passed" if r.passed else "failed"),
+                    "status": (
+                        "skipped" if not r.ran
+                        else "error" if r.error
+                        else "passed" if r.passed
+                        else "failed"
+                    ),
                     "skipped_reason": r.skipped_reason,
+                    "error": r.error,
                     "expected_decision": r.case.expected.decision,
                     "actual_decision": r.actual_decision,
                     "missed": [e.label() for e in r.missed],
@@ -273,8 +293,9 @@ class BenchmarkSummary:
             return "n/a" if value is None else f"{value:.1%}"
 
         lines = [
-            f"Benchmark: {m['cases_total']} cases | {m['cases_run']} run | "
-            f"{m['cases_skipped']} skipped | {m['cases_passed']}/{m['cases_run']} passed",
+            f"Benchmark: {m['cases_total']} cases | {m['cases_run']} scored | "
+            f"{m['cases_skipped']} skipped | {m['cases_errored']} errored | "
+            f"{m['cases_passed']}/{m['cases_run']} passed",
             f"Issues:    found {m['true_positives']} | missed {m['false_negatives']} | "
             f"false alarms {m['false_positives']}",
             f"           recall {pct(m['recall'])} | precision {pct(m['precision'])} | "
@@ -291,6 +312,9 @@ class BenchmarkSummary:
             lines.append(f"Decision:  exact accuracy {pct(m['exact_decision_accuracy'])}")
 
         for r in self.failures:
+            if r.error:
+                lines.append(f"\nERROR  {r.case.case_id} {r.case.title}: {r.error[:200]}")
+                continue
             lines.append(f"\nFAILED {r.case.case_id} {r.case.title}")
             lines.append(f"  decision: expected {r.case.expected.decision}, got {r.actual_decision}")
             lines += [f"  missed:     {e.label()}" for e in r.missed]
