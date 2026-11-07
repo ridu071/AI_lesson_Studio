@@ -139,19 +139,24 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="radio"
 
 /* 8. Card */
 [class*="st-key-lcard"] {background: #fff; border: 1px solid #E5E7EB; border-radius: 12px;
-  padding: .45rem .3rem .5rem .75rem; box-shadow: 0 1px 2px rgba(17, 24, 39, .04);
+  padding: .6rem .35rem .7rem .85rem; min-height: 3.9rem; box-shadow: 0 1px 2px rgba(17, 24, 39, .04);
   transition: background .15s, border-color .15s; gap: 0 !important;}
 [class*="st-key-lcard"] [data-testid="stVerticalBlock"] {gap: 0 !important;}
 /* 9. Hover */
 [class*="st-key-lcard-"]:hover {background: #F5F3FF; border-color: #C7D2FE;}
 /* 10. Selected lesson */
 [class*="st-key-lcardsel-"] {background: #EEF2FF; border-color: #C7D2FE; border-left: 4px solid #4F46E5;
-  padding-left: calc(.75rem - 3px);}
+  padding-left: calc(.85rem - 3px);}
 
 /* 4 + 5. Title: bold, left-aligned, cut off with "…" */
 [class*="st-key-lcard"] [data-testid="stColumn"] {min-width: 0;}
 [class*="st-key-lcard"] [class*="st-key-open-"] button {justify-content: flex-start; text-align: left;
-  padding: 0; min-height: 0; height: 1.45rem; width: 100%; color: #111827; overflow: hidden;}
+  padding: 0; min-height: 0; height: 1.6rem; width: 100%; color: #111827; overflow: hidden;}
+[class*="st-key-lcard"] [class*="st-key-open-"] button > div,
+[class*="st-key-lcard"] [class*="st-key-open-"] button > div > div {justify-content: flex-start !important;
+  text-align: left !important; width: 100%; margin: 0;}
+[class*="st-key-lcard"] [class*="st-key-open-"] button [data-testid="stMarkdownContainer"] {width: 100%;
+  text-align: left !important;}
 [class*="st-key-lcard"] [class*="st-key-open-"] button > div,
 [class*="st-key-lcard"] [class*="st-key-open-"] button [data-testid="stMarkdownContainer"] {min-width: 0; max-width: 100%;}
 [class*="st-key-lcard"] [class*="st-key-open-"] button p {font-weight: 650; font-size: .95rem; margin: 0;
@@ -159,7 +164,11 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="radio"
 [class*="st-key-lcard"] [class*="st-key-open-"] button:hover {color: #4338CA;}
 /* 11. Meta line (and goal snippet for repeated titles) */
 .lmeta {font-size: .76rem; color: #6B7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  line-height: 1.35;}
+  line-height: 1.4; margin: .1rem 0 0 0; padding: 0;}
+[class*="st-key-lcard"] [data-testid="stMarkdown"],
+[class*="st-key-lcard"] [data-testid="stMarkdownContainer"],
+[class*="st-key-lcard"] [data-testid="stElementContainer"] {margin: 0 !important;}
+[class*="st-key-lcard"] [data-testid="stMarkdownContainer"] p {margin: 0 !important;}
 
 /* 2 + 3 + 12. ⋮ menu: small, borderless, grey; indigo tint on hover; no dropdown arrow */
 [class*="st-key-lmenu-"] button {border: none !important; background: transparent !important; color: #6B7280;
