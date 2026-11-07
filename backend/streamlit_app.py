@@ -413,88 +413,116 @@ def _norm(text: str) -> str:
     return " ".join(text.split()).casefold()
 
 
+def _keep(widget_key: str, store_key: str) -> None:
+    """Copy a widget's value into a store that survives the widget being hidden."""
+    st.session_state[store_key] = st.session_state.get(widget_key)
+
+
 def render_question(q, key: str, number: int) -> None:
     st.markdown(f"**Question {number}.** {q.prompt}")
+    store = f"{key}-saved"
     if q.question_type in (QuestionType.MULTIPLE_CHOICE, QuestionType.TRUE_FALSE) and q.options:
-        choice = st.radio("Your answer", q.options, index=None, key=f"{key}-radio",
-                          label_visibility="collapsed")
+        saved = st.session_state.get(store)
+        choice = st.radio("Your answer", q.options, key=f"{key}-radio", label_visibility="collapsed",
+                          index=q.options.index(saved) if saved in q.options else None,
+                          on_change=_keep, args=(f"{key}-radio", store))
         if st.button("Check answer", key=f"{key}-check", disabled=choice is None):
             if _norm(choice) == _norm(q.answer_key):
                 st.success(f"Correct! {q.explanation}")
             else:
                 st.error(f"Not quite. The answer is **{q.answer_key}**. {q.explanation}")
     else:
-        st.text_area("Write your answer", key=f"{key}-text", height=90)
+        st.text_area("Write your answer", value=st.session_state.get(store, ""), key=f"{key}-text", height=90,
+                     on_change=_keep, args=(f"{key}-text", store))
         with st.expander("Show a model answer"):
             st.markdown(f"**{q.answer_key}**\n\n{q.explanation}")
 
 
-def render_learn(project: Project, lesson, research) -> None:
-    package = research[0]
-    minutes = sum(s.duration_minutes for s in lesson.sections)
-    audits = project.audits()
-    badge = ""
-    if audits and audits[2]:
-        color, text = DECISION_BADGE[audits[2].decision]
-        badge = f'<span class="badge {color}">{text}</span>'
-    st.markdown(f'<span class="badge">⏱ {minutes} min</span><span class="badge">🎚 {lesson.learner_level}</span>'
-                f'<span class="badge">📚 {len([s for s in package.sources if s.evidence_passages])} sources</span>'
-                f'{badge}', unsafe_allow_html=True)
+def _render_section(s, lesson, base: str) -> None:
+    st.markdown(f'<div class="section-head"><h4 style="margin:0">{escape(s.title)}</h4>'
+                f'<span class="minutes">⏱ {s.duration_minutes} min</span></div>', unsafe_allow_html=True)
+    for block in s.content_blocks:
+        if block.type is ContentBlockType.DEFINITION:
+            st.markdown(f'<div class="callout def"><b>Definition</b> - {escape(block.content)}</div>',
+                        unsafe_allow_html=True)
+        elif block.type is ContentBlockType.EXAMPLE:
+            st.markdown(f'<div class="callout ex"><b>Example</b> - {escape(block.content)}</div>',
+                        unsafe_allow_html=True)
+        elif block.type is ContentBlockType.CODE:
+            st.code(block.content)
+        elif block.type is ContentBlockType.NOTE:
+            st.caption(block.content)
+        else:
+            st.markdown(block.content)
+    for a in [a for a in lesson.activities if a.section_id == s.section_id]:
+        with st.expander(f"🛠 Activity: {a.title} ({a.duration_minutes} min)", expanded=True):
+            st.markdown(a.instructions)
+            store = f"act-{base}-{a.activity_id}-saved"
+            st.text_area("Your work", value=st.session_state.get(store, ""), height=110,
+                         key=f"act-{base}-{a.activity_id}", on_change=_keep,
+                         args=(f"act-{base}-{a.activity_id}", store))
+    for number, q in enumerate(lesson.assessments, start=1):
+        if q.section_id == s.section_id:
+            render_question(q, f"q-{base}-{q.question_id}", number)
 
+
+def _step_to(key: str, index: int) -> None:
+    st.session_state[key] = index
+
+
+@st.fragment
+def render_learn(project: Project, lesson, research) -> None:
+    """One step at a time: objectives -> each section -> finish. Previous / Next move between them.
+    A fragment, so moving between steps re-runs only this view (instant)."""
+    package = research[0]
+    base = f"{project.meta['project_id']}-v{lesson.version}"
     sections = [s for s in lesson.sections if s.section_type is not SectionType.LEARNING_OBJECTIVES]
-    done_key = f"done-{project.meta['project_id']}-v{lesson.version}"
-    done: set = st.session_state.setdefault(done_key, set())
-    st.progress(len(done) / len(sections), text=f"Your progress: {len(done)} of {len(sections)} sections")
+    steps = ["By the end of this lesson"] + [s.title for s in sections] + ["Finish"]
+    step_key = f"step-{base}"
+    index = min(st.session_state.get(step_key, 0), len(steps) - 1)
+
+    st.progress((index + 1) / len(steps), text=f"Step {index + 1} of {len(steps)} · {steps[index]}")
 
     with st.container(border=True):
-        st.markdown("#### 🎯 By the end of this lesson you will be able to")
-        for o in lesson.learning_objectives:
-            st.markdown(f'<div class="objective">☐ {escape(o.description)}</div>', unsafe_allow_html=True)
+        if index == 0:
+            minutes = sum(s.duration_minutes for s in lesson.sections)
+            audits = project.audits()
+            badge = ""
+            if audits and audits[2]:
+                color, text = DECISION_BADGE[audits[2].decision]
+                badge = f'<span class="badge {color}">{text}</span>'
+            st.markdown(f'<span class="badge">⏱ {minutes} min</span>'
+                        f'<span class="badge">{lesson.learner_level.capitalize()}</span>'
+                        f'<span class="badge">{len(sections)} sections</span>{badge}', unsafe_allow_html=True)
+            st.markdown("#### 🎯 By the end of this lesson you will be able to")
+            for o in lesson.learning_objectives:
+                st.markdown(f'<div class="objective">☐ {escape(o.description)}</div>', unsafe_allow_html=True)
+            st.caption("Work through one section at a time. Press Next when you're ready to move on.")
+        elif index <= len(sections):
+            _render_section(sections[index - 1], lesson, base)
+        else:
+            st.markdown("#### 🎉 You've completed the lesson. Great work!")
+            st.markdown("Go back with **Previous** to review any section.")
+            if lesson.videos:
+                st.markdown("##### Want to go further? Watch (optional)")
+                cols = st.columns(2)
+                for i, v in enumerate(lesson.videos):
+                    with cols[i % 2]:
+                        st.video(str(v.url))
+                        st.caption(v.title + (f" - {v.duration_minutes} min" if v.duration_minutes else ""))
+            with st.expander("📚 References and further reading"):
+                st.markdown("\n".join(render_references(lesson, package)[1:]))
 
-    number = 0
-    for s in sections:
-        with st.container(border=True):
-            st.markdown(f'<div class="section-head"><h4 style="margin:0">{escape(s.title)}</h4>'
-                        f'<span class="minutes">⏱ {s.duration_minutes} min</span></div>', unsafe_allow_html=True)
-            for block in s.content_blocks:
-                if block.type is ContentBlockType.DEFINITION:
-                    st.markdown(f'<div class="callout def"><b>Definition</b> - {escape(block.content)}</div>',
-                                unsafe_allow_html=True)
-                elif block.type is ContentBlockType.EXAMPLE:
-                    st.markdown(f'<div class="callout ex"><b>Example</b> - {escape(block.content)}</div>',
-                                unsafe_allow_html=True)
-                elif block.type is ContentBlockType.CODE:
-                    st.code(block.content)
-                elif block.type is ContentBlockType.NOTE:
-                    st.caption(block.content)
-                else:
-                    st.markdown(block.content)
-            for a in [a for a in lesson.activities if a.section_id == s.section_id]:
-                with st.expander(f"🛠 Activity: {a.title} ({a.duration_minutes} min)", expanded=True):
-                    st.markdown(a.instructions)
-                    st.text_area("Your work", key=f"act-{done_key}-{a.activity_id}", height=110)
-            for q in [q for q in lesson.assessments if q.section_id == s.section_id]:
-                number += 1
-                render_question(q, f"q-{done_key}-{q.question_id}", number)
-            checked = st.checkbox("I've finished this section", value=s.section_id in done,
-                                  key=f"chk-{done_key}-{s.section_id}")
-            if checked != (s.section_id in done):
-                done.add(s.section_id) if checked else done.discard(s.section_id)
-                st.rerun()
-
-    if lesson.videos:
-        st.markdown("### 🎬 Want to go further? Watch (optional)")
-        cols = st.columns(2)
-        for i, v in enumerate(lesson.videos):
-            with cols[i % 2]:
-                st.video(str(v.url))
-                st.caption(f"{v.title}" + (f" - {v.duration_minutes} min" if v.duration_minutes else ""))
-
-    with st.expander("📚 References and further reading"):
-        st.markdown("\n".join(render_references(lesson, package)[1:]))
-
-    if len(done) == len(sections):
-        st.success("🎉 You've completed the whole lesson. Great work!")
+    prev_col, _, next_col = st.columns([1, 2, 1])
+    prev_col.button("← Previous", key=f"prev-{base}", use_container_width=True, disabled=index == 0,
+                    on_click=_step_to, args=(step_key, index - 1))
+    if index < len(steps) - 1:
+        label = "Start the lesson →" if index == 0 else ("Finish →" if index == len(steps) - 2 else "Next →")
+        next_col.button(label, key=f"next-{base}", type="primary", use_container_width=True,
+                        on_click=_step_to, args=(step_key, index + 1))
+    else:
+        next_col.button("↺ Start again", key=f"restart-{base}", use_container_width=True,
+                        on_click=_step_to, args=(step_key, 0))
 
 
 # ----------------------------------------------------------------- sidebar
