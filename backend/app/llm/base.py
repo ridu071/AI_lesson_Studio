@@ -44,6 +44,7 @@ def call_structured(
     output_model: type[T],
     validate: Callable[[T], None] | None = None,
     attempts: int = 2,
+    context: dict | None = None,
 ) -> T:
     """Ask for JSON, validate its shape (pydantic) and meaning (`validate`).
 
@@ -55,7 +56,7 @@ def call_structured(
     for _ in range(attempts):
         raw = client.generate_json(system=system, user=prompt, schema=schema)
         try:
-            parsed = output_model.model_validate(raw)
+            parsed = output_model.model_validate(raw, context=context)
             if validate:
                 validate(parsed)
             return parsed

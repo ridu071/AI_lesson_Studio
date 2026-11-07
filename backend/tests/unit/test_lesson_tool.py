@@ -114,7 +114,8 @@ def test_draft_citing_a_metadata_only_source_is_rejected(lesson_data, research_d
     bad = draft_from(lesson_data)
     bad["claims"][0]["source_ids"] = ["SRC-003"]  # a video: no passages, cannot be evidence
     llm = LessonLLM([bad, bad])
-    with pytest.raises(LLMInvalidOutputError, match="only sources with evidence passages"):
+    # The video citation is removed, leaving the fact unsourced: still rejected.
+    with pytest.raises(LLMInvalidOutputError, match="claims must cite a source"):
         generator.generate_lesson(title="ML", objective=OBJECTIVE,
                                   research=ResearchPackage.model_validate(research_data),
                                   video_minutes={}, client=llm, lesson_id="LES-001")
@@ -307,3 +308,35 @@ def test_markdown_export_includes_rich_blocks(lesson_data, research_data):
     assert "> **Common mistake:** Thinking clusters are given." in text
     assert "*Visual (flowchart): Notice the order of the steps.*" in text
     assert "*Hint:* Ask: does the data have labels?" in text and "## Practice answers" in text
+
+
+def test_test_section_always_has_exactly_ten_questions(lesson_data, research_data):
+    research = ResearchPackage.model_validate(research_data)
+    too_many = draft_from(lesson_data)
+    extra = [q | {"question_id": f"Q-{40 + i}"} for i, q in enumerate(too_many["assessments"][-2:])]
+    too_many["assessments"] += extra  # 12 test questions
+    lesson, _ = generator.generate_lesson(title="ML", objective=OBJECTIVE, research=research,
+                                          video_minutes={}, client=LessonLLM([too_many]), lesson_id="LES-001")
+    assert sum(q.kind == "final" for q in lesson.assessments) == 10
+
+    too_few = draft_from(lesson_data)
+    finals = [q for q in too_few["assessments"] if q["kind"] == "final"]
+    too_few["assessments"] = [q for q in too_few["assessments"] if q["kind"] != "final"] + finals[:8]
+    llm = LessonLLM([too_few, draft_from(lesson_data)])
+    lesson, _ = generator.generate_lesson(title="ML", objective=OBJECTIVE, research=research,
+                                          video_minutes={}, client=llm, lesson_id="LES-001")
+    assert sum(q.kind == "final" for q in lesson.assessments) == 10
+    assert "you wrote 8 test questions; the Test section needs exactly 10" in llm.calls[-1]["user"]
+
+
+def test_book_citations_are_removed_and_missing_hints_filled(lesson_data, research_data):
+    draft = draft_from(lesson_data)
+    draft["claims"][0]["source_ids"] = ["SRC-001", "SRC-003"]  # SRC-003 is a video (no passages)
+    final = next(q for q in draft["assessments"] if q["kind"] == "final")
+    final["hint"] = None
+    lesson, _ = generator.generate_lesson(title="ML", objective=OBJECTIVE,
+                                          research=ResearchPackage.model_validate(research_data),
+                                          video_minutes={}, client=LessonLLM([draft]), lesson_id="LES-001")
+    assert lesson.claims[0].source_ids == ["SRC-001"]
+    filled = next(q for q in lesson.assessments if q.kind == "final")
+    assert filled.hint.startswith("Think back to the section")

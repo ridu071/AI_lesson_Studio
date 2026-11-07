@@ -9,13 +9,13 @@ fails is sent back once with the reasons.
 
 from typing import Any
 
-from pydantic import Field, model_validator
+from pydantic import Field, ValidationInfo, model_validator
 
 from app.llm.base import LLMClient, LLMInvalidOutputError, call_structured, to_prompt_json
 from app.llm.prompts import load_prompt
 from app.modules.qc.schemas import QCIssue
 from app.schemas.common import ContractModel
-from app.schemas.enums import AssessmentKind, ClaimType, ContentBlockType, LearnerLevel, SourceType
+from app.schemas.enums import AssessmentKind, ClaimType, ContentBlockType, LearnerLevel, SectionType, SourceType
 from app.schemas.lesson import (
     Activity,
     AssessmentQuestion,
@@ -29,9 +29,10 @@ from app.schemas.lesson import (
 from app.schemas.research import ResearchPackage
 
 MIN_MINUTES, MAX_MINUTES = 40, 45
-MIN_EVIDENCE_CLAIMS = 5
+MIN_EVIDENCE_CLAIMS = 3  # maths/skills lessons state fewer facts; every stated fact must still be cited
 # Check questions are requested but not required: a lesson is not failed for lacking them.
-MIN_CHECKS, MIN_TEST_QUESTIONS = 0, 8
+MIN_CHECKS = 0
+TEST_QUESTIONS = 10  # every lesson's test has exactly this many questions, whatever the topic
 # A whole lesson is a large answer; allow two corrections before giving up.
 GENERATION_ATTEMPTS = 3
 EVIDENCE_CLAIMS = {ClaimType.FACTUAL, ClaimType.DEFINITION}
@@ -98,14 +99,51 @@ def normalize_ids(raw: Any) -> Any:
     for item in data.get("activities", []) + data.get("assessments", []):
         item["section_id"] = remap("SEC", item.get("section_id"))
         item["objective_ids"] = [remap("LO", o) for o in item.get("objective_ids") or []]
+    return _keep_ten_test_questions(data)
+
+
+def _drop_non_evidence_citations(data: dict, evidence: set[str]) -> None:
+    """Remove citations of sources that have no evidence passages (books, videos, unknown IDs).
+    A fact left with no real source is still caught by validation and sent back."""
+    for item in data.get("claims", []) + data.get("sections", []):
+        if isinstance(item, dict):
+            item["source_ids"] = [s for s in item.get("source_ids") or [] if s in evidence]
+
+
+def _fill_missing_hints(data: Any) -> Any:
+    """A test question without a hint gets a safe nudge to the section it tests.
+    It points to where the idea is taught and never reveals the answer."""
+    if not isinstance(data, dict):
+        return data
+    titles = {s.get("section_id"): s.get("title") for s in data.get("sections", []) if isinstance(s, dict)}
+    for q in data.get("assessments", []):
+        if isinstance(q, dict) and q.get("kind") == "final" and not (q.get("hint") or "").strip():
+            title = titles.get(q.get("review_section_id"))
+            q["hint"] = (f'Think back to the section "{title}".' if title
+                         else "Think back to the two core ideas before you answer.")
+    return data
+
+
+def _keep_ten_test_questions(data: dict) -> dict:
+    """If the model wrote MORE than 10 test questions, keep the first 10 (they are ordered
+    easy to hard). Fewer than 10 is not padded: the draft is sent back instead."""
+    finals = [q for q in data.get("assessments", []) if isinstance(q, dict) and q.get("kind") == "final"]
+    if len(finals) <= TEST_QUESTIONS:
+        return data
+    drop = {id(q) for q in finals[TEST_QUESTIONS:]}
+    data["assessments"] = [q for q in data["assessments"] if id(q) not in drop]
     return data
 
 
 class GeneratedLesson(ContractModel):
     @model_validator(mode="before")
     @classmethod
-    def _normalize(cls, raw: Any) -> Any:
-        return normalize_ids(raw)
+    def _normalize(cls, raw: Any, info: ValidationInfo) -> Any:
+        data = normalize_ids(raw)
+        evidence = (info.context or {}).get("evidence_sources")
+        if isinstance(data, dict) and evidence is not None:
+            _drop_non_evidence_citations(data, evidence)
+        return _fill_missing_hints(data)
 
     title: str
     learner_level: LearnerLevel = LearnerLevel.BEGINNER
@@ -189,9 +227,9 @@ def _validator(lesson_id: str, version: int, research: ResearchPackage, videos: 
         if len(checks) < MIN_CHECKS:
             problems.append(f"you wrote {len(checks)} check questions; write one knowledge_check "
                             "short_answer question in each core idea section")
-        if len(finals) < MIN_TEST_QUESTIONS:
-            problems.append(f"you wrote {len(finals)} test questions; the Test section needs 10 "
-                            "final questions")
+        if len(finals) != TEST_QUESTIONS:
+            problems.append(f"you wrote {len(finals)} test questions; the Test section needs exactly "
+                            f"{TEST_QUESTIONS} final questions (understand, then apply, then transfer)")
         types = {q.question_type for q in finals}
         if finals and len(types) < 3:
             problems.append(f"the test uses {len(types)} question types; use at least 3 different types")
@@ -206,7 +244,8 @@ def _validator(lesson_id: str, version: int, research: ResearchPackage, videos: 
         if missing_remedial:
             problems.append(f"write one remedial per objective; missing for {missing_remedial}")
         no_visual = [s.section_id for s in lesson.sections
-                     if not any(b.type is ContentBlockType.VISUAL for b in s.content_blocks)]
+                     if s.section_type is not SectionType.INTRODUCTION
+                     and not any(b.type is ContentBlockType.VISUAL for b in s.content_blocks)]
         if no_visual:
             problems.append(f"every section needs at least one visual block; missing in {no_visual}")
         facts = sum(c.claim_type in EVIDENCE_CLAIMS for c in lesson.claims)
@@ -239,6 +278,7 @@ def generate_lesson(
         schema=LESSON_SCHEMA, output_model=GeneratedLesson,
         validate=_validator(lesson_id, 1, research, videos),
         attempts=GENERATION_ATTEMPTS,
+        context={"evidence_sources": {s.source_id for s in research.sources if s.evidence_passages}},
     )
     return _to_lesson(draft, lesson_id, 1, videos), prompt.version
 
@@ -266,5 +306,6 @@ def revise_lesson(
         schema=LESSON_SCHEMA, output_model=GeneratedLesson,
         validate=_validator(lesson.lesson_id, next_version, research, list(lesson.videos)),
         attempts=GENERATION_ATTEMPTS,
+        context={"evidence_sources": {s.source_id for s in research.sources if s.evidence_passages}},
     )
     return _to_lesson(draft, lesson.lesson_id, next_version, list(lesson.videos)), prompt.version
