@@ -921,6 +921,13 @@ if project is not None and st.session_state.get("building") == project.meta["pro
     st.session_state.pop("building")
     st.session_state.setdefault("last_title", project.inputs.title)
     st.session_state.setdefault("last_objective", project.inputs.objective)
+    # The build runs inside this script run, so the previous screen's elements (the input
+    # box, "continue" tiles...) would linger, faded, until it ends. Hide them: only the
+    # ducks are shown. Sidebar elements are re-drawn before this point, so they stay.
+    st.markdown('<style>[data-testid="stMain"] [data-testid="stElementContainer"][data-stale="true"],'
+                '[data-testid="stMain"] [data-testid="stVerticalBlock"] > '
+                ':has([data-stale="true"]):not(:has([data-stale="false"]))'
+                '{display:none !important;}</style>', unsafe_allow_html=True)
     _, back_col, _ = st.columns([1, 6, 1])
     back_col.button("← Back", on_click=go_home, help="Stop and go back to the first screen. "
                     "Anything already finished is saved.")
