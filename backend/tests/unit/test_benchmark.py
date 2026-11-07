@@ -187,3 +187,10 @@ def test_errored_case_is_reported_but_not_scored():
     from app.evaluation.benchmark import BenchmarkSummary
     m = BenchmarkSummary([result]).metrics()
     assert m["cases_errored"] == 1 and m["false_negatives"] == 0
+
+
+def test_issue_needing_an_evaluator_that_did_not_run_is_not_required():
+    expected = {"decision": "eligible_for_instructor_review",
+                "issues": [{"issue_type": "research_gap", "needs": "gap_detection"}]}
+    result = run_case(case(expected=expected), runner, DETERMINISTIC_EVALUATORS)
+    assert result.passed and result.missed == []

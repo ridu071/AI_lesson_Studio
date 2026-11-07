@@ -1,7 +1,7 @@
 {
   "case_id": "F-006",
   "title": "Inaccessible source with a readable alternative (control)",
-  "rationale": "CL-001 and CL-002 also cite SRC-002, which is readable. Report the dead source, but the claims are not unverifiable.",
+  "rationale": "SRC-001 becomes unreachable, but CL-001 and CL-002 also cite SRC-004, which is readable and states the same facts. Report the dead source only: the claims are still verified. Adjudicated after the first LLM run: the original version cited SRC-002, which does not support these claims, so the LLM correctly called them unsupported.",
   "base": "ml_intro",
   "mutations": [
     {
@@ -10,11 +10,40 @@
       "value": "inaccessible"
     },
     {
+      "op": "add",
+      "path": "/research/sources/-",
+      "value": {
+        "source_id": "SRC-004",
+        "source_type": "website",
+        "title": "Machine Learning Basics",
+        "publisher": "Example College",
+        "url": "https://example.org/college/ml-basics",
+        "published_at": "2025-03-01",
+        "retrieved_at": "2026-11-07",
+        "access_status": "accessible",
+        "content_access": "full_text",
+        "authority_category": "educational",
+        "relevance_score": 85,
+        "evidence_passages": [
+          {
+            "passage_id": "EV-006",
+            "text": "Machine learning is a subfield of artificial intelligence in which computers learn patterns from data instead of being explicitly programmed with every rule.",
+            "location": "Introduction"
+          },
+          {
+            "passage_id": "EV-007",
+            "text": "Supervised learning uses labelled training data, in which every example is paired with its correct output.",
+            "location": "Supervised learning"
+          }
+        ]
+      }
+    },
+    {
       "op": "replace",
       "path": "/lesson/claims/0/source_ids",
       "value": [
         "SRC-001",
-        "SRC-002"
+        "SRC-004"
       ]
     },
     {
@@ -22,7 +51,7 @@
       "path": "/lesson/claims/1/source_ids",
       "value": [
         "SRC-001",
-        "SRC-002"
+        "SRC-004"
       ]
     }
   ],

@@ -1,7 +1,7 @@
 {
   "case_id": "F-005",
   "title": "Key source has become inaccessible",
-  "rationale": "SRC-001 is the only source for CL-001 and CL-002. Without it they cannot be verified.",
+  "rationale": "SRC-001 is the only source for CL-001 and CL-002. Without it they cannot be verified. Adjudicated after the first LLM run: with SRC-001 gone, no passage covers supervised learning, so LO-01 also has a genuine research gap (only gap detection can see it).",
   "base": "ml_intro",
   "mutations": [
     {
@@ -23,6 +23,11 @@
       {
         "issue_type": "unverifiable_claim",
         "claim_id": "CL-002"
+      },
+      {
+        "issue_type": "research_gap",
+        "objective_id": "LO-01",
+        "needs": "gap_detection"
       }
     ]
   }

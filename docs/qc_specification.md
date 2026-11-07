@@ -269,6 +269,26 @@ Each issue must point to a real section, question or objective. An issue already
 found by a deterministic check at the same place is not reported twice. The
 prompt asks for material problems only: "could be better" is not an issue.
 
+## 6c. Measured accuracy (benchmark)
+
+Run on 2026-11-07, rubric 0.1.0, prompts qc1 0.1.0 / qc2 0.2.0, `gemini-3.5-flash-lite`:
+
+| Mode | Cases | Passed | Recall | Precision | Block accuracy | Exact decisions |
+|---|---|---|---|---|---|---|
+| Deterministic | 21 run (5 need LLM) | 21 | 100% | 100% | 100% | n/a |
+| Full (LLM) | 26 | 25 | 100% (29/29) | 96.7% | 100% | 100% |
+
+**Known limitation:** QC2 sometimes reports a clear but *false* statement as
+`unclear_explanation` (F-009), although factual accuracy is QC1's job. The
+prompt tells it not to; the lite model does not always comply. Impact: one
+duplicate medium-severity note for the instructor; the decision is unchanged.
+
+**What these numbers do and do not show.** The checks and the cases were
+written by the same author, and the dataset is one topic. 100% recall here
+means the engine does what it was designed to do. It is not yet evidence of
+reliability on real lessons; that needs cases from instructors (§19.2) and
+the repeatability check (Step 7).
+
 ## 7. Timing rule
 
 - A section's `duration_minutes` is authoritative and **includes** the
@@ -293,5 +313,5 @@ exposes no-op revisions.
 | 3 | Deterministic checks: duration, structure, citation existence, coverage matrix, answer keys | done |
 | 4 | Scoring weights and decision engine (sections 5, 5a) | done |
 | 5 | Benchmark dataset with intentionally broken lessons, plus a detection runner (see `evaluation/README.md`) | done |
-| 6 | LLM modules: claim extraction and verification, clarity, Bloom alignment | next |
-| 7 | Human-readable reports and a repeatability check | |
+| 6 | LLM evaluators: claim verification, consistency, gaps, freshness, instructional review (§6b, §6c) | done |
+| 7 | Human-readable reports and a repeatability check | next |

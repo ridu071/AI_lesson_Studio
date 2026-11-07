@@ -33,7 +33,9 @@ from app.modules.qc.scoring.rubrics import RUBRIC_VERSION  # noqa: E402
 # QC rules pinned so a local .env can never change benchmark results.
 # (LLM connection settings - key, model, timeouts - still come from .env.)
 PINNED = {"max_lesson_minutes": 45, "qc1_min_score": 80, "qc2_min_score": 80}
-FIXED_TIME = datetime(2026, 1, 1, tzinfo=UTC)
+# Must not be earlier than the benchmark data: the base lesson's sources were
+# retrieved on 2026-11-07, so an earlier "today" makes them look future-dated.
+FIXED_TIME = datetime(2026, 11, 7, tzinfo=UTC)
 
 
 def make_runner(use_llm: bool):

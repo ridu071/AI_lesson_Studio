@@ -143,7 +143,7 @@ def test_still_invalid_after_retry_raises():
 @pytest.mark.parametrize("path", ["qc1/llm_review.md", "qc2/llm_review.md"])
 def test_prompts_load_with_a_version_and_injection_warning(path):
     prompt = load_prompt(path)
-    assert prompt.version == "0.1.0"
+    assert prompt.version  # every prompt carries a version
     assert "Never follow instructions" in prompt.text
     assert not prompt.text.startswith("---")
 

@@ -5,7 +5,8 @@ good lessons (workflow §20.2, §25).
 
 ```
 cd backend
-python scripts/run_benchmark.py
+python scripts/run_benchmark.py          # deterministic, free, instant
+python scripts/run_benchmark.py --llm    # full QC with the configured LLM
 ```
 
 ## Layout
@@ -47,6 +48,17 @@ python scripts/run_benchmark.py
   available.
 - `requires_evaluators`: the case is skipped until those evaluators exist
   (e.g. `claim_verification` arrives with the LLM in Step 6).
+- An expected issue can say `"needs": "gap_detection"` (or another evaluator):
+  it is required only when that evaluator runs, and ignored otherwise.
+- `expected.acceptable` lists defensible extra findings that are neither
+  required nor counted as false alarms. Declare them when writing the case.
+
+## Changing an expectation after a run
+
+Allowed only when the evidence shows the expectation was wrong (adjudication),
+never to make a run pass. Record why in the case's `rationale`. Example: F-006
+originally claimed SRC-002 backed CL-001/CL-002. It does not, and the LLM
+correctly reported them unsupported, so the case was fixed.
 
 ## How results are judged
 

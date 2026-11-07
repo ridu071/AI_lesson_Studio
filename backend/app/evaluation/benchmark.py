@@ -61,6 +61,9 @@ class ExpectedIssue(ContractModel):
     section_id: SectionId | None = None
     claim_id: ClaimId | None = None
     objective_id: ObjectiveId | None = None
+    # Only expected when this evaluator runs (e.g. a research gap that only
+    # the LLM gap detector can see). Otherwise it is neither required nor penalised.
+    needs: Evaluator | None = None
 
     def matches(self, issue: QCIssue) -> bool:
         return issue.issue_type is self.issue_type and all(
@@ -184,7 +187,8 @@ def run_case(
         return CaseResult(case, error=message)
     remaining = run.qc1.issues + run.qc2.issues
     found, missed = [], []
-    for expected in case.expected.issues:
+    applicable = [e for e in case.expected.issues if e.needs is None or e.needs in evaluators_available]
+    for expected in applicable:
         match = next((i for i in remaining if expected.matches(i)), None)
         if match is None:
             missed.append(expected)
@@ -227,7 +231,7 @@ class BenchmarkSummary:
         tp = sum(len(r.found) for r in ran)
         fn = sum(len(r.missed) for r in ran)
         fp = sum(len(r.unexpected) for r in ran)
-        blocking_expected = [e for r in ran for e in r.case.expected.issues if e.must_block]
+        blocking_expected = [e for r in ran for e in r.found + r.missed if e.must_block]
         blocking_found = [e for r in ran for e in r.found if e.must_block]
 
         per_type: dict[str, dict[str, int]] = {}
