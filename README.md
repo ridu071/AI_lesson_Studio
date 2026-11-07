@@ -1,5 +1,7 @@
 # AI Lesson Studio
 
+[![tests](https://github.com/ridu071/AI_lesson_Studio/actions/workflows/tests.yml/badge.svg)](https://github.com/ridu071/AI_lesson_Studio/actions/workflows/tests.yml)
+
 An AI-powered lesson creation tool. From a **lesson title** and a **learning objective**
 it researches websites, books and YouTube videos, writes a structured, visual lesson
 that takes **45 minutes**, and checks it with **two independent quality-control (QC)
@@ -41,7 +43,7 @@ Other commands (from `backend/`):
 
 | Command | Purpose |
 |---|---|
-| `pytest` | 245 offline tests (a fake LLM; no network, no keys) |
+| `pytest` | 247 offline tests (a fake LLM; no network, no keys) |
 | `python scripts/check_setup.py` | Checks Python, packages, folders and settings |
 | `python scripts/run_benchmark.py` | QC benchmark, deterministic checks only (free, instant) |
 | `python scripts/run_benchmark.py --llm` | QC benchmark with the AI evaluators (about 52 calls) |
@@ -68,7 +70,7 @@ Other commands (from `backend/`):
 | Separate audit reports with fixes | `qc1_factual_audit.md` and `qc2_instructional_audit.md`, each issue with location, evidence and a suggested fix |
 | Review, edit, save | Teacher tools, then Edit: text, visuals, questions; every save is a new version |
 | Review and apply QC recommendations | Teacher tools, then Improve: pick issues or write an instruction; the AI revises and the new version is re-checked automatically |
-| Preview | The Learn view (exactly what students see), plus a preview of any earlier version |
+| Preview | The Learn view (exactly what students see), plus a preview of any earlier version and a **what changed** diff between any two versions (Teacher tools, then Version history) |
 | Export | **PDF notes**, a **summary image**, and lesson / references / both QC reports as Markdown, JSON or a zip |
 | Error handling | Every step is checkpointed to disk; a failed step shows why and offers **Try again** (resumes there); versions are never overwritten |
 
@@ -158,7 +160,7 @@ Details, and both versions' QC reports, are in [`demo/README.md`](demo/README.md
 
 ### QC accuracy benchmark
 
-26 lessons with deliberately planted problems (fabricated citations, contradicted
+27 lessons with deliberately planted problems (fabricated citations, contradicted
 facts, 60-minute lessons, untested objectives, wrong answer keys, jargon for beginners,
 ...) and control cases that must **not** be flagged. See [`evaluation/`](evaluation/).
 
@@ -166,12 +168,16 @@ Latest run (2026-11-07, current prompts: QC1 0.1.0, QC2 0.3.0, `gemini-3.5-flash
 
 | Mode | Cases scored | Passed | Recall | Precision | Block accuracy | Exact decisions |
 |---|---|---|---|---|---|---|
-| Deterministic checks only | 21 (5 need the AI) | 21 | 100% | 100% | 100% | n/a |
-| Full (with AI evaluators) | 23 of 26 | **23** | **100%** (25/25) | **100%** | **100%** | **100%** |
+| Deterministic checks only | 21 (6 need the AI) | 21 | 100% | 100% | 100% | n/a |
+| Full (with AI evaluators) | 23 of 26 (run before I-015 was added) | **23** | **100%** (25/25) | **100%** | **100%** | **100%** |
 
 The free-tier daily quota ran out after 23 cases. The 3 that did not run (I-012 to
 I-014) passed in the previous full run (25/26, earlier QC2 prompt), whose one false
 alarm (F-009) is fixed in the current prompt.
+
+I-015 (added after the demo) plants the kind of error QC missed in the Photosynthesis
+lesson: two final questions asking the same thing with opposite answer keys. It has not
+been run with the AI evaluators yet (quota), so it is an open test, not a claimed pass.
 
 Repeatability (3 runs × 26 cases, earlier prompt versions): 100% identical decisions,
 96.2% identical issue sets.
@@ -213,9 +219,9 @@ backend/
   app/modules/qc/        QC1, QC2, rubrics and scoring, decision rules, reports
   app/llm/               Gemini client (retries, quota handling, structured JSON output)
   app/schemas/           lesson and research data contracts
-  tests/                 245 unit tests
+  tests/                 247 unit tests
 prompts/                 versioned prompts (research, generation, qc1, qc2)
-evaluation/              QC benchmark: base lesson + 26 cases
+evaluation/              QC benchmark: base lesson + 27 cases
 demo/                    exported demo lessons, PDFs, summary images, QC reports
 docs/                    QC specification, demo video script
 ```

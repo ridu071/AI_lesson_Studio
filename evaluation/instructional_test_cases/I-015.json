@@ -1,0 +1,38 @@
+{
+  "case_id": "I-015",
+  "title": "Two final questions contradict each other",
+  "rationale": "Q-04 asks the same thing as Q-03 but its key gives the opposite answer. Each key reads plausibly on its own; together they contradict. Modelled on the real miss found in the Photosynthesis demo (two questions using 'primary electron donor' for different things), which neither QC layer caught.",
+  "base": "ml_intro",
+  "requires_evaluators": [
+    "instructional_review"
+  ],
+  "mutations": [
+    {
+      "op": "replace",
+      "path": "/lesson/assessments/3/prompt",
+      "value": "A bank has past transactions, each marked 'fraud' or 'not fraud', and wants to flag new fraudulent transactions. Which type of learning fits, and why?"
+    },
+    {
+      "op": "replace",
+      "path": "/lesson/assessments/3/answer_key",
+      "value": "Unsupervised learning, because the model must discover the fraud patterns on its own."
+    }
+  ],
+  "expected": {
+    "decision": "revision_required",
+    "issues": [
+      {
+        "issue_type": "incorrect_answer_key",
+        "section_id": "SEC-07"
+      }
+    ],
+    "acceptable": [
+      {
+        "issue_type": "weak_assessment"
+      },
+      {
+        "issue_type": "internal_contradiction"
+      }
+    ]
+  }
+}

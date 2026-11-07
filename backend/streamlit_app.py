@@ -14,6 +14,7 @@ import streamlit as st
 
 from app.core.config import get_settings
 from app.generation.render import render_lesson_markdown, render_references
+from app.generation.diff import diff_versions
 from app.generation.exports import lesson_pdf, summary_image
 from app.generation.grading import (CHOICE_TYPES, PAIR_TYPES, chosen_misconception, is_correct,
                                     personal_line, score_objectives, final_questions)
@@ -1212,7 +1213,22 @@ def view_history() -> None:
         decision = a[2].decision if a and a[2] else "not checked"
         st.markdown(f"**v{entry['version']}** · {entry['origin']} · {entry['created_at']} · "
                     f"QC: {decision}  \n{entry['note']}")
-    old = st.selectbox("Preview an older version", [e["version"] for e in project.meta["versions"]][::-1])
+    versions = [e["version"] for e in project.meta["versions"]]
+    if len(versions) > 1:
+        st.markdown("##### What changed")
+        c1, c2 = st.columns(2)
+        before = c1.selectbox("From version", versions, index=len(versions) - 2, key="diff-from")
+        after = c2.selectbox("To version", versions, index=len(versions) - 1, key="diff-to")
+        if before != after:
+            d = diff_versions(project.lesson(before), project.lesson(after), research[0])
+            if d.identical:
+                st.info("These two versions have the same content.")
+            else:
+                st.caption(f"{d.added} line(s) added, {d.removed} line(s) removed. "
+                           "Lines starting with + are new; lines starting with - were removed.")
+                st.code(d.text, language="diff")
+    st.markdown("##### Preview a version")
+    old = st.selectbox("Version", versions[::-1], key="preview-version")
     if old != lesson.version:
         st.markdown(render_lesson_markdown(project.lesson(old), research[0]))
 

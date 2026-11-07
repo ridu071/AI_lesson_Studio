@@ -96,7 +96,7 @@ def test_benchmark_passes_in_deterministic_mode():
     assert summary.failures == [], summary.format_report()
     m = summary.metrics()
     assert m["false_blocks"] == 0 and m["missed_blocks"] == 0
-    assert m["cases_skipped"] == 5
+    assert m["cases_skipped"] == 6
 
 
 def test_only_llm_cases_are_skipped():
