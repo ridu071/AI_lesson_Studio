@@ -85,6 +85,9 @@ class QCIssue(ContractModel):
     # Set by the check that raises the issue, for rules that must always stop
     # release (e.g. fabricated citation, lesson over 45 minutes).
     hard_gate: bool = False
+    # The engine cannot decide this one (e.g. the only evidence is unreadable).
+    # Leads to MANUAL_REVIEW unless something blocks first.
+    requires_manual_review: bool = False
     explanation: str = Field(min_length=10)
     section_id: SectionId | None = None
     claim_id: ClaimId | None = None
@@ -236,12 +239,12 @@ class AuditReport(ContractModel):
             bad = [
                 i.issue_id
                 for i in self.issues
-                if i.blocks_release or i.severity is Severity.HIGH
+                if i.blocks_release or i.severity is Severity.HIGH or i.requires_manual_review
             ]
             if bad:
                 problems.append(
-                    "a passed audit cannot contain blocking or high-severity issues: "
-                    + ", ".join(bad)
+                    "a passed audit cannot contain blocking, high-severity or "
+                    "manual-review issues: " + ", ".join(bad)
                 )
         if self.status is AuditStatus.ERROR and not self.error_message:
             problems.append("an error audit must explain what went wrong in error_message")

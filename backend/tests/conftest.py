@@ -19,3 +19,4 @@ def lesson_data() -> dict:
 @pytest.fixture
 def research_data() -> dict:
     return _load("valid_research.json")
+

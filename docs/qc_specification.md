@@ -1,6 +1,6 @@
 # QC Engine Specification
 
-Status: **Milestone 1, Step 2: data contracts.** Rubric version `0.1.0`.
+Status: **Milestone 1, Step 3: deterministic checks.** Rubric version `0.1.0`.
 
 This document defines what the QC engine receives, what it produces, and the
 rules that decide whether a lesson may go to the instructor. The code is the
@@ -12,6 +12,9 @@ source of truth for field-level detail; this document explains the *why*.
 | Research package | [`backend/app/schemas/research.py`](../backend/app/schemas/research.py) |
 | QC input, issues, audits, release result | [`backend/app/modules/qc/schemas.py`](../backend/app/modules/qc/schemas.py) |
 | QC vocabulary (statuses, severities, issue types) | [`backend/app/modules/qc/enums.py`](../backend/app/modules/qc/enums.py) |
+| Default severity and hard gate per issue type | [`backend/app/modules/qc/policy.py`](../backend/app/modules/qc/policy.py) |
+| QC1 deterministic checks | [`backend/app/modules/qc/qc1/`](../backend/app/modules/qc/qc1/) |
+| QC2 deterministic checks | [`backend/app/modules/qc/qc2/`](../backend/app/modules/qc/qc2/) |
 
 ## 1. Data flow
 
@@ -36,9 +39,10 @@ QCInput = request_objective + LessonVersion (frozen) + ResearchPackage
   metadata only), because a title is not proof of content.
 - **AuditReport**: one per layer. It holds the status, the weighted score with
   its subscores, issues, QC1 claim verdicts and the QC2 objective coverage matrix.
-- **QCIssue** holds the type, severity, the `hard_gate` flag, an explanation,
-  the location (section, claim, objective), evidence references and a
-  recommendation.
+- **QCIssue** holds the type, severity, the `hard_gate` flag, the
+  `requires_manual_review` flag (the engine cannot decide this alone), an
+  explanation, the location (section, claim, objective), evidence references
+  and a recommendation.
 - **ReleaseResult**: the combined decision, with reasons and the IDs of the
   issues that block release.
 
@@ -79,7 +83,7 @@ Applied in this order. The first rule that matches wins.
 | # | Condition | Decision |
 |---|---|---|
 | 1 | Any issue is `critical` or a hard gate | **blocked** |
-| 2 | Key evidence inaccessible/unverifiable, or either audit is `manual_review` | **manual_review** |
+| 2 | Any issue has `requires_manual_review`, or either audit is `manual_review` | **manual_review** |
 | 3 | Any `high` issue, or QC1 or QC2 score below its threshold (80) | **revision_required** |
 | 4 | Otherwise | **eligible_for_instructor_review** |
 
@@ -89,7 +93,7 @@ Applied in this order. The first rule that matches wins.
 
 These rules are also enforced by the contracts themselves:
 
-- A `passed` audit cannot contain a high, critical or hard-gate issue.
+- A `passed` audit cannot contain a high, critical, hard-gate or manual-review issue.
 - An `eligible` release cannot list blocking issues.
 - A `blocked` release must list them.
 - A claim verdict of `supported`, `partially_supported` or `contradicted` must
@@ -99,45 +103,85 @@ These rules are also enforced by the contracts themselves:
 ## 6. Issue catalogue
 
 Each type belongs to exactly one layer, so QC1 and QC2 stay independent.
-Default severities are starting values, applied by the checks in Step 3 and
-calibrated against the benchmark in Step 5.
+Severities are starting values, to be calibrated against the benchmark in
+Step 5. The code table is `policy.py`, and a test keeps it identical to this one.
+
+A check may **raise** an issue's severity (e.g. a missing citation on a key
+claim) but can never lower it or switch a hard gate off.
+
+"Detected by": **det** = deterministic check (Step 3), **LLM** = language
+model evaluator (Step 6).
 
 ### QC1: factual accuracy
 
-| Issue type | Default severity | Hard gate |
-|---|---|---|
-| `fabricated_citation` (cited source not in research, or does not exist) | critical | yes |
-| `contradicted_claim` | critical | yes |
-| `unsupported_claim` | high | |
-| `misleading_citation` (source exists but does not say this) | high | |
-| `internal_contradiction` | high | |
-| `partially_supported_claim` | medium | |
-| `missing_citation` | medium | |
-| `unverifiable_claim` | medium (manual review if key claim) | |
-| `inaccessible_source` | medium (manual review if key evidence) | |
-| `low_credibility_source` | medium | |
-| `outdated_source` | low–medium (domain-dependent) | |
-| `research_gap` | medium | |
+| Issue type | Severity | Hard gate | Detected by |
+|---|---|---|---|
+| `fabricated_citation` (cited source not in research package) | critical | yes | det |
+| `contradicted_claim` | critical | yes | LLM |
+| `unsupported_claim` | high | | LLM |
+| `misleading_citation` (source exists but does not say this) | high | | LLM |
+| `internal_contradiction` | high | | LLM |
+| `partially_supported_claim` | medium | | LLM |
+| `missing_citation` (factual/definition claim cites nothing) | medium | | det |
+| `unverifiable_claim` (only unreadable sources cited, needs manual review) | medium | | det, LLM |
+| `inaccessible_source` | medium | | det |
+| `low_credibility_source` | medium | | later |
+| `research_gap` | medium | | LLM |
+| `outdated_source` | low | | later |
 
 ### QC2: instructional quality
 
-| Issue type | Default severity | Hard gate |
-|---|---|---|
-| `duration_exceeded` (mandatory content > 45 min) | high | yes |
-| `objective_not_assessed` | high | yes |
-| `incorrect_answer_key` | high | |
-| `objective_not_explained` | high | |
-| `bloom_mismatch` (assessment below the objective's level) | high | |
-| `missing_section` | medium | |
-| `objective_not_exemplified` | medium | |
-| `objective_not_practiced` | medium | |
-| `duration_mismatch` (stated time ≠ section total) | medium | |
-| `poor_sequencing` | medium | |
-| `unclear_explanation` | medium | |
-| `weak_example` | low–medium | |
-| `unclear_activity` | low–medium | |
-| `weak_assessment` | medium | |
-| `accessibility_issue` | low–medium | |
+| Issue type | Severity | Hard gate | Detected by |
+|---|---|---|---|
+| `duration_exceeded` (mandatory content > 45 min) | high | yes | det |
+| `objective_not_assessed` (no final question) | high | yes | det |
+| `incorrect_answer_key` | high | | det, LLM |
+| `objective_not_explained` | high | | det |
+| `bloom_mismatch` (final questions below the objective's level) | high | | det, LLM |
+| `missing_section` | medium | | det |
+| `objective_not_exemplified` | medium | | det |
+| `objective_not_practiced` | medium | | det |
+| `duration_mismatch` (stated ≠ real; activities exceed their section) | medium | | det |
+| `poor_sequencing` | medium | | det, LLM |
+| `unclear_explanation` | medium | | LLM |
+| `weak_assessment` | medium | | det, LLM |
+| `weak_example` | low | | LLM |
+| `unclear_activity` | low | | LLM |
+| `accessibility_issue` | low | | LLM |
+
+## 6a. Deterministic check rules
+
+These run without an LLM, so they are fast, free and always give the same result.
+
+**QC1 citations**
+- Every source ID cited by a section, claim or video must exist in the research
+  package, otherwise `fabricated_citation`.
+- `factual` and `definition` claims must cite at least one source, otherwise
+  `missing_citation`. Mathematical claims are checked by computation instead.
+  Opinions, hypothetical examples, instructions and exercises need no source.
+- A cited source marked `inaccessible` gives `inaccessible_source`, once per source.
+- A claim whose real cited sources include none with readable evidence
+  (passages present and not inaccessible) gives `unverifiable_claim` with
+  manual review. A claim that cites only fabricated IDs is not reported twice.
+
+**QC2 structure**
+- Required sections: introduction, concept_explanation, final_assessment, summary.
+- The introduction must be first.
+- An objective must be explained (concept_explanation) before any worked
+  examples, practical application, knowledge check or final assessment use it.
+
+**QC2 coverage matrix** (per objective; uses the lesson's declared mappings)
+- explained: a concept_explanation section maps to it.
+- exemplified: a worked_examples section, or a section with an example block, maps to it.
+- practiced: a **mandatory** activity maps to it.
+- assessed: a **final** assessment question maps to it. Knowledge checks alone do not count.
+
+**QC2 assessments**
+- Bloom: the highest-level final question for an objective must reach the
+  objective's Bloom level. Higher is fine.
+- Multiple choice: at least 2 distinct options, and the answer key must be one of them.
+- True/false: options exactly True/False, and the answer key True or False.
+- Answers are compared ignoring case and extra spaces.
 
 ## 7. Timing rule
 
@@ -160,8 +204,8 @@ exposes no-op revisions.
 |---|---|---|
 | 1 | Config, QC vocabulary | done |
 | 2 | Data contracts, sample lesson, this document | done |
-| 3 | Deterministic checks: duration, structure, citation existence, coverage matrix, answer keys | next |
-| 4 | Scoring weights and decision engine (section 5) | |
+| 3 | Deterministic checks: duration, structure, citation existence, coverage matrix, answer keys | done |
+| 4 | Scoring weights and decision engine (section 5) | next |
 | 5 | Benchmark dataset with intentionally broken lessons, plus a detection runner | |
 | 6 | LLM modules: claim extraction and verification, clarity, Bloom alignment | |
 | 7 | Human-readable reports and a repeatability check | |

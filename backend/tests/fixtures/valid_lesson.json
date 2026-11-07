@@ -47,7 +47,7 @@
       "section_type": "concept_explanation",
       "title": "Supervised and unsupervised learning",
       "duration_minutes": 12,
-      "objective_ids": ["LO-01"],
+      "objective_ids": ["LO-01", "LO-02"],
       "source_ids": ["SRC-001", "SRC-002"],
       "content_blocks": [
         {
@@ -65,6 +65,10 @@
         {
           "type": "explanation",
           "content": "The key question is: does the training data include the answer? If yes, it is supervised. If the model must discover the structure itself, it is unsupervised."
+        },
+        {
+          "type": "explanation",
+          "content": "This also tells you where each one is used. Supervised learning suits tasks with past examples whose answers are known, such as classifying or predicting. Unsupervised learning suits exploring data whose groups are not known in advance, such as finding similar customers."
         }
       ]
     },

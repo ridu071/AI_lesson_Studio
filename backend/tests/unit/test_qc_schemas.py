@@ -149,7 +149,12 @@ def test_passed_audit_is_accepted():
 
 @pytest.mark.parametrize(
     "bad_issue",
-    [issue(severity="high"), issue(severity="critical"), issue(severity="low", hard_gate=True)],
+    [
+        issue(severity="high"),
+        issue(severity="critical"),
+        issue(severity="low", hard_gate=True),
+        issue(severity="low", requires_manual_review=True),
+    ],
 )
 def test_passed_audit_cannot_hide_a_serious_issue(bad_issue):
     # The core rule: a high score can never conceal a serious failure.
