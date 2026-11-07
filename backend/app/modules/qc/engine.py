@@ -8,6 +8,8 @@ from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 
+from pydantic import ValidationError
+
 from app.core.config import Settings, get_settings
 from app.llm.base import LLMClient, LLMError
 from app.modules.qc.enums import AUDIT_OUTCOMES, AuditStatus, AuditType, Evaluator, IssueType
@@ -146,7 +148,7 @@ def _run_qc1_full(
         assessments, prompt_version = run_qc1_llm_review(
             qc_input, issues, client, skip_claim_ids=settled, today=started.date()
         )
-    except LLMError as exc:
+    except (LLMError, ValidationError) as exc:  # bad model output must never crash QC
         return error_audit(audit_type=AuditType.QC1, qc_input=qc_input, message=str(exc),
                            started_at=started, completed_at=clock(), llm_model=client.model)
     return build_audit(
@@ -171,7 +173,7 @@ def _run_qc2_full(
     try:
         checks = run_qc2_checks(qc_input, max_minutes=settings.max_lesson_minutes, issues=issues)
         prompt_version = run_qc2_llm_review(qc_input, issues, client)
-    except LLMError as exc:
+    except (LLMError, ValidationError) as exc:  # bad model output must never crash QC
         return error_audit(audit_type=AuditType.QC2, qc_input=qc_input, message=str(exc),
                            started_at=started, completed_at=clock(), llm_model=client.model)
     return build_audit(

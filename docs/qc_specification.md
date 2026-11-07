@@ -1,6 +1,6 @@
 # QC Engine Specification
 
-Status: **Milestone 1, Step 6: LLM evaluators.** Rubric version `0.1.0`
+Status: **Milestone 1 complete (QC engine).** Rubric version `0.1.0`
 (defined in `scoring/rubrics.py`, next to the weights it describes).
 
 This document defines what the QC engine receives, what it produces, and the
@@ -278,6 +278,15 @@ Run on 2026-11-07, rubric 0.1.0, prompts qc1 0.1.0 / qc2 0.2.0, `gemini-3.5-flas
 | Deterministic | 21 run (5 need LLM) | 21 | 100% | 100% | 100% | n/a |
 | Full (LLM) | 26 | 25 | 100% (29/29) | 96.7% | 100% | 100% |
 
+**Repeatability** (§20.2), 3 runs × 26 cases, same model and prompts:
+
+| Measure | Result |
+|---|---|
+| Same release decision in every run | **100%** (26/26) |
+| Same set of issues in every run | **96.2%** (25/26) |
+| Flaky issues | 2, both in F-008, both QC2 extras pre-declared as acceptable |
+| Errored runs | 1 of 78 (I-003, transient; did not recur in 3 reruns) |
+
 **Known limitation:** QC2 sometimes reports a clear but *false* statement as
 `unclear_explanation` (F-009), although factual accuracy is QC1's job. The
 prompt tells it not to; the lite model does not always comply. Impact: one
@@ -286,8 +295,7 @@ duplicate medium-severity note for the instructor; the decision is unchanged.
 **What these numbers do and do not show.** The checks and the cases were
 written by the same author, and the dataset is one topic. 100% recall here
 means the engine does what it was designed to do. It is not yet evidence of
-reliability on real lessons; that needs cases from instructors (§19.2) and
-the repeatability check (Step 7).
+reliability on real lessons; that needs cases from instructors (§19.2).
 
 ## 7. Timing rule
 
@@ -314,4 +322,4 @@ exposes no-op revisions.
 | 4 | Scoring weights and decision engine (sections 5, 5a) | done |
 | 5 | Benchmark dataset with intentionally broken lessons, plus a detection runner (see `evaluation/README.md`) | done |
 | 6 | LLM evaluators: claim verification, consistency, gaps, freshness, instructional review (§6b, §6c) | done |
-| 7 | Human-readable reports and a repeatability check | next |
+| 7 | Instructor report (`reporting.py`, `scripts/qc_report.py`) and repeatability check | done |

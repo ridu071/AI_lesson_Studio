@@ -257,7 +257,8 @@ def apply_claim_relations(
         return assessment(ClaimVerdict.CONTRADICTED, contradicting, why)
 
     if supporting_cited:
-        return assessment(ClaimVerdict.SUPPORTED, supporting_cited, supporting_cited[0].reason)
+        why = f"Claim {claim.claim_id} is supported: {supporting_cited[0].reason}"
+        return assessment(ClaimVerdict.SUPPORTED, supporting_cited, why)
 
     if partial_cited:
         why = f"Claim {claim.claim_id} is only partly supported: {partial_cited[0].reason}"
@@ -275,7 +276,8 @@ def apply_claim_relations(
                 f"the supporting evidence is in {better}.",
                 f"Cite {better} instead of {cited}.",
             )
-        return assessment(ClaimVerdict.SUPPORTED, supporting_other, supporting_other[0].reason)
+        why = f"Claim {claim.claim_id} is supported by uncited evidence: {supporting_other[0].reason}"
+        return assessment(ClaimVerdict.SUPPORTED, supporting_other, why)
 
     if partial_other:
         why = f"Claim {claim.claim_id} is only partly supported, and not by its cited sources: " \

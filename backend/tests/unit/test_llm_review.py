@@ -196,3 +196,15 @@ def test_qc2_cannot_report_issue_types_reserved_for_code(lesson_data, research_d
     bad = {"issues": [qc2_issue("duration_exceeded")]}
     result = run(lesson_data, research_data, FakeLLM(qc2=[bad, bad]))
     assert result.qc2.status is AuditStatus.ERROR
+
+
+def test_terse_model_reasons_do_not_crash_qc(lesson_data, research_data):
+    def terse(request):
+        out = clean_qc1(request)
+        for c in out["claims"]:
+            for r in c["relations"]:
+                r["reason"] = "Yes."
+        return out
+    result = run(lesson_data, research_data, FakeLLM(qc1=terse))
+    assert result.qc1.status is AuditStatus.PASSED
+    assert result.qc1.claim_assessments[0].explanation.startswith("Claim CL-001 is supported")
