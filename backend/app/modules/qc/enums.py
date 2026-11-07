@@ -40,16 +40,106 @@ def severity_rank(severity: Severity) -> int:
     return _SEVERITY_RANK[severity]
 
 
+class AuditType(StrEnum):
+    """Which independent QC layer produced an audit or issue."""
+
+    QC1 = "qc1"  # factual accuracy and research verification
+    QC2 = "qc2"  # instructional effectiveness and learning alignment
+
+
 class AuditStatus(StrEnum):
-    """Lifecycle of one QC audit (QC1 and QC2 each have their own)."""
+    """Lifecycle of one QC audit (QC1 and QC2 each have their own).
+
+    There are three kinds of status, and they must not be confused:
+    - In progress:  PENDING, RUNNING.
+    - Outcome:      PASSED, NEEDS_REVISION, MANUAL_REVIEW, BLOCKED.
+                    The audit finished and this is its judgement of the lesson.
+    - Not a judgement:
+        ERROR  the audit could not finish (e.g. a model timeout). It says nothing
+               about the lesson. The fix is to retry the same audit.
+        STALE  the lesson version changed after this audit ran.
+    """
 
     PENDING = "pending"
     RUNNING = "running"
     PASSED = "passed"
-    FAILED = "failed"
     NEEDS_REVISION = "needs_revision"
     MANUAL_REVIEW = "manual_review"
-    STALE = "stale"  # the lesson version changed after this audit ran
+    BLOCKED = "blocked"
+    ERROR = "error"
+    STALE = "stale"
+
+
+# Statuses that mean "the audit finished and judged the lesson".
+AUDIT_OUTCOMES = frozenset(
+    {
+        AuditStatus.PASSED,
+        AuditStatus.NEEDS_REVISION,
+        AuditStatus.MANUAL_REVIEW,
+        AuditStatus.BLOCKED,
+    }
+)
+
+
+class IssueType(StrEnum):
+    """Every kind of problem a QC layer can report.
+
+    Fixed types (instead of free text) let the benchmark check that the right
+    problem was detected, not just that "some" problem was detected.
+    """
+
+    # --- QC1: factual accuracy ---
+    UNSUPPORTED_CLAIM = "unsupported_claim"
+    PARTIALLY_SUPPORTED_CLAIM = "partially_supported_claim"
+    CONTRADICTED_CLAIM = "contradicted_claim"
+    UNVERIFIABLE_CLAIM = "unverifiable_claim"
+    MISSING_CITATION = "missing_citation"
+    FABRICATED_CITATION = "fabricated_citation"
+    MISLEADING_CITATION = "misleading_citation"
+    INACCESSIBLE_SOURCE = "inaccessible_source"
+    LOW_CREDIBILITY_SOURCE = "low_credibility_source"
+    OUTDATED_SOURCE = "outdated_source"
+    INTERNAL_CONTRADICTION = "internal_contradiction"
+    RESEARCH_GAP = "research_gap"
+
+    # --- QC2: instructional quality ---
+    OBJECTIVE_NOT_EXPLAINED = "objective_not_explained"
+    OBJECTIVE_NOT_EXEMPLIFIED = "objective_not_exemplified"
+    OBJECTIVE_NOT_PRACTICED = "objective_not_practiced"
+    OBJECTIVE_NOT_ASSESSED = "objective_not_assessed"
+    BLOOM_MISMATCH = "bloom_mismatch"
+    MISSING_SECTION = "missing_section"
+    POOR_SEQUENCING = "poor_sequencing"
+    UNCLEAR_EXPLANATION = "unclear_explanation"
+    WEAK_EXAMPLE = "weak_example"
+    UNCLEAR_ACTIVITY = "unclear_activity"
+    WEAK_ASSESSMENT = "weak_assessment"
+    INCORRECT_ANSWER_KEY = "incorrect_answer_key"
+    DURATION_EXCEEDED = "duration_exceeded"
+    DURATION_MISMATCH = "duration_mismatch"
+    ACCESSIBILITY_ISSUE = "accessibility_issue"
+
+
+_QC1_ISSUES = (
+    IssueType.UNSUPPORTED_CLAIM,
+    IssueType.PARTIALLY_SUPPORTED_CLAIM,
+    IssueType.CONTRADICTED_CLAIM,
+    IssueType.UNVERIFIABLE_CLAIM,
+    IssueType.MISSING_CITATION,
+    IssueType.FABRICATED_CITATION,
+    IssueType.MISLEADING_CITATION,
+    IssueType.INACCESSIBLE_SOURCE,
+    IssueType.LOW_CREDIBILITY_SOURCE,
+    IssueType.OUTDATED_SOURCE,
+    IssueType.INTERNAL_CONTRADICTION,
+    IssueType.RESEARCH_GAP,
+)
+
+# Which layer is allowed to report each issue type. Keeps QC1 and QC2 independent:
+# QC1 cannot raise a teaching issue and QC2 cannot raise a factual one.
+ISSUE_TYPE_OWNER: dict[IssueType, AuditType] = {
+    t: (AuditType.QC1 if t in _QC1_ISSUES else AuditType.QC2) for t in IssueType
+}
 
 
 class ReleaseDecision(StrEnum):

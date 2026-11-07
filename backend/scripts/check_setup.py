@@ -15,6 +15,9 @@ sys.path.insert(0, str(BACKEND_DIR))  # so "import app" works from any folder
 REQUIRED_PATHS = [
     "app/core/config.py",
     "app/modules/qc/enums.py",
+    "app/modules/qc/schemas.py",
+    "app/schemas/lesson.py",
+    "app/schemas/research.py",
     "tests/unit",
     "../prompts/qc1",
     "../prompts/qc2",
@@ -78,12 +81,24 @@ def check_enums() -> None:
         record("QC enums import", False, f"{type(exc).__name__}: {exc}")
 
 
+def check_contracts() -> None:
+    try:
+        from app.modules.qc.schemas import AuditReport, QCInput, ReleaseResult  # noqa: F401
+        from app.schemas.lesson import LessonVersion  # noqa: F401
+        from app.schemas.research import ResearchPackage  # noqa: F401
+
+        record("QC data contracts import", True)
+    except Exception as exc:  # noqa: BLE001
+        record("QC data contracts import", False, f"{type(exc).__name__}: {exc}")
+
+
 if __name__ == "__main__":
     check_python()
     check_packages()
     check_folders()
     check_settings()
     check_enums()
+    check_contracts()
 
     failed = [r for r in results if not r[1]]
     print()
