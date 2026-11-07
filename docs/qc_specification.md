@@ -1,6 +1,7 @@
 # QC Engine Specification
 
-Status: **Milestone 1, Step 3: deterministic checks.** Rubric version `0.1.0`.
+Status: **Milestone 1, Step 4: scoring and decision engine.** Rubric version `0.1.0`
+(defined in `scoring/rubrics.py`, next to the weights it describes).
 
 This document defines what the QC engine receives, what it produces, and the
 rules that decide whether a lesson may go to the instructor. The code is the
@@ -15,6 +16,9 @@ source of truth for field-level detail; this document explains the *why*.
 | Default severity and hard gate per issue type | [`backend/app/modules/qc/policy.py`](../backend/app/modules/qc/policy.py) |
 | QC1 deterministic checks | [`backend/app/modules/qc/qc1/`](../backend/app/modules/qc/qc1/) |
 | QC2 deterministic checks | [`backend/app/modules/qc/qc2/`](../backend/app/modules/qc/qc2/) |
+| Rubrics, weights, penalties | [`backend/app/modules/qc/scoring/`](../backend/app/modules/qc/scoring/) |
+| Audit outcome and release decision | [`backend/app/modules/qc/validation/decision.py`](../backend/app/modules/qc/validation/decision.py) |
+| End-to-end run | [`backend/app/modules/qc/engine.py`](../backend/app/modules/qc/engine.py) |
 
 ## 1. Data flow
 
@@ -38,7 +42,8 @@ QCInput = request_objective + LessonVersion (frozen) + ResearchPackage
   `limitations`. Each source records `content_access` (full text, excerpt, or
   metadata only), because a title is not proof of content.
 - **AuditReport**: one per layer. It holds the status, the weighted score with
-  its subscores, issues, QC1 claim verdicts and the QC2 objective coverage matrix.
+  its subscores, the evaluators that actually ran, issues, QC1 claim verdicts
+  and the QC2 objective coverage matrix.
 - **QCIssue** holds the type, severity, the `hard_gate` flag, the
   `requires_manual_review` flag (the engine cannot decide this alone), an
   explanation, the location (section, claim, objective), evidence references
@@ -78,17 +83,24 @@ There is deliberately no `failed`: it could mean either "the lesson failed" or
 
 ## 5. Release decision rule
 
-Applied in this order. The first rule that matches wins.
+Each layer's audit outcome is decided by these rules, in order. The first
+rule that matches wins.
 
-| # | Condition | Decision |
+| # | Condition (within one layer) | Audit outcome |
 |---|---|---|
-| 1 | Any issue is `critical` or a hard gate | **blocked** |
-| 2 | Any issue has `requires_manual_review`, or either audit is `manual_review` | **manual_review** |
-| 3 | Any `high` issue, or QC1 or QC2 score below its threshold (80) | **revision_required** |
-| 4 | Otherwise | **eligible_for_instructor_review** |
+| 1 | Any issue is `critical` or a hard gate | `blocked` |
+| 2 | Any issue has `requires_manual_review`, or any rubric category is not evaluated | `manual_review` |
+| 3 | Any `high` issue, or the score is below the layer threshold (80) | `needs_revision` |
+| 4 | Otherwise | `passed` |
+
+The release decision is the **worse** of the two outcomes:
+`blocked` → **blocked**, `manual_review` → **manual_review**,
+`needs_revision` → **revision_required**, `passed` → **eligible_for_instructor_review**.
 
 - `medium` and `low` issues never block. They appear as recommendations.
-- An `error` or `stale` audit produces **no decision**: rerun it first.
+- An `error`, `pending`, `running` or `stale` audit produces **no decision**: rerun it first.
+- An audit whose lesson ID, version or content hash differs from the lesson
+  being decided is rejected (E2E-009, E2E-016).
 - "Eligible" is not "approved". Only the instructor approves (workflow §9.6).
 
 These rules are also enforced by the contracts themselves:
@@ -99,6 +111,38 @@ These rules are also enforced by the contracts themselves:
 - A claim verdict of `supported`, `partially_supported` or `contradicted` must
   cite an evidence passage ("evidence before confidence").
 - The score must equal the weighted subscores, and the weights must sum to 1.
+- An audit is `blocked` if and only if it contains a blocking issue.
+- A `passed` audit must have every rubric category evaluated.
+- While any category is not evaluated, the layer score is empty, never partial.
+
+## 5a. Scoring
+
+Weights are the workflow's starting values (§7.2, §7.3), to be calibrated in Step 5.
+
+- Each category starts at 100 and loses points for each issue in it:
+  critical −50, high −25, medium −10, low −3, never below 0.
+- Layer score = Σ weight × category score.
+- **A category is evaluated only when every evaluator that can find its issues
+  has run.** Otherwise "no issues found" would only mean "not checked", and
+  the category score is empty.
+- Each issue type is scored in exactly one category of its own layer (tested).
+
+| QC1 category | Weight | Needs | QC2 category | Weight | Needs |
+|---|---|---|---|---|---|
+| claim_evidence_support | 0.30 | citation check + claim verification | objective_alignment | 0.25 | coverage + assessment check + instructional review |
+| source_credibility | 0.20 | source assessment | clarity | 0.15 | instructional review |
+| citation_integrity | 0.15 | citation check + claim verification | learning_progression | 0.15 | structure check + instructional review |
+| cross_source_consistency | 0.15 | consistency check | examples | 0.10 | coverage + instructional review |
+| factual_correctness | 0.15 | claim verification | activities | 0.10 | coverage + instructional review |
+| research_coverage | 0.05 | gap detection | assessment_effectiveness | 0.15 | assessment check + instructional review |
+| | | | engagement_accessibility | 0.05 | instructional review |
+| | | | time_feasibility | 0.05 | duration check |
+
+**Consequence until Step 6:** only `time_feasibility` can be evaluated without
+an LLM. So with deterministic checks alone, a lesson can be `blocked` (hard
+gates and critical issues work fully), but its best possible outcome is
+`manual_review`. It can never be `eligible`. This is intended: the engine does
+not claim to have checked what it has not.
 
 ## 6. Issue catalogue
 
@@ -205,7 +249,7 @@ exposes no-op revisions.
 | 1 | Config, QC vocabulary | done |
 | 2 | Data contracts, sample lesson, this document | done |
 | 3 | Deterministic checks: duration, structure, citation existence, coverage matrix, answer keys | done |
-| 4 | Scoring weights and decision engine (section 5) | next |
-| 5 | Benchmark dataset with intentionally broken lessons, plus a detection runner | |
+| 4 | Scoring weights and decision engine (sections 5, 5a) | done |
+| 5 | Benchmark dataset with intentionally broken lessons, plus a detection runner | next |
 | 6 | LLM modules: claim extraction and verification, clarity, Bloom alignment | |
 | 7 | Human-readable reports and a repeatability check | |

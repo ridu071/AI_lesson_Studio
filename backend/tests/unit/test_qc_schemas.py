@@ -257,3 +257,40 @@ def test_naive_timestamps_are_rejected():
     # Times without a timezone are ambiguous in an audit trail.
     with pytest.raises(ValidationError):
         ReleaseResult(**release(decided_at=datetime(2026, 11, 7, 12, 0)))
+
+
+# --- "not evaluated" is never presented as a score ---
+
+
+def partial_subscores() -> list[dict]:
+    return [
+        {"name": "claim_evidence_support", "weight": 0.6, "score": 90},
+        {"name": "source_credibility", "weight": 0.4, "score": None},  # not evaluated
+    ]
+
+
+def test_partial_subscores_give_no_score():
+    assert weighted_score([SubScore(**s) for s in partial_subscores()]) is None
+    report = AuditReport(**audit(status="manual_review", score=None, subscores=partial_subscores()))
+    assert report.score is None
+
+
+def test_partial_subscores_cannot_carry_a_score():
+    with pytest.raises(ValidationError, match="score must be empty"):
+        AuditReport(**audit(status="manual_review", score=54.0, subscores=partial_subscores()))
+
+
+def test_passed_audit_needs_every_category_evaluated():
+    with pytest.raises(ValidationError, match="every category evaluated"):
+        AuditReport(**audit(score=None, subscores=partial_subscores()))
+
+
+def test_blocking_issue_forces_blocked_status():
+    critical = issue(issue_type="fabricated_citation", severity="critical")
+    with pytest.raises(ValidationError, match="must be blocked, not needs_revision"):
+        AuditReport(**audit(status="needs_revision", issues=[critical]))
+
+
+def test_blocked_status_needs_a_blocking_issue():
+    with pytest.raises(ValidationError, match="must contain a blocking issue"):
+        AuditReport(**audit(status="blocked", issues=[issue(severity="high")]))

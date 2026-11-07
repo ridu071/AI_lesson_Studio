@@ -4,7 +4,7 @@ from tests.helpers import build_qc_input
 
 
 def run(lesson, research):
-    return run_qc1_checks(build_qc_input(lesson, research))
+    return run_qc1_checks(build_qc_input(lesson, research)).issues
 
 
 def types(issues):

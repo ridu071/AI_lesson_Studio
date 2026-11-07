@@ -9,7 +9,7 @@ def clean_env(monkeypatch):
     """Remove any real environment values so tests only see what they set."""
     for name in (
         "APP_ENV", "LLM_API_KEY", "LLM_MODEL", "MAX_LESSON_MINUTES",
-        "QC1_MIN_SCORE", "QC2_MIN_SCORE", "RUBRIC_VERSION",
+        "QC1_MIN_SCORE", "QC2_MIN_SCORE",
     ):
         monkeypatch.delenv(name, raising=False)
 

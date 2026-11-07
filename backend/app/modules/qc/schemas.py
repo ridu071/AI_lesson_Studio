@@ -21,6 +21,7 @@ from app.modules.qc.enums import (
     AuditStatus,
     AuditType,
     ClaimVerdict,
+    Evaluator,
     IssueType,
     ReleaseDecision,
     Severity,
@@ -153,12 +154,22 @@ class ObjectiveCoverage(ContractModel):
 class SubScore(ContractModel):
     name: NonEmptyStr  # rubric category, e.g. "claim_evidence_support"
     weight: float = Field(gt=0, le=1)
-    score: float = Field(ge=0, le=100)
+    # None = not evaluated yet (the checks this category needs have not run).
+    # We never invent a number for something that was not measured.
+    score: float | None = Field(default=None, ge=0, le=100)
+
+    @property
+    def evaluated(self) -> bool:
+        return self.score is not None
 
 
 def weighted_score(subscores: Sequence[SubScore]) -> float | None:
-    """The layer score: sum of weight x subscore, rounded to 2 decimals."""
-    if not subscores:
+    """The layer score: sum of weight x subscore, rounded to 2 decimals.
+
+    None if there are no subscores or ANY category is not evaluated: a partial
+    score would look like a real one.
+    """
+    if not subscores or not all(s.evaluated for s in subscores):
         return None
     return round(sum(s.weight * s.score for s in subscores), 2)
 
@@ -180,6 +191,8 @@ class AuditReport(ContractModel):
     status: AuditStatus
     score: float | None = Field(default=None, ge=0, le=100)  # must equal weighted_score(subscores)
     subscores: list[SubScore] = []
+    # Which checks actually ran. Shows the instructor what was NOT checked.
+    evaluators: list[Evaluator] = []
     issues: list[QCIssue] = []
     claim_assessments: list[ClaimAssessment] = []  # QC1 only
     coverage: list[ObjectiveCoverage] = []  # QC2 only
@@ -189,24 +202,38 @@ class AuditReport(ContractModel):
 
     @model_validator(mode="after")
     def _check_consistency(self) -> "AuditReport":
-        problems: list[str] = []
+        problems = (
+            self._score_problems()
+            + self._issue_problems()
+            + self._layer_problems()
+            + self._status_problems()
+        )
+        if problems:
+            raise ValueError(f"Audit {self.audit_id} is invalid: " + "; ".join(problems))
+        return self
 
-        # Scores
-        problems += [
+    def _score_problems(self) -> list[str]:
+        problems = [
             f"duplicate subscore {d}" for d in find_duplicates(s.name for s in self.subscores)
         ]
-        if self.subscores:
-            total_weight = sum(s.weight for s in self.subscores)
-            if abs(total_weight - 1) > WEIGHT_TOLERANCE:
-                problems.append(f"subscore weights must sum to 1, got {total_weight:.4f}")
-            expected = weighted_score(self.subscores)
-            if self.score is None or abs(self.score - expected) > SCORE_TOLERANCE:
-                problems.append(f"score must equal the weighted subscores ({expected})")
-        elif self.score is not None:
-            problems.append("score given without subscores")
+        if not self.subscores:
+            if self.score is not None:
+                problems.append("score given without subscores")
+            return problems
+        total_weight = sum(s.weight for s in self.subscores)
+        if abs(total_weight - 1) > WEIGHT_TOLERANCE:
+            problems.append(f"subscore weights must sum to 1, got {total_weight:.4f}")
+        expected = weighted_score(self.subscores)
+        if expected is None and self.score is not None:
+            problems.append("score must be empty while any subscore is not evaluated")
+        elif expected is not None and (
+            self.score is None or abs(self.score - expected) > SCORE_TOLERANCE
+        ):
+            problems.append(f"score must equal the weighted subscores ({expected})")
+        return problems
 
-        # Issues belong to this layer
-        problems += [
+    def _issue_problems(self) -> list[str]:
+        problems = [
             f"duplicate issue id {d}" for d in find_duplicates(i.issue_id for i in self.issues)
         ]
         problems += [
@@ -214,8 +241,10 @@ class AuditReport(ContractModel):
             for i in self.issues
             if i.audit_type is not self.audit_type
         ]
+        return problems
 
-        # Layer-specific content
+    def _layer_problems(self) -> list[str]:
+        problems = []
         if self.audit_type is AuditType.QC2 and self.claim_assessments:
             problems.append("claim assessments belong to QC1 only")
         if self.audit_type is AuditType.QC1 and self.coverage:
@@ -228,32 +257,53 @@ class AuditReport(ContractModel):
             f"objective {d} appears twice in coverage"
             for d in find_duplicates(c.objective_id for c in self.coverage)
         ]
+        return problems
 
-        # Status rules
+    def _status_problems(self) -> list[str]:
+        problems = []
         if self.status in AUDIT_OUTCOMES:
-            if not self.subscores:
-                problems.append(f"a {self.status} audit must include its subscores")
-            if self.completed_at is None:
-                problems.append(f"a {self.status} audit must have completed_at")
+            problems += self._outcome_problems()
         if self.status is AuditStatus.PASSED:
-            bad = [
-                i.issue_id
-                for i in self.issues
-                if i.blocks_release or i.severity is Severity.HIGH or i.requires_manual_review
-            ]
-            if bad:
-                problems.append(
-                    "a passed audit cannot contain blocking, high-severity or "
-                    "manual-review issues: " + ", ".join(bad)
-                )
+            problems += self._passed_problems()
         if self.status is AuditStatus.ERROR and not self.error_message:
             problems.append("an error audit must explain what went wrong in error_message")
         if self.started_at and self.completed_at and self.completed_at < self.started_at:
             problems.append("completed_at is before started_at")
+        return problems
 
-        if problems:
-            raise ValueError(f"Audit {self.audit_id} is invalid: " + "; ".join(problems))
-        return self
+    def _outcome_problems(self) -> list[str]:
+        problems = []
+        if not self.subscores:
+            problems.append(f"a {self.status} audit must include its subscores")
+        if self.completed_at is None:
+            problems.append(f"a {self.status} audit must have completed_at")
+        # BLOCKED if and only if something blocks release.
+        has_blocker = any(i.blocks_release for i in self.issues)
+        if has_blocker and self.status is not AuditStatus.BLOCKED:
+            problems.append(f"an audit with a blocking issue must be blocked, not {self.status}")
+        if self.status is AuditStatus.BLOCKED and not has_blocker:
+            problems.append("a blocked audit must contain a blocking issue")
+        return problems
+
+    def _passed_problems(self) -> list[str]:
+        problems = []
+        unevaluated = [s.name for s in self.subscores if not s.evaluated]
+        if unevaluated:
+            problems.append(
+                "a passed audit must have every category evaluated; missing: "
+                + ", ".join(unevaluated)
+            )
+        bad = [
+            i.issue_id
+            for i in self.issues
+            if i.blocks_release or i.severity is Severity.HIGH or i.requires_manual_review
+        ]
+        if bad:
+            problems.append(
+                "a passed audit cannot contain blocking, high-severity or "
+                "manual-review issues: " + ", ".join(bad)
+            )
+        return problems
 
     def blocking_issues(self) -> list[QCIssue]:
         return [i for i in self.issues if i.blocks_release]

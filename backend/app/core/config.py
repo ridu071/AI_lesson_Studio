@@ -38,8 +38,8 @@ class Settings(BaseSettings):
     qc1_min_score: float = Field(default=80.0, ge=0, le=100)
     qc2_min_score: float = Field(default=80.0, ge=0, le=100)
 
-    # Stored with every audit so old reports stay explainable after rubric changes.
-    rubric_version: str = "0.1.0"
+    # The rubric version is NOT a setting: it lives next to the weights it
+    # describes, in app/modules/qc/scoring/rubrics.py.
 
     @property
     def llm_configured(self) -> bool:

@@ -120,6 +120,25 @@ class IssueType(StrEnum):
     ACCESSIBILITY_ISSUE = "accessibility_issue"
 
 
+class Evaluator(StrEnum):
+    """One unit of QC work. Each audit records which evaluators actually ran,
+    so a score is never presented as complete when some checks were skipped.
+    """
+
+    # --- QC1 ---
+    CITATION_CHECK = "citation_check"  # deterministic (Step 3)
+    CLAIM_VERIFICATION = "claim_verification"  # LLM (Step 6)
+    CONSISTENCY_CHECK = "consistency_check"  # LLM (Step 6)
+    GAP_DETECTION = "gap_detection"  # LLM (Step 6)
+    SOURCE_ASSESSMENT = "source_assessment"  # later
+    # --- QC2 ---
+    STRUCTURE_CHECK = "structure_check"  # deterministic
+    DURATION_CHECK = "duration_check"  # deterministic
+    COVERAGE_CHECK = "coverage_check"  # deterministic
+    ASSESSMENT_CHECK = "assessment_check"  # deterministic
+    INSTRUCTIONAL_REVIEW = "instructional_review"  # LLM (Step 6)
+
+
 _QC1_ISSUES = (
     IssueType.UNSUPPORTED_CLAIM,
     IssueType.PARTIALLY_SUPPORTED_CLAIM,
