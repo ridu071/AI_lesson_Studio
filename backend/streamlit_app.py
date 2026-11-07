@@ -249,6 +249,7 @@ button[kind="primary"]:disabled {background: #BBF7D0 !important; border-color: #
 .viz-caption {font-size: .88rem; color: #57534E; font-style: italic; margin-top: .2rem;}
 .sr-only {position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;}
 .q-head {font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #047857;}
+.needs-answer {color: #B91C1C; font-weight: 600; font-size: .9rem; margin-top: .2rem;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -599,9 +600,37 @@ def _review_section_title(lesson, section_id) -> str | None:
     return next((s.title for s in lesson.sections if s.section_id == section_id), None)
 
 
+def _is_answered(q, base: str) -> bool:
+    """Has the learner answered this question? Reads the widgets' latest values, so a word
+    typed just before clicking Submit counts."""
+    store = f"ans-{base}-{q.question_id}"
+    kind = q.question_type
+    if kind in PAIR_TYPES:
+        picks = [st.session_state.get(f"w-{store}-{i}") for i in range(len(q.pairs))]
+        if any(p is not None for p in picks):
+            return all(p not in (None, "—") for p in picks)
+        saved = st.session_state.get(store) or {}
+        return bool(q.pairs) and all(saved.get(left) for left, _ in q.pairs)
+    value = st.session_state.get(f"w-{store}", st.session_state.get(store))
+    if kind is QuestionType.ORDER_STEPS:
+        return len(value or []) == len(q.correct_order)
+    if isinstance(value, str):
+        return bool(value.strip())
+    return value is not None
+
+
+def _try_submit(base: str, questions: list) -> None:
+    """Submit only when every question has an answer; otherwise list what is missing."""
+    missing = [n for n, q in enumerate(questions, start=1) if not _is_answered(q, base)]
+    st.session_state[f"missing-{base}"] = missing
+    if not missing:
+        st.session_state[f"submitted-{base}"] = True
+
+
 def _set_submitted(base: str, value: bool, clear_ids: list[str]) -> None:
-    """Button callback (runs before the rerun): submit, or reset for a retake."""
+    """Button callback (runs before the rerun): reset for a retake."""
     st.session_state[f"submitted-{base}"] = value
+    st.session_state.pop(f"missing-{base}", None)
     for qid in clear_ids:
         st.session_state.pop(f"ans-{base}-{qid}", None)
         for key in [k for k in st.session_state if str(k).startswith(f"w-ans-{base}-{qid}")]:
@@ -624,6 +653,9 @@ def render_test(lesson, base: str) -> None:
             if q.visual:
                 render_visual(q.visual)
             _test_question_input(q, store, locked=submitted)
+            if not submitted and n in st.session_state.get(f"missing-{base}", []) and not _is_answered(q, base):
+                st.markdown('<div class="needs-answer">⚠ Please answer this question.</div>',
+                            unsafe_allow_html=True)
             if not submitted and q.hint:
                 with st.expander("Need a hint?"):
                     st.markdown(q.hint)
@@ -642,12 +674,17 @@ def render_test(lesson, base: str) -> None:
                         st.caption(f"Review: {title}")
 
     if not submitted:
-        unanswered = sum(1 for q in questions if not answers.get(q.question_id))
-        if unanswered:
-            st.caption(f"{unanswered} question{'s' * (unanswered > 1)} not answered yet - "
-                       "you can still submit; unanswered questions count as wrong.")
+        left = [n for n, q in enumerate(questions, start=1) if not _is_answered(q, base)]
+        missing = [n for n in st.session_state.get(f"missing-{base}", []) if n in left]
+        if missing:
+            st.error("Please answer every question before submitting: "
+                     + ", ".join(f"question {n}" for n in missing) + ".")
+        elif left:
+            st.caption(f"{len(left)} question{'s' * (len(left) > 1)} left to answer.")
+        else:
+            st.caption("All questions answered - ready to submit.")
         st.button("Submit test", type="primary", key=f"submit-{base}", width="stretch",
-                  on_click=_set_submitted, args=(base, True, []))
+                  on_click=_try_submit, args=(base, questions))
     else:
         st.button("↺ Retake the test", key=f"retake-{base}",
                   on_click=_set_submitted, args=(base, False, [q.question_id for q in questions]))
