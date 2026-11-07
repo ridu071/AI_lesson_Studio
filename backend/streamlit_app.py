@@ -26,39 +26,37 @@ st.set_page_config(page_title="AI Lesson Studio", page_icon="🎓", layout="wide
 st.markdown("""
 <style>
 .block-container {padding-top: 3.8rem; max-width: 1200px;}
-.hero {background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%); color: white;
+.hero {background: linear-gradient(135deg, #047857 0%, #064E3B 100%); color: white;
        padding: 2rem 2.2rem; border-radius: 18px; margin-bottom: 1.5rem;}
 .hero h1 {color: white; margin: 0 0 .4rem 0; font-size: 2.1rem;}
-.hero p {color: #E0E7FF; margin: 0; font-size: 1.05rem;}
+.hero p {color: #DCFCE7; margin: 0; font-size: 1.05rem;}
 .badge {display: inline-block; padding: .18rem .65rem; border-radius: 999px; font-size: .82rem;
-        font-weight: 600; margin-right: .35rem; background: #EEF2FF; color: #4338CA;}
+        font-weight: 600; margin-right: .35rem; background: #DCFCE7; color: #065F46;}
 .badge.green {background: #DCFCE7; color: #166534;}
 .badge.amber {background: #FEF3C7; color: #92400E;}
-.badge.red {background: #FEE2E2; color: #991B1B;}
-.stage {border: 1px solid #E5E7EB; border-radius: 14px; padding: .9rem 1.1rem; margin-bottom: .6rem;}
+.badge.red {background: #FEE2E2; color: #B91C1C;}
+.stage {border: 1px solid #E7E5E4; border-radius: 14px; padding: .9rem 1.1rem; margin-bottom: .6rem;}
 .stage.done {border-color: #86EFAC; background: #F0FDF4;}
-.stage.active {border-color: #A5B4FC; background: #EEF2FF;}
+.stage.active {border-color: #6EE7B7; background: #DCFCE7;}
 .stage.failed {border-color: #FCA5A5; background: #FEF2F2;}
 .stage .title {font-weight: 700; font-size: 1.02rem;}
-.stage .detail {color: #4B5563; font-size: .92rem; margin-top: .25rem;}
+.stage .detail {color: #57534E; font-size: .92rem; margin-top: .25rem;}
 .tip {background: #FFFBEB; border-left: 4px solid #F59E0B; padding: .7rem 1rem; border-radius: 8px;
       color: #78350F; font-size: .95rem;}
 .objective {padding: .35rem 0; font-size: 1.02rem;}
 .section-head {display: flex; justify-content: space-between; align-items: center;}
-.minutes {color: #6B7280; font-size: .9rem;}
+.minutes {color: #57534E; font-size: .9rem;}
 
 /* ---- landing ---- */
 .landing-title {text-align: center; font-size: 2.2rem; font-weight: 800; margin: 0 0 .2rem 0;
-  white-space: nowrap;
-  background: linear-gradient(135deg, #4F46E5, #7C3AED); -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;}
-.landing-sub {text-align: center; color: #374151; font-size: .9rem; margin-bottom: .9rem;}
-.features {display: flex; justify-content: center; gap: 1.6rem; color: #374151; font-size: .9rem;
+  white-space: nowrap; color: #064E3B;}
+.landing-sub {text-align: center; color: #44403C; font-size: .9rem; margin-bottom: .9rem;}
+.features {display: flex; justify-content: center; gap: 1.6rem; color: #44403C; font-size: .9rem;
   margin-top: .6rem; flex-wrap: wrap;}
 
 /* ---- duck pond loading screen ---- */
 .pond {position: relative; border-radius: 22px; padding: 2.2rem 1rem 1.2rem 1rem; overflow: hidden;
-  background: linear-gradient(180deg, #E0F2FE 0%, #BAE6FD 55%, #7DD3FC 100%);}
+  background: linear-gradient(180deg, #F0FDF4 0%, #D1FAE5 55%, #A7F3D0 100%);}
 .pond::after {content: ""; position: absolute; left: -50%; bottom: 58px; width: 200%; height: 18px;
   background: radial-gradient(circle at 10px -4px, transparent 12px, rgba(255,255,255,.55) 13px) repeat-x;
   background-size: 34px 18px; animation: waves 3s linear infinite; opacity: .9;}
@@ -77,46 +75,45 @@ st.markdown("""
 @keyframes paddle {0%,100% {margin-left: -8px;} 50% {margin-left: 8px;}}
 @keyframes ripple {from {transform: scale(.4); opacity: 1;} to {transform: scale(1.4); opacity: 0;}}
 .duck .badge-done {font-size: .95rem; height: 1.3rem;}
-.duck .label {font-weight: 700; font-size: .9rem; color: #0C4A6E; margin-top: .55rem;}
-.duck .what {font-size: .78rem; color: #075985; min-height: 2.4rem; margin-top: .15rem; padding: 0 .2rem;}
-.duck.active .label {color: #4338CA;}
-.duck.failed .label {color: #B91C1C;}
+.duck .label {font-weight: 700; font-size: .9rem; color: #064E3B; margin-top: .55rem;}
+.duck .what {font-size: .78rem; color: #065F46; min-height: 2.4rem; margin-top: .15rem; padding: 0 .2rem;}
+.duck.active .label {color: #065F46;}
+.duck.failed .label {color: #DC2626;}
 /* ---- build screen: the student's title as the headline, everything on one screen ---- */
 .build-wrap {text-align: center; margin: 0 0 1.2rem 0; animation: rise .7s ease-out both;}
 .build-wrap .eyebrow {text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; font-weight: 700;
-  color: #7C3AED;}
+  color: #064E3B;}
 .build-wrap .build-title {font-size: 2.7rem; font-weight: 800; line-height: 1.15; margin: .35rem 0 .45rem 0;
-  background: linear-gradient(135deg, #4F46E5, #7C3AED); -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;}
-.build-wrap .build-goal {color: #6B7280; font-size: 1rem; max-width: 760px; margin: 0 auto;}
+  color: #064E3B;}
+.build-wrap .build-goal {color: #57534E; font-size: 1rem; max-width: 760px; margin: 0 auto;}
 .pond {animation: rise .7s .15s ease-out both;}
 @keyframes rise {from {opacity: 0; transform: translateY(46px);} to {opacity: 1; transform: none;}}
-.pond-status {text-align: center; margin: 1.1rem 0 .3rem 0; font-size: 1.15rem; font-weight: 700; color: #1F2937;}
-.pond-detail {text-align: center; color: #4B5563; font-size: .95rem;}
+.pond-status {text-align: center; margin: 1.1rem 0 .3rem 0; font-size: 1.15rem; font-weight: 700; color: #1C1917;}
+.pond-detail {text-align: center; color: #57534E; font-size: .95rem;}
 .features span {cursor: help;}
 .group-label {font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
-  color: #4B5563; margin: .8rem 0 .3rem 0;}
-[data-testid="stVerticalBlockBorderWrapper"] {box-shadow: 0 6px 24px rgba(79, 70, 229, .08);}
-[data-testid="stDecoration"] {display: none;}
+  color: #57534E; margin: .8rem 0 .3rem 0;}
+[data-testid="stVerticalBlockBorderWrapper"] {box-shadow: 0 6px 24px rgba(28, 25, 23, .06);}
+[data-testid="stDecoration"] {display: block; height: 3px; background: #047857 !important; background-image: none !important;}
 button:focus-visible, input:focus-visible, textarea:focus-visible, [role="radio"]:focus-visible,
-[role="tab"]:focus-visible {outline: 3px solid #A78BFA !important; outline-offset: 2px;}
+[role="tab"]:focus-visible {outline: 3px solid #10B981 !important; outline-offset: 2px;}
 @media (max-width: 760px) {
   .landing-title {white-space: normal; font-size: 1.7rem;}
   .build-wrap .build-title {font-size: 1.9rem;}
   .duck .body {font-size: 2.2rem;}
 }
 /* ================= sidebar lesson list ================= */
-.side-brand {font-weight: 800; font-size: 1.05rem; color: #1F2937; margin: -.2rem 0 .6rem .1rem;}
+.side-brand {font-weight: 800; font-size: 1.05rem; color: #1C1917; margin: -.2rem 0 .6rem .1rem;}
 
 /* 14. "New lesson": the only solid indigo button */
-.st-key-newlesson button {background: #4F46E5; border: 1px solid #4F46E5; color: #fff; border-radius: 10px;}
-.st-key-newlesson button:hover {background: #4338CA; border-color: #4338CA; color: #fff;}
+.st-key-newlesson button {background: #047857; border: 1px solid #047857; color: #fff; border-radius: 10px;}
+.st-key-newlesson button:hover {background: #065F46; border-color: #065F46; color: #fff;}
 
 /* 15. Search box styled like the cards, indigo ring when focused */
-.st-key-lsearch [data-baseweb="input"] {background: #fff; border: 1px solid #E5E7EB; border-radius: 10px;}
+.st-key-lsearch [data-baseweb="input"] {background: #fff; border: 1px solid #E7E5E4; border-radius: 10px;}
 .st-key-lsearch [data-baseweb="input"] > div, .st-key-lsearch input {background: #fff;}
-.st-key-lsearch [data-baseweb="input"]:focus-within {border-color: #4F46E5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, .18);}
+.st-key-lsearch [data-baseweb="input"]:focus-within {border-color: #047857;
+  box-shadow: 0 0 0 3px rgba(4, 120, 87, .18);}
 
 /* One scrollbar only: the sidebar itself never scrolls; the lesson list fills the space left
    under the brand, "New lesson" and search, and scrolls on its own. */
@@ -126,37 +123,37 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="radio"
   padding: .55rem .8rem 0 .8rem !important; margin-bottom: 0 !important; justify-content: flex-end;}
 [data-testid="stSidebarCollapseButton"] {display: inline-flex !important; visibility: visible !important;
   opacity: 1 !important;}
-[data-testid="stSidebarCollapseButton"] button {color: #4B5563;}
-[data-testid="stSidebarCollapseButton"] button:hover {color: #4F46E5; background: #EEF2FF;}
+[data-testid="stSidebarCollapseButton"] button {color: #57534E;}
+[data-testid="stSidebarCollapseButton"] button:hover {color: #047857; background: #DCFCE7;}
 [data-testid="stSidebarUserContent"] {padding-top: 0 !important; padding-bottom: .5rem !important;}
 .st-key-llist {max-height: calc(100vh - 205px); overflow-y: auto; overflow-x: hidden; padding: 0 .35rem .6rem 0;
-  scrollbar-width: thin; scrollbar-color: #C7D2FE transparent;}
+  scrollbar-width: thin; scrollbar-color: #A7F3D0 transparent;}
 .st-key-llist::-webkit-scrollbar {width: 6px;}
-.st-key-llist::-webkit-scrollbar-thumb {background: #C7D2FE; border-radius: 6px;}
+.st-key-llist::-webkit-scrollbar-thumb {background: #A7F3D0; border-radius: 6px;}
 
 /* 6. Small, even gaps between cards */
 .st-key-llist [data-testid="stVerticalBlock"] {gap: .4rem;}
 
 /* 7 + 16. Group label: small, bold, uppercase, grey; more space above than below */
 .st-key-llist .group-label {font-size: .7rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
-  color: #6B7280; margin: .9rem 0 .15rem .15rem;}
+  color: #57534E; margin: .9rem 0 .15rem .15rem;}
 .st-key-llist [data-testid="stElementContainer"]:first-child .group-label {margin-top: .1rem;}
 
 /* 8. Card */
-[class*="st-key-lcard"] {background: #fff; border: 1px solid #E5E7EB; border-radius: 12px;
-  padding: .6rem .35rem .7rem .85rem; min-height: 3.9rem; box-shadow: 0 1px 2px rgba(17, 24, 39, .04);
+[class*="st-key-lcard"] {background: #fff; border: 1px solid #E7E5E4; border-radius: 12px;
+  padding: .6rem .35rem .7rem .85rem; min-height: 3.9rem; box-shadow: 0 1px 2px rgba(28, 25, 23, .04);
   transition: background .15s, border-color .15s; gap: 0 !important;}
 [class*="st-key-lcard"] [data-testid="stVerticalBlock"] {gap: 0 !important;}
 /* 9. Hover */
-[class*="st-key-lcard-"]:hover {background: #F5F3FF; border-color: #C7D2FE;}
+[class*="st-key-lcard-"]:hover {background: #F0FDF4; border-color: #A7F3D0;}
 /* 10. Selected lesson */
-[class*="st-key-lcardsel-"] {background: #EEF2FF; border-color: #C7D2FE; border-left: 4px solid #4F46E5;
-  padding-left: calc(.85rem - 3px);}
+[class*="st-key-lcardsel-"] {background: #DCFCE7; border-color: #A7F3D0; border-left: 3px solid #047857;
+  padding-left: calc(.85rem - 2px);}
 
 /* 4 + 5. Title: bold, left-aligned, cut off with "…" */
 [class*="st-key-lcard"] [data-testid="stColumn"] {min-width: 0;}
 [class*="st-key-lcard"] [class*="st-key-open-"] button {justify-content: flex-start; text-align: left;
-  padding: 0; min-height: 0; height: 1.6rem; width: 100%; color: #111827; overflow: hidden;}
+  padding: 0; min-height: 0; height: 1.6rem; width: 100%; color: #1C1917; overflow: hidden;}
 [class*="st-key-lcard"] [class*="st-key-open-"] button > div,
 [class*="st-key-lcard"] [class*="st-key-open-"] button > div > div {justify-content: flex-start !important;
   text-align: left !important; width: 100%; margin: 0;}
@@ -166,9 +163,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="radio"
 [class*="st-key-lcard"] [class*="st-key-open-"] button [data-testid="stMarkdownContainer"] {min-width: 0; max-width: 100%;}
 [class*="st-key-lcard"] [class*="st-key-open-"] button p {font-weight: 650; font-size: .95rem; margin: 0;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left;}
-[class*="st-key-lcard"] [class*="st-key-open-"] button:hover {color: #4338CA;}
+[class*="st-key-lcard"] [class*="st-key-open-"] button:hover {color: #065F46;}
 /* 11. Meta line (and goal snippet for repeated titles) */
-.lmeta {font-size: .76rem; color: #6B7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+.lmeta {font-size: .76rem; color: #57534E; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   line-height: 1.4; margin: .1rem 0 0 0; padding: 0;}
 [class*="st-key-lcard"] [data-testid="stMarkdown"],
 [class*="st-key-lcard"] [data-testid="stMarkdownContainer"],
@@ -176,9 +173,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="radio"
 [class*="st-key-lcard"] [data-testid="stMarkdownContainer"] p {margin: 0 !important;}
 
 /* 2 + 3 + 12. ⋮ menu: small, borderless, grey; indigo tint on hover; no dropdown arrow */
-[class*="st-key-lmenu-"] button {border: none !important; background: transparent !important; color: #6B7280;
+[class*="st-key-lmenu-"] button {border: none !important; background: transparent !important; color: #57534E;
   padding: .15rem .25rem; min-height: 0; border-radius: 8px;}
-[class*="st-key-lmenu-"] button:hover {background: #EEF2FF !important; color: #4F46E5;}
+[class*="st-key-lmenu-"] button:hover {background: #DCFCE7 !important; color: #047857;}
 /* Streamlit renders the dropdown arrow as a trailing aria-hidden span after the label: hide only that. */
 [class*="st-key-lmenu-"] button div > [aria-hidden="true"]:last-child:not(:first-child) {display: none;}
 
@@ -188,10 +185,50 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="radio"
 [class*="st-key-ltile-"] {gap: .35rem !important;}
 [class*="st-key-rn-save-"] button, [class*="st-key-del-"] button {width: 2.4rem; height: 2.4rem; min-height: 0;
   padding: 0; border-radius: 8px;}
-[class*="st-key-rn-save-"] button {color: #4F46E5; border-color: #C7D2FE;}
-[class*="st-key-rn-save-"] button:hover {background: #EEF2FF; border-color: #4F46E5;}
-[class*="st-key-del-"] button {color: #B91C1C; border-color: #FECACA;}
-[class*="st-key-del-"] button:hover {background: #FEF2F2; border-color: #F87171; color: #991B1B;}
+[class*="st-key-rn-save-"] button {color: #047857; border-color: #A7F3D0;}
+[class*="st-key-rn-save-"] button:hover {background: #DCFCE7; border-color: #047857;}
+[class*="st-key-del-"] button {color: #DC2626; border-color: #FECACA;}
+[class*="st-key-del-"] button:hover {background: #FEF2F2; border-color: #F87171; color: #B91C1C;}
+
+/* ================= Forest Green components ================= */
+.stApp {background: #FAFAF9;}
+[data-testid="stCaptionContainer"], [data-testid="stCaptionContainer"] p {color: #57534E;}
+/* Inputs: white, warm border; green border + soft green ring on focus */
+[data-baseweb="input"], [data-baseweb="textarea"], [data-baseweb="base-input"] {background: #fff !important;
+  border-color: #D6D3D1 !important;}
+[data-baseweb="input"] input, [data-baseweb="textarea"] textarea {background: #fff !important; color: #1C1917;}
+[data-baseweb="input"]:focus-within, [data-baseweb="textarea"]:focus-within {border-color: #047857 !important;
+  box-shadow: 0 0 0 3px rgba(4, 120, 87, .18) !important;}
+/* Level selector: selected = solid green with white text; others plain white; no glow */
+button[kind="segmented_control"] {background: #fff; color: #1C1917; border-color: #D6D3D1 !important;
+  box-shadow: none !important;}
+button[kind="segmented_control"]:hover {background: #F0FDF4; color: #065F46;}
+button[kind="segmented_controlActive"] {background: #047857 !important; color: #fff !important;
+  border-color: #047857 !important; box-shadow: none !important;}
+/* Example chips: white, thin green border, green text; pale green on hover */
+button[kind="pills"] {background: #fff; color: #047857; border: 1px solid #047857 !important;}
+button[kind="pills"]:hover {background: #DCFCE7; color: #065F46;}
+button[kind="pillsActive"] {background: #DCFCE7 !important; color: #065F46 !important;
+  border: 1px solid #047857 !important;}
+.st-key-example_pick [data-testid="stIconMaterial"] {color: #F59E0B;}
+/* Primary buttons: emerald, darker on hover; mint with grey text when disabled */
+button[kind="primary"] {background: #047857; border-color: #047857; color: #fff;}
+button[kind="primary"]:hover {background: #065F46 !important; border-color: #065F46 !important; color: #fff;}
+button[kind="primary"]:disabled {background: #BBF7D0 !important; border-color: #BBF7D0 !important;
+  color: #78716C !important;}
+/* "Continue where you left off": white cards, soft green shadow on hover */
+[class*="st-key-recent-"] button {background: #fff; border: 1px solid #E7E5E4; border-radius: 12px; color: #1C1917;}
+[class*="st-key-recent-"] button:hover {border-color: #A7F3D0; box-shadow: 0 6px 18px rgba(4, 120, 87, .15);
+  color: #065F46;}
+/* Trust signals: one icon style, one colour */
+.features {color: #44403C;}
+.features span {display: inline-flex; align-items: center; gap: .35rem;}
+.features svg {width: 1rem; height: 1rem; stroke: #047857; flex: none;}
+/* Learn view callouts */
+.callout {border-radius: 10px; padding: .7rem .9rem; margin: .35rem 0 .6rem 0; color: #1C1917;}
+.callout.def {background: #F0FDF4; border-left: 4px solid #047857;}
+.callout.ex {background: #FFFBEB; border-left: 4px solid #F59E0B;}
+.callout b {color: #064E3B;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -420,9 +457,11 @@ def render_learn(project: Project, lesson, research) -> None:
                         f'<span class="minutes">⏱ {s.duration_minutes} min</span></div>', unsafe_allow_html=True)
             for block in s.content_blocks:
                 if block.type is ContentBlockType.DEFINITION:
-                    st.info(f"**Definition** - {block.content}", icon="📘")
+                    st.markdown(f'<div class="callout def"><b>Definition</b> - {escape(block.content)}</div>',
+                                unsafe_allow_html=True)
                 elif block.type is ContentBlockType.EXAMPLE:
-                    st.success(f"**Example** - {block.content}", icon="💡")
+                    st.markdown(f'<div class="callout ex"><b>Example</b> - {escape(block.content)}</div>',
+                                unsafe_allow_html=True)
                 elif block.type is ContentBlockType.CODE:
                     st.code(block.content)
                 elif block.type is ContentBlockType.NOTE:
@@ -624,7 +663,8 @@ def landing_form() -> None:
         objective = st.text_area("After this lesson, I want to be able to...", key="in_objective",
                                  placeholder="e.g. Describe the inputs and outputs of photosynthesis "
                                              "and explain the role of chlorophyll.", height=76)
-        st.pills("Try an example", [t for t, _ in EXAMPLES], key="example_pick", on_change=_fill_example)
+        st.pills(":material/lightbulb: Try an example", [t for t, _ in EXAMPLES], key="example_pick",
+                 on_change=_fill_example)
         submitted = st.button("Create my lesson", type="primary", use_container_width=True)
         if not (title or "").strip() or not (objective or "").strip():
             st.caption("Add a topic and a goal to start - or pick an example above.")
@@ -681,11 +721,11 @@ if project is None:
         st.markdown(
             '<div class="features">'
             '<span title="Facts come from Wikipedia articles, quoted word for word; books and YouTube '
-            'videos are added as references and extra viewing.">🔎 Researched from trusted sources ⓘ</span>'
+            'videos are added as references and extra viewing."><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Researched from trusted sources</span>'
             '<span title="Sections, activities and quizzes are timed so the whole lesson takes at most '
-            '45 minutes.">⏱ Finish in 45 minutes ⓘ</span>'
+            '45 minutes."><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Finish in 45 minutes</span>'
             '<span title="Check 1 compares every fact with its source. Check 2 makes sure the lesson '
-            'really teaches your goal, clearly and in a good order.">✅ Double-checked ⓘ</span></div>',
+            'really teaches your goal, clearly and in a good order."><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>Double-checked</span></div>',
             unsafe_allow_html=True)
         recent = [p for p in Project.list_all() if p.next_step() is None][:3]
         if recent:
