@@ -6,6 +6,7 @@ Run from the backend folder:
 
 import random
 import time
+from html import escape
 
 import streamlit as st
 
@@ -78,6 +79,16 @@ st.markdown("""
 .duck .what {font-size: .78rem; color: #075985; min-height: 2.4rem; margin-top: .15rem; padding: 0 .2rem;}
 .duck.active .label {color: #4338CA;}
 .duck.failed .label {color: #B91C1C;}
+/* ---- build screen: the student's title as the headline, everything on one screen ---- */
+.build-wrap {text-align: center; margin: 1.2rem 0 1.4rem 0; animation: rise .7s ease-out both;}
+.build-wrap .eyebrow {text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; font-weight: 700;
+  color: #7C3AED;}
+.build-wrap .build-title {font-size: 2.7rem; font-weight: 800; line-height: 1.15; margin: .35rem 0 .45rem 0;
+  background: linear-gradient(135deg, #4F46E5, #7C3AED); -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;}
+.build-wrap .build-goal {color: #6B7280; font-size: 1rem; max-width: 760px; margin: 0 auto;}
+.pond {animation: rise .7s .15s ease-out both;}
+@keyframes rise {from {opacity: 0; transform: translateY(46px);} to {opacity: 1; transform: none;}}
 .pond-status {text-align: center; margin: 1.1rem 0 .3rem 0; font-size: 1.15rem; font-weight: 700; color: #1F2937;}
 .pond-detail {text-align: center; color: #4B5563; font-size: .95rem;}
 </style>
@@ -137,7 +148,7 @@ def _pond_html(states: dict[str, str], notes: dict[str, str]) -> str:
         ducks.append(
             f'<div class="duck {state}"><div class="badge-done">{badge}</div>'
             f'<div class="body"><span class="bob">🦆</span></div>'
-            f'<div class="label">{label}</div><div class="what">{notes.get(key, blurb)}</div></div>'
+            f'<div class="label">{label}</div><div class="what">{escape(notes.get(key, blurb))}</div></div>'
         )
     return f'<div class="pond"><div class="duck-row">{"".join(ducks)}</div></div>'
 
@@ -175,8 +186,10 @@ def generate_with_progress(project: Project) -> bool:
 
     _, middle, _ = st.columns([1, 6, 1])
     with middle:
-        st.markdown(f'<div class="landing-title" style="margin-top:1.5rem;font-size:1.9rem">'
-                    f'Building your lesson</div><div class="landing-sub">{project.inputs.title}</div>',
+        # The student's own title becomes the headline (escaped: it is user input).
+        st.markdown(f'<div class="build-wrap"><div class="eyebrow">Building your lesson</div>'
+                    f'<div class="build-title">{escape(project.inputs.title)}</div>'
+                    f'<div class="build-goal">🎯 {escape(project.inputs.objective)}</div></div>',
                     unsafe_allow_html=True)
         pond, status, bar, tip_box, clock = (st.empty() for _ in range(5))
 
@@ -291,12 +304,12 @@ def render_learn(project: Project, lesson, research) -> None:
     with st.container(border=True):
         st.markdown("#### 🎯 By the end of this lesson you will be able to")
         for o in lesson.learning_objectives:
-            st.markdown(f'<div class="objective">☐ {o.description}</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="objective">☐ {escape(o.description)}</div>', unsafe_allow_html=True)
 
     number = 0
     for s in sections:
         with st.container(border=True):
-            st.markdown(f'<div class="section-head"><h4 style="margin:0">{s.title}</h4>'
+            st.markdown(f'<div class="section-head"><h4 style="margin:0">{escape(s.title)}</h4>'
                         f'<span class="minutes">⏱ {s.duration_minutes} min</span></div>', unsafe_allow_html=True)
             for block in s.content_blocks:
                 if block.type is ContentBlockType.DEFINITION:
@@ -358,6 +371,29 @@ except LLMConfigError as exc:
 
 project = current_project()
 
+
+def start_building(project_id: str) -> None:
+    """Switch to the build screen on the next run (used as a button callback)."""
+    st.session_state["project_id"] = project_id
+    st.session_state["building"] = project_id
+
+
+# ------------------------------------------------------------ build screen
+# Shown on its own: the input box is gone and the student's title is the headline.
+
+if project is not None and st.session_state.get("building") == project.meta["project_id"]:
+    st.session_state.pop("building")
+    if generate_with_progress(project):
+        time.sleep(1.5)
+        st.rerun()
+    _, middle, _ = st.columns([1, 6, 1])
+    with middle:
+        c1, c2 = st.columns(2)
+        c1.button("🔁 Try again", type="primary", use_container_width=True,
+                  on_click=start_building, args=(project.meta["project_id"],))
+        c2.button("Back to the lesson page", use_container_width=True)
+    st.stop()
+
 # ---------------------------------------------------------------- landing
 
 if project is None:
@@ -393,26 +429,22 @@ if project is None:
         except InputError as exc:
             problem.warning(f"Please check your input: {exc}")
             st.stop()
-        st.session_state["project_id"] = new.meta["project_id"]
-        if generate_with_progress(new):
-            time.sleep(1.5)
-            st.rerun()
+        start_building(new.meta["project_id"])
+        st.rerun()
     st.stop()
 
 # ------------------------------------------------------------ lesson page
 
 inputs = project.inputs
-st.markdown(f'<div class="hero"><h1>{inputs.title}</h1><p>🎯 {inputs.objective}</p></div>',
+st.markdown(f'<div class="hero"><h1>{escape(inputs.title)}</h1><p>🎯 {escape(inputs.objective)}</p></div>',
             unsafe_allow_html=True)
 
 if project.next_step():
     failed = any(s["status"] == "failed" for s in project.meta["steps"].values())
     if project.lesson() is None or project.next_step() != "qc" or failed:
         st.info("This lesson isn't finished yet. Your progress so far is saved.")
-        if st.button("🔁 Try again" if failed else "▶ Continue", type="primary"):
-            if generate_with_progress(project):
-                time.sleep(1.2)
-                st.rerun()
+        st.button("🔁 Try again" if failed else "▶ Continue", type="primary",
+                  on_click=start_building, args=(project.meta["project_id"],))
         if project.lesson() is None:
             st.stop()
 
@@ -421,9 +453,8 @@ audits = project.audits()
 research = project.research()
 if project.step("qc")["status"] != "done":
     st.warning(f"Version {lesson.version} hasn't been quality-checked yet.")
-    if st.button("✅ Run quality checks", type="primary"):
-        if generate_with_progress(project):
-            st.rerun()
+    st.button("✅ Run quality checks", type="primary",
+              on_click=start_building, args=(project.meta["project_id"],))
 
 tabs = st.tabs(["📖 Learn", "✅ Fact check (QC1)", "🎓 Teaching check (QC2)", "🛠 Improve",
                 "✏️ Edit", "📚 Sources", "⬇ Export", "🕘 History"])
