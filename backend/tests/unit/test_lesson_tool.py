@@ -207,14 +207,3 @@ def test_same_topic_and_level_is_detected(project, tmp_path):
     assert Project.find_existing(same, root=tmp_path).folder == project.folder
     other_level = validate_inputs("Machine learning", OBJECTIVE, "advanced")
     assert Project.find_existing(other_level, root=tmp_path) is None
-
-
-def test_goal_suggestion_uses_the_model():
-    from app.generation.goal import suggest_goal
-
-    class GoalLLM:
-        model = "fake"
-        def generate_json(self, *, system, user, schema):
-            assert '"topic": "Volcanoes"' in user
-            return {"goal": "Explain how volcanoes form and describe why they erupt."}
-    assert suggest_goal("Volcanoes", "beginner", GoalLLM()).startswith("Explain how volcanoes")

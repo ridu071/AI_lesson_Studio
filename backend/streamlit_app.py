@@ -12,7 +12,6 @@ from html import escape
 import streamlit as st
 
 from app.core.config import get_settings
-from app.generation.goal import suggest_goal
 from app.generation.render import render_lesson_markdown, render_references
 from app.llm.base import LLMConfigError
 from app.llm.factory import create_llm_client
@@ -53,7 +52,7 @@ st.markdown("""
   white-space: nowrap;
   background: linear-gradient(135deg, #4F46E5, #7C3AED); -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;}
-.landing-sub {text-align: center; color: #374151; font-size: 1rem; margin-bottom: 1rem;}
+.landing-sub {text-align: center; color: #374151; font-size: .9rem; margin-bottom: .9rem;}
 .features {display: flex; justify-content: center; gap: 1.6rem; color: #374151; font-size: .9rem;
   margin-top: .6rem; flex-wrap: wrap;}
 
@@ -143,16 +142,15 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="radio"
 /* 4 + 5. Title: bold, left-aligned, cut off with "…" */
 [class*="st-key-lcard"] [data-testid="stColumn"] {min-width: 0;}
 [class*="st-key-lcard"] [class*="st-key-open-"] button {justify-content: flex-start; text-align: left;
-  padding: 0; min-height: 0; width: 100%; color: #111827;}
+  padding: 0; min-height: 0; height: 1.45rem; width: 100%; color: #111827; overflow: hidden;}
 [class*="st-key-lcard"] [class*="st-key-open-"] button > div,
 [class*="st-key-lcard"] [class*="st-key-open-"] button [data-testid="stMarkdownContainer"] {min-width: 0; max-width: 100%;}
 [class*="st-key-lcard"] [class*="st-key-open-"] button p {font-weight: 650; font-size: .95rem; margin: 0;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left;}
 [class*="st-key-lcard"] [class*="st-key-open-"] button:hover {color: #4338CA;}
 /* 11. Meta line (and goal snippet for repeated titles) */
-.lmeta, .lgoal {font-size: .76rem; color: #6B7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+.lmeta {font-size: .76rem; color: #6B7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   line-height: 1.35;}
-.lgoal {color: #4B5563; font-style: italic;}
 
 /* 2 + 3 + 12. ⋮ menu: small, borderless, grey; indigo tint on hover; no dropdown arrow */
 [class*="st-key-lmenu-"] button {border: none !important; background: transparent !important; color: #6B7280;
@@ -449,8 +447,17 @@ def _when(created_at: str) -> tuple[str, str]:
     return ("This week" if age < timedelta(days=7) else "Earlier"), label
 
 
-def _lesson_card(p: Project, duplicated: bool) -> None:
-    """One lesson = one card: bold title, meta line (and goal if the title repeats), ⋮ menu."""
+CARD_TITLE_CHARS = 28  # what fits on one line of a sidebar card
+
+
+def _fit(text: str, limit: int = CARD_TITLE_CHARS) -> str:
+    """Shorten to one card line with '…' (the CSS does the same; this is the fallback)."""
+    text = " ".join(text.split())
+    return text if len(text) <= limit else text[: limit - 1].rstrip() + "…"
+
+
+def _lesson_card(p: Project) -> None:
+    """One lesson = one card: a one-line bold title, a one-line meta line, and the ⋮ menu."""
     pid = p.meta["project_id"]
     current = st.session_state.get("project_id") == pid
     created = datetime.fromisoformat(p.meta["created_at"])
@@ -465,12 +472,10 @@ def _lesson_card(p: Project, duplicated: bool) -> None:
     with st.container(key=f"{'lcardsel' if current else 'lcard'}-{pid}"):
         c1, c2 = st.columns([9, 1], vertical_alignment="center", gap="small")
         with c1:
-            if st.button(p.display_name, key=f"open-{pid}", type="tertiary", use_container_width=True,
+            if st.button(_fit(p.display_name), key=f"open-{pid}", type="tertiary", use_container_width=True,
                          help=p.display_name):
                 go(pid)
-            goal = (f'<div class="lgoal">{escape(" ".join(p.inputs.objective.split()[:9]))}…</div>'
-                    if duplicated else "")
-            st.markdown(f'<div class="lmeta">{escape(" · ".join(meta))}</div>{goal}', unsafe_allow_html=True)
+            st.markdown(f'<div class="lmeta">{escape(" · ".join(meta))}</div>', unsafe_allow_html=True)
         with c2:
             with st.popover("", icon=":material/more_vert:", type="tertiary", key=f"lmenu-{pid}",
                             help="Rename or delete"):
@@ -503,7 +508,6 @@ with st.sidebar:
     if query.strip():
         q = query.casefold()
         lessons = [p for p in lessons if q in p.display_name.casefold() or q in p.inputs.objective.casefold()]
-    names = [p.display_name.casefold() for p in lessons]
     with st.container(height=600, border=False, key="llist"):
         if not lessons:
             st.caption("No lessons found." if query.strip() else "No lessons yet. Create your first one!")
@@ -512,7 +516,7 @@ with st.sidebar:
             if members:
                 st.markdown(f'<div class="group-label">{group}</div>', unsafe_allow_html=True)
                 for p in members:
-                    _lesson_card(p, names.count(p.display_name.casefold()) > 1)
+                    _lesson_card(p)
 
 try:
     llm()
@@ -573,19 +577,6 @@ def _fill_example() -> None:
         st.session_state["in_title"], st.session_state["in_objective"] = picked, goal
 
 
-def _suggest_goal() -> None:
-    topic = (st.session_state.get("in_title") or "").strip()
-    if len(topic) < 3:
-        st.session_state["goal_hint"] = "Type a topic first, then I can suggest a goal."
-        return
-    level = (st.session_state.get("in_level") or "Beginner").lower()
-    try:
-        st.session_state["in_objective"] = suggest_goal(topic, level, llm()[1])
-        st.session_state["goal_hint"] = "Suggested goal added. Edit it if you like."
-    except Exception as exc:  # noqa: BLE001 - any failure: just tell the user
-        st.session_state["goal_hint"] = f"Couldn't suggest a goal right now ({type(exc).__name__}). Try again."
-
-
 if project is None:
     _, middle, _ = st.columns([0.6, 4, 0.6])
     with middle:
@@ -600,14 +591,9 @@ if project is None:
             level_name = c_level.segmented_control("Level", list(LEVELS), key="in_level",
                                                    default="Beginner") or "Beginner"
             c_level.caption(f"**{level_name}:** {LEVELS[level_name]}")
-            g1, g2 = st.columns([3, 1], vertical_alignment="bottom")
-            objective = g1.text_area("After this lesson, I want to be able to...", key="in_objective",
+            objective = st.text_area("After this lesson, I want to be able to...", key="in_objective",
                                      placeholder="e.g. Describe the inputs and outputs of photosynthesis "
                                                  "and explain the role of chlorophyll.", height=76)
-            g2.button("✨ Suggest a goal", on_click=_suggest_goal, use_container_width=True,
-                      help="Drafts a clear goal from your topic and level")
-            if st.session_state.get("goal_hint"):
-                st.caption(st.session_state.pop("goal_hint"))
             st.markdown('<div class="you-get"><b>You\'ll get:</b> clear explanations · worked examples · '
                         'a hands-on activity · quiz questions with instant feedback · a summary · '
                         'videos and references</div>', unsafe_allow_html=True)
