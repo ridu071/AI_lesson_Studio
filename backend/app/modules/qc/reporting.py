@@ -162,3 +162,22 @@ def render_markdown(qc_input: QCInput, run: QCRunResult) -> str:
             f"checks run: {', '.join(audit.evaluators) or 'none'}"
         )
     return "\n".join(lines) + "\n"
+
+
+def render_audit_report(qc_input: QCInput, audit: AuditReport) -> str:
+    """One layer's audit as its own report (the assignment asks for separate reports)."""
+    lesson = qc_input.lesson
+    prompts = ", ".join(f"{k} {v}" for k, v in audit.prompt_versions.items()) or "none"
+    lines = [
+        f"# {LAYER_TITLE[audit.audit_type]} - audit report",
+        "",
+        f"Lesson: **{lesson.title}** - version {lesson.version} - content hash "
+        f"`{lesson.content_hash()[:12]}`",
+        "",
+        *_layer_section(qc_input, audit)[1:],  # drop the duplicate layer heading
+        "---",
+        "",
+        f"Rubric {audit.rubric_version} - model {audit.llm_model or 'none'} - prompts: {prompts} - "
+        f"checks run: {', '.join(audit.evaluators) or 'none'}",
+    ]
+    return "\n".join(lines) + "\n"

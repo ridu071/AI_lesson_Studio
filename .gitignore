@@ -19,3 +19,6 @@ node_modules/
 # Benchmark run output
 evaluation/evaluation_results/*
 !evaluation/evaluation_results/.gitkeep
+
+# Lesson projects created by the app (local working data)
+data/

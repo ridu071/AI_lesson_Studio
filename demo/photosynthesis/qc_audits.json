@@ -1,0 +1,244 @@
+{
+  "qc1": {
+    "audit_id": "AUD-LES-001-V2-QC1",
+    "audit_type": "qc1",
+    "lesson_id": "LES-001",
+    "version": 2,
+    "content_hash": "610f9aa6b235688809869b911ad5e4e1adef4aa67da05f9feea7e8c51730c0c7",
+    "rubric_version": "0.1.0",
+    "status": "passed",
+    "score": 100.0,
+    "subscores": [
+      {
+        "name": "claim_evidence_support",
+        "weight": 0.3,
+        "score": 100.0
+      },
+      {
+        "name": "source_credibility",
+        "weight": 0.2,
+        "score": 100.0
+      },
+      {
+        "name": "citation_integrity",
+        "weight": 0.15,
+        "score": 100.0
+      },
+      {
+        "name": "cross_source_consistency",
+        "weight": 0.15,
+        "score": 100.0
+      },
+      {
+        "name": "factual_correctness",
+        "weight": 0.15,
+        "score": 100.0
+      },
+      {
+        "name": "research_coverage",
+        "weight": 0.05,
+        "score": 100.0
+      }
+    ],
+    "evaluators": [
+      "citation_check",
+      "claim_verification",
+      "consistency_check",
+      "gap_detection",
+      "source_assessment"
+    ],
+    "llm_model": "gemini-3.5-flash-lite",
+    "prompt_versions": {
+      "qc1/llm_review": "0.1.0"
+    },
+    "issues": [],
+    "claim_assessments": [
+      {
+        "claim_id": "CL-01",
+        "verdict": "supported",
+        "evidence": [
+          {
+            "source_id": "SRC-001",
+            "passage_id": "EV-001",
+            "note": null
+          }
+        ],
+        "explanation": "Claim CL-01 is supported: The passage states that photosynthesis is the process by which photopigment-bearing autotrophic organisms like plants, algae, and cyanobacteria convert sunlight into chemical energy."
+      },
+      {
+        "claim_id": "CL-02",
+        "verdict": "supported",
+        "evidence": [
+          {
+            "source_id": "SRC-001",
+            "passage_id": "EV-001",
+            "note": null
+          }
+        ],
+        "explanation": "Claim CL-02 is supported: The passage states that oxygenic photosynthesis releases oxygen as a byproduct of water splitting in most plants, algae, and cyanobacteria."
+      },
+      {
+        "claim_id": "CL-03",
+        "verdict": "supported",
+        "evidence": [
+          {
+            "source_id": "SRC-001",
+            "passage_id": "EV-004",
+            "note": null
+          }
+        ],
+        "explanation": "Claim CL-03 is supported: The passage states that carbon dioxide is converted into sugars in a process called carbon fixation."
+      },
+      {
+        "claim_id": "CL-04",
+        "verdict": "supported",
+        "evidence": [
+          {
+            "source_id": "SRC-001",
+            "passage_id": "EV-001",
+            "note": null
+          }
+        ],
+        "explanation": "Claim CL-04 is supported: The passage states that photosynthetic organisms store converted chemical energy within the bonds of intracellular organic compounds like carbohydrates, sugars, and cellulose."
+      },
+      {
+        "claim_id": "CL-05",
+        "verdict": "supported",
+        "evidence": [
+          {
+            "source_id": "SRC-002",
+            "passage_id": "EV-020",
+            "note": null
+          }
+        ],
+        "explanation": "Claim CL-05 is supported: The passage defines chlorophyll as green pigments and photochemical catalysts found in cyanobacteria and chloroplasts of algae and plants."
+      },
+      {
+        "claim_id": "CL-06",
+        "verdict": "supported",
+        "evidence": [
+          {
+            "source_id": "SRC-002",
+            "passage_id": "EV-020",
+            "note": null
+          }
+        ],
+        "explanation": "Claim CL-06 is supported: The passage explicitly states that chlorophyll allows plants to absorb energy from light."
+      },
+      {
+        "claim_id": "CL-07",
+        "verdict": "supported",
+        "evidence": [
+          {
+            "source_id": "SRC-001",
+            "passage_id": "EV-008",
+            "note": null
+          }
+        ],
+        "explanation": "Claim CL-07 is supported: The passage describes chlorophyll absorbing photons and the water molecule ultimately being split in photolysis."
+      }
+    ],
+    "coverage": [],
+    "started_at": "2026-11-07T11:11:18.659961Z",
+    "completed_at": "2026-11-07T11:11:22.594379Z",
+    "error_message": null
+  },
+  "qc2": {
+    "audit_id": "AUD-LES-001-V2-QC2",
+    "audit_type": "qc2",
+    "lesson_id": "LES-001",
+    "version": 2,
+    "content_hash": "610f9aa6b235688809869b911ad5e4e1adef4aa67da05f9feea7e8c51730c0c7",
+    "rubric_version": "0.1.0",
+    "status": "passed",
+    "score": 100.0,
+    "subscores": [
+      {
+        "name": "objective_alignment",
+        "weight": 0.25,
+        "score": 100.0
+      },
+      {
+        "name": "clarity",
+        "weight": 0.15,
+        "score": 100.0
+      },
+      {
+        "name": "learning_progression",
+        "weight": 0.15,
+        "score": 100.0
+      },
+      {
+        "name": "examples",
+        "weight": 0.1,
+        "score": 100.0
+      },
+      {
+        "name": "activities",
+        "weight": 0.1,
+        "score": 100.0
+      },
+      {
+        "name": "assessment_effectiveness",
+        "weight": 0.15,
+        "score": 100.0
+      },
+      {
+        "name": "engagement_accessibility",
+        "weight": 0.05,
+        "score": 100.0
+      },
+      {
+        "name": "time_feasibility",
+        "weight": 0.05,
+        "score": 100.0
+      }
+    ],
+    "evaluators": [
+      "assessment_check",
+      "coverage_check",
+      "duration_check",
+      "instructional_review",
+      "structure_check"
+    ],
+    "llm_model": "gemini-3.5-flash-lite",
+    "prompt_versions": {
+      "qc2/llm_review": "0.2.0"
+    },
+    "issues": [],
+    "claim_assessments": [],
+    "coverage": [
+      {
+        "objective_id": "LO-01",
+        "explained": true,
+        "exemplified": true,
+        "practiced": true,
+        "assessed": true
+      },
+      {
+        "objective_id": "LO-02",
+        "explained": true,
+        "exemplified": true,
+        "practiced": true,
+        "assessed": true
+      }
+    ],
+    "started_at": "2026-11-07T11:11:22.595392Z",
+    "completed_at": "2026-11-07T11:11:25.401485Z",
+    "error_message": null
+  },
+  "release": {
+    "lesson_id": "LES-001",
+    "version": 2,
+    "content_hash": "610f9aa6b235688809869b911ad5e4e1adef4aa67da05f9feea7e8c51730c0c7",
+    "qc1_audit_id": "AUD-LES-001-V2-QC1",
+    "qc2_audit_id": "AUD-LES-001-V2-QC2",
+    "decision": "eligible_for_instructor_review",
+    "reasons": [
+      "QC1 passed with score 100.0.",
+      "QC2 passed with score 100.0."
+    ],
+    "blocking_issue_ids": [],
+    "decided_at": "2026-11-07T11:11:25.402991Z"
+  }
+}

@@ -18,7 +18,10 @@ LOW_AUTHORITY = frozenset({AuthorityCategory.COMMUNITY, AuthorityCategory.UNKNOW
 def check_source_credibility(
     lesson: LessonVersion, research: ResearchPackage, issues: IssueCollector
 ) -> None:
-    for source_id in sorted(lesson.cited_source_ids()):
+    # Only sources used as evidence. Supplementary videos are optional extras.
+    evidence_ids = {sid for s in lesson.sections for sid in s.source_ids}
+    evidence_ids |= {sid for c in lesson.claims for sid in c.source_ids}
+    for source_id in sorted(evidence_ids):
         source = research.find_source(source_id)
         if source and source.authority_category in LOW_AUTHORITY:
             issues.add(

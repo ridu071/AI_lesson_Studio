@@ -90,6 +90,7 @@ class AuthorityCategory(StrEnum):
     OFFICIAL = "official"
     GOVERNMENT = "government"
     EDUCATIONAL = "educational"
+    REFERENCE = "reference"  # encyclopedias and other tertiary references
     INDUSTRY = "industry"
     NEWS = "news"
     COMMUNITY = "community"

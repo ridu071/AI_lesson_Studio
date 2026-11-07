@@ -1,0 +1,286 @@
+{
+  "request_id": null,
+  "sources": [
+    {
+      "source_id": "SRC-001",
+      "source_type": "website",
+      "title": "Photosynthesis (Wikipedia)",
+      "publisher": "Wikipedia",
+      "author": null,
+      "url": "https://en.wikipedia.org/wiki/Photosynthesis",
+      "published_at": "2026-11-01",
+      "retrieved_at": "2026-11-07",
+      "access_status": "accessible",
+      "content_access": "excerpt",
+      "authority_category": "reference",
+      "relevance_score": 64.0,
+      "evidence_passages": [
+        {
+          "passage_id": "EV-001",
+          "text": "Photosynthesis is a system of biological processes by which photopigment-bearing autotrophic organisms, such as most plants, algae and cyanobacteria, convert light energy—typically from sunlight—into the chemical energy necessary to fuel their metabolism. The term photosynthesis usually refers to oxygenic photosynthesis, a process that releases oxygen as a byproduct of water splitting. Photosynthetic organisms store the converted chemical energy within the bonds of intracellular organic compounds (complex compounds containing carbon), typically carbohydrates like sugars (mainly glucose, fructose and sucrose), starches, phytoglycogen and cellulose.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-002",
+          "text": "When needing to use this stored energy, an organism's cells then metabolize the organic compounds through cellular respiration. Photosynthesis plays a critical role in producing and maintaining the oxygen content of the Earth's atmosphere, and it supplies most of the biological energy necessary for complex life on Earth.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-003",
+          "text": "Although there are some differences between oxygenic photosynthesis in plants, algae, and cyanobacteria, the overall process is quite similar in these organisms. There are also many varieties of anoxygenic photosynthesis, used mostly by bacteria, which consume carbon dioxide but do not release oxygen or which produce elemental sulfur instead of molecular oxygen.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-004",
+          "text": "Carbon dioxide is converted into sugars in a process called carbon fixation; photosynthesis captures energy from sunlight to convert carbon dioxide into carbohydrates. Carbon fixation is an endothermic redox reaction. In general outline, photosynthesis is the opposite of cellular respiration: while photosynthesis is a process of reduction of carbon dioxide to carbohydrates, cellular respiration is the oxidation of carbohydrates or other nutrients to carbon dioxide. Nutrients used in cellular respiration include carbohydrates, amino acids and fatty acids. These nutrients are oxidized to produce carbon dioxide and water, and to release chemical energy to drive the organism's metabolism.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-005",
+          "text": "Since water is used as the electron donor in oxygenic photosynthesis, the equation for this process is:",
+          "location": null
+        },
+        {
+          "passage_id": "EV-006",
+          "text": "Other processes substitute other compounds (such as arsenite) for water in the electron-supply role; for example some microbes use sunlight to oxidize arsenite to arsenate: The equation for this reaction is:",
+          "location": null
+        },
+        {
+          "passage_id": "EV-007",
+          "text": "Some organisms employ even more radical variants of photosynthesis. Some archaea use a simpler method that employs a pigment similar to those used for vision in animals. The bacteriorhodopsin changes its configuration in response to sunlight, acting as a proton pump. This produces a proton gradient more directly, which is then converted to chemical energy. The process does not involve carbon dioxide fixation and does not release oxygen, and seems to have evolved separately from the more common types of photosynthesis.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-008",
+          "text": "In the light-dependent reactions, one molecule of the pigment chlorophyll absorbs one photon and loses one electron. This electron is taken up by a modified form of chlorophyll called pheophytin, which passes the electron to a quinone molecule, starting the flow of electrons down an electron transport chain that leads to the ultimate reduction of NADP to NADPH. In addition, this creates a proton gradient (energy gradient) across the chloroplast membrane, which is used by ATP synthase in the synthesis of ATP. The chlorophyll molecule ultimately regains the electron it lost when a water molecule is split in a process called photolysis, which releases oxygen.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-009",
+          "text": "In the non-cyclic reaction, the photons are captured in the light-harvesting antenna complexes of photosystem II by chlorophyll and other accessory pigments (see diagram \"Z-scheme\"). The absorption of a photon by the antenna complex loosens an electron by a process called photoinduced charge separation. The antenna system is at the core of the chlorophyll molecule of the photosystem II reaction center. That loosened electron is taken up by the primary electron-acceptor molecule, pheophytin.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-010",
+          "text": "Linear electron transport through a photosystem will leave the reaction center of that photosystem oxidized. Elevating another electron will first require re-reduction of the reaction center. The excited electrons lost from the reaction center (P700) of photosystem I are replaced by transfer from plastocyanin, whose electrons come from electron transport through photosystem II. Photosystem II, as the first step of the Z-scheme, requires an external source of electrons to reduce its oxidized chlorophyll a reaction center. The source of electrons for photosynthesis in green plants and cyanobacteria is water.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-011",
+          "text": "Calcium-oxalate-accumulating plants, such as Amaranthus hybridus and Colobanthus quitensis, show a variation of photosynthesis where calcium oxalate crystals function as dynamic carbon pools, supplying carbon dioxide (CO2) to photosynthetic cells when stomata are partially or totally closed. This process was named alarm photosynthesis. Under stress conditions (e.g., water deficit), oxalate released from calcium oxalate crystals is converted to CO2 by an oxalate oxidase enzyme, and the produced CO2 can support the Calvin cycle reactions. Reactive hydrogen peroxide (H2O2), the byproduct of oxalate oxidase reaction, can be neutralized by catalase.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-012",
+          "text": "Absorbed light that is unconverted is dissipated primarily as heat, with a small fraction (1–2%) reemitted as chlorophyll fluorescence at longer (redder) wavelengths. This fact allows measurement of the light reaction of photosynthesis by using chlorophyll fluorometers.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-013",
+          "text": "Integrated chlorophyll fluorometer – gas exchange systems allow a more precise measure of photosynthetic response and mechanisms. While standard gas exchange photosynthesis systems can measure Ci, or substomatal CO2 levels, the addition of integrated chlorophyll fluorescence measurements allows a more precise measurement of CC, the estimation of CO2 concentration at the site of carboxylation in the chloroplast, to replace Ci. CO2 concentration in the chloroplast becomes possible to estimate with the measurement of mesophyll conductance or gm using an integrated system.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-014",
+          "text": "Photosynthesis measurement systems are not designed to directly measure the amount of light the leaf absorbs, but analysis of chlorophyll fluorescence, P700- and P515-absorbance, and gas exchange measurements reveal detailed information about, e.g., the photosystems, quantum efficiency and the CO2 assimilation rates. With some instruments, even wavelength dependency of the photosynthetic efficiency can be analyzed.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-015",
+          "text": "With a possible exception of Heimdallarchaeota, photosynthesis is not found in archaea. Haloarchaea are photoheterotrophic; they can absorb energy from the sun, but do not harvest carbon from the atmosphere and are therefore not photosynthetic. Instead of chlorophyll they use rhodopsins, which convert light-energy to ion gradients but cannot mediate electron transfer reactions.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-016",
+          "text": "Jan van Helmont began the research of the process in the mid-17th century when he carefully measured the mass of the soil a plant was using and the mass of the plant as it grew. After noticing that the soil mass changed very little, he hypothesized that the mass of the growing plant must come from the water, the only substance he added to the potted plant. His hypothesis was partially accurate – much of the gained mass comes from carbon dioxide as well as water. However, this was a signaling point to the idea that the bulk of a plant's biomass comes from the inputs of photosynthesis, not the soil itself.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-017",
+          "text": "In 1893, the American botanist Charles Reid Barnes proposed two terms, photosyntax and photosynthesis, for the biological process of synthesis of complex carbon compounds out of carbonic acid, in the presence of chlorophyll, under the influence of light. The term photosynthesis is derived from the Greek phōs (φῶς, 'gleam') and sýnthesis (σύνθεσις, 'arranging together'), while photosyntax comes from sýntaxis (σύνταξις, 'configuration'). Over time, the term photosynthesis came into common usage. Later discovery of anoxygenic photosynthetic bacteria and photophosphorylation necessitated redefinition of the term.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-018",
+          "text": "Later in 1958–1963 at Cornell University, field grown maize was reported to have much greater leaf photosynthetic rates of 40 μmol CO2·m−2·s−1 and not be saturated at near full sunlight. This higher rate in maize was almost double of those observed in other species such as wheat and soybean, indicating that large differences in photosynthesis exist among higher plants. At the University of Arizona, detailed gas exchange research on more than 15 species of monocots and dicots uncovered for the first time that differences in leaf anatomy are crucial factors in differentiating photosynthetic capacities among species.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-019",
+          "text": "The process of photosynthesis provides the main input of free energy into the biosphere, and is one of four main ways in which radiation is important for plant life.",
+          "location": null
+        }
+      ]
+    },
+    {
+      "source_id": "SRC-002",
+      "source_type": "website",
+      "title": "Chlorophyll (Wikipedia)",
+      "publisher": "Wikipedia",
+      "author": null,
+      "url": "https://en.wikipedia.org/wiki/Chlorophyll",
+      "published_at": "2026-09-22",
+      "retrieved_at": "2026-11-07",
+      "access_status": "accessible",
+      "content_access": "excerpt",
+      "authority_category": "reference",
+      "relevance_score": 56.0,
+      "evidence_passages": [
+        {
+          "passage_id": "EV-020",
+          "text": "Chlorophyll is any of several related photochemical catalysts and green pigments found in cyanobacteria and in the chloroplasts of algae and plants. Its name is derived from the Greek words χλωρός (khloros, \"pale green\") and φύλλον (phyllon, \"leaf\"). Chlorophyll allows plants to absorb energy from light. Those pigments are involved in oxygenic photosynthesis, as opposed to bacteriochlorophylls, which are related molecules found only in bacteria and involved in anoxygenic photosynthesis.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-021",
+          "text": "Chlorophyll is vital for photosynthesis, which allows plants to absorb energy from light.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-022",
+          "text": "The function of the reaction center of chlorophyll is to absorb light energy and transfer it to other parts of the photosystem. The absorbed energy of the photon is transferred to an electron in a process called charge separation. The removal of the electron from the chlorophyll is an oxidation reaction. The chlorophyll donates the high energy electron to a series of molecular intermediates called an electron transport chain. The charged reaction center of chlorophyll (P680+) is then reduced back to its ground state by accepting an electron stripped from water. The electron that reduces P680+ ultimately comes from the oxidation of water into O2 and H+ through several intermediates.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-023",
+          "text": "The process of plant senescence involves the degradation of chlorophyll: for example the enzyme chlorophyllase (EC 3.1.1.14) hydrolyses the phytyl sidechain to reverse the reaction in which chlorophylls are biosynthesised from chlorophyllide a or b. Since chlorophyllide a can be converted to chlorophyllide b and the latter can be re-esterified to chlorophyll b, these processes allow cycling between chlorophylls a and b. Moreover, chlorophyll b can be directly reduced (via 71-hydroxychlorophyll a) back to chlorophyll a, completing the cycle.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-024",
+          "text": "The highest chlorophyll concentrations, where tiny surface-dwelling ocean plants are, are in cold polar waters or in places where ocean currents bring cold water to the surface, such as around the equator and along the shores of continents. It is not the cold water itself that stimulates the phytoplankton. Instead, the cool temperatures are often a sign that the water has welled up to the surface from deeper in the ocean, carrying nutrients that have built up over time. In polar waters, nutrients accumulate in surface waters during the dark winter months when plants cannot grow. When sunlight returns in the spring and summer, the plants flourish in high concentrations.",
+          "location": null
+        }
+      ]
+    },
+    {
+      "source_id": "SRC-003",
+      "source_type": "website",
+      "title": "Photosystem (Wikipedia)",
+      "publisher": "Wikipedia",
+      "author": null,
+      "url": "https://en.wikipedia.org/wiki/Photosystem",
+      "published_at": "2026-09-26",
+      "retrieved_at": "2026-11-07",
+      "access_status": "accessible",
+      "content_access": "excerpt",
+      "authority_category": "reference",
+      "relevance_score": 56.0,
+      "evidence_passages": [
+        {
+          "passage_id": "EV-025",
+          "text": "PSII is a complex highly organized transmembrane structure that contains a water splitting complex, chlorophylls and carotenoid pigments, a reaction center (P680), pheophytin (a pigment similar to chlorophyll), and two quinones. It uses the energy of sunlight to oxidize water to a mobile electron carrier in the membrane called plastoquinone:",
+          "location": null
+        },
+        {
+          "passage_id": "EV-026",
+          "text": "The excitation P680 → P680* of the reaction center pigment P680 occurs here. These special chlorophyll molecules embedded in PSII absorb the energy of photons, with maximal absorption at 680 nm. Electrons within these molecules are promoted to a higher-energy state. This is one of two core processes in photosynthesis, and it occurs with astonishing efficiency (greater than 90%) because, in addition to direct excitation by light at 680 nm, the energy of light first harvested by antenna proteins at other wavelengths in the light-harvesting system is also transferred to these special chlorophyll molecules.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-027",
+          "text": "This is followed by the electron transfer P680* → pheophytin, and then on to plastoquinol, which occurs within the reaction center of PSII. The electrons are transferred to plastoquinone and two protons, generating plastoquinol, which released into the membrane as a mobile electron carrier. This is the second core process in photosynthesis. The initial stages occur within picoseconds, with an efficiency of 100%. The seemingly impossible efficiency is due to the precise positioning of molecules within the reaction center.  This is a solid-state process, not a typical chemical reaction. It occurs within an essentially crystalline environment created by the macromolecular structure of PSII.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-028",
+          "text": "The photosynthesis process in chloroplasts begins when an electron of P680 of PSII attains a higher-energy level. This energy is used to reduce a chain of electron acceptors that have subsequently higher redox potentials. This chain of electron acceptors is known as an electron transport chain. When this chain reaches PSI, an electron is again excited, creating a high redox-potential. The electron transport chain of photosynthesis is often put in a diagram called the Z-scheme, because the redox diagram from P680 to P700 resembles the letter Z.",
+          "location": null
+        }
+      ]
+    },
+    {
+      "source_id": "SRC-004",
+      "source_type": "book",
+      "title": "Biology (1990)",
+      "publisher": "Open Library record",
+      "author": "Kenneth R. Miller, Joseph S. Levine, Prentice-Hall, inc.",
+      "url": "https://openlibrary.org/works/OL277185W",
+      "published_at": null,
+      "retrieved_at": "2026-11-07",
+      "access_status": "accessible",
+      "content_access": "metadata_only",
+      "authority_category": "unknown",
+      "relevance_score": null,
+      "evidence_passages": []
+    },
+    {
+      "source_id": "SRC-005",
+      "source_type": "book",
+      "title": "Biology (1994)",
+      "publisher": "Open Library record",
+      "author": "Neil Allison Campbell, Lawrence G. Mitchell, Jane B. Reece",
+      "url": "https://openlibrary.org/works/OL1983083W",
+      "published_at": null,
+      "retrieved_at": "2026-11-07",
+      "access_status": "accessible",
+      "content_access": "metadata_only",
+      "authority_category": "unknown",
+      "relevance_score": null,
+      "evidence_passages": []
+    },
+    {
+      "source_id": "SRC-006",
+      "source_type": "book",
+      "title": "Biology (1986)",
+      "publisher": "Open Library record",
+      "author": "Peter H. Raven, George B. Johnson",
+      "url": "https://openlibrary.org/works/OL2012527W",
+      "published_at": null,
+      "retrieved_at": "2026-11-07",
+      "access_status": "accessible",
+      "content_access": "metadata_only",
+      "authority_category": "unknown",
+      "relevance_score": null,
+      "evidence_passages": []
+    },
+    {
+      "source_id": "SRC-007",
+      "source_type": "video",
+      "title": "Photosynthesis | The Dr. Binocs Show | Learn Videos For Kids",
+      "publisher": "Peekaboo Kidz",
+      "author": null,
+      "url": "https://www.youtube.com/watch?v=D1Ymc311XS8",
+      "published_at": "2015-05-13",
+      "retrieved_at": "2026-11-07",
+      "access_status": "accessible",
+      "content_access": "metadata_only",
+      "authority_category": "unknown",
+      "relevance_score": null,
+      "evidence_passages": []
+    },
+    {
+      "source_id": "SRC-008",
+      "source_type": "video",
+      "title": "Photosynthesis 3D animation",
+      "publisher": "ANIMATED BIOLOGY 3D+",
+      "author": null,
+      "url": "https://www.youtube.com/watch?v=-E4EL4bZbXU",
+      "published_at": "2022-04-17",
+      "retrieved_at": "2026-11-07",
+      "access_status": "accessible",
+      "content_access": "metadata_only",
+      "authority_category": "unknown",
+      "relevance_score": null,
+      "evidence_passages": []
+    },
+    {
+      "source_id": "SRC-009",
+      "source_type": "video",
+      "title": "Photosynthesis Explain in 3D Animation | Photosynthesis Kaise Hota Hai #photosynthesis #science #3d",
+      "publisher": "MD Quick Study",
+      "author": null,
+      "url": "https://www.youtube.com/watch?v=idpuvbJwzV8",
+      "published_at": "2024-09-11",
+      "retrieved_at": "2026-11-07",
+      "access_status": "accessible",
+      "content_access": "metadata_only",
+      "authority_category": "unknown",
+      "relevance_score": null,
+      "evidence_passages": []
+    }
+  ],
+  "limitations": [
+    "Books and videos are metadata only (title, author/channel): their content was not read, so they are references, never evidence."
+  ]
+}

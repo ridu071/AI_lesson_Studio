@@ -38,6 +38,9 @@ class Settings(BaseSettings):
     # Minimum pause between calls, to stay under free-tier rate limits.
     llm_min_interval_seconds: float = Field(default=0.0, ge=0, le=60)
 
+    # Research sources. Wikipedia and Open Library need no key.
+    youtube_api_key: SecretStr | None = None
+
     # Hard rule: mandatory lesson content must fit in this many minutes.
     max_lesson_minutes: int = Field(default=45, ge=1, le=240)
 

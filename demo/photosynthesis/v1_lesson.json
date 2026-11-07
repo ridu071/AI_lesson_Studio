@@ -1,0 +1,386 @@
+{
+  "lesson_id": "LES-001",
+  "version": 1,
+  "title": "Photosynthesis",
+  "learner_level": "beginner",
+  "stated_duration_minutes": 42,
+  "learning_objectives": [
+    {
+      "id": "LO-01",
+      "description": "Describe the inputs and outputs of photosynthesis",
+      "bloom_level": "understand"
+    },
+    {
+      "id": "LO-02",
+      "description": "Explain the role of chlorophyll and sunlight in the process",
+      "bloom_level": "understand"
+    }
+  ],
+  "sections": [
+    {
+      "section_id": "SEC-01",
+      "section_type": "introduction",
+      "title": "Introduction to Photosynthesis",
+      "duration_minutes": 5,
+      "objective_ids": [
+        "LO-01",
+        "LO-02"
+      ],
+      "content_blocks": [
+        {
+          "type": "explanation",
+          "content": "Photosynthesis is a system of biological processes by which photopigment-bearing autotrophic organisms convert light energy from sunlight into chemical energy."
+        },
+        {
+          "type": "example",
+          "content": "Plants, algae, and cyanobacteria perform oxygenic photosynthesis, releasing oxygen as a byproduct of water splitting."
+        }
+      ],
+      "source_ids": [
+        "SRC-001"
+      ]
+    },
+    {
+      "section_id": "SEC-02",
+      "section_type": "learning_objectives",
+      "title": "Lesson Goals",
+      "duration_minutes": 2,
+      "objective_ids": [
+        "LO-01",
+        "LO-02"
+      ],
+      "content_blocks": [
+        {
+          "type": "explanation",
+          "content": "In this lesson, you will learn to describe the inputs and outputs of photosynthesis, and explain how chlorophyll and sunlight play their roles."
+        }
+      ],
+      "source_ids": []
+    },
+    {
+      "section_id": "SEC-03",
+      "section_type": "concept_explanation",
+      "title": "Inputs and Outputs of Photosynthesis",
+      "duration_minutes": 8,
+      "objective_ids": [
+        "LO-01"
+      ],
+      "content_blocks": [
+        {
+          "type": "definition",
+          "content": "Carbon fixation is the process where carbon dioxide is converted into sugars."
+        },
+        {
+          "type": "explanation",
+          "content": "Photosynthesis captures energy from sunlight to convert carbon dioxide into carbohydrates. In oxygenic photosynthesis, water is used as an electron donor, releasing oxygen."
+        },
+        {
+          "type": "example",
+          "content": "Organic compounds stored include carbohydrates like sugars (glucose, fructose, sucrose), starches, and cellulose."
+        }
+      ],
+      "source_ids": [
+        "SRC-001"
+      ]
+    },
+    {
+      "section_id": "SEC-04",
+      "section_type": "concept_explanation",
+      "title": "Role of Chlorophyll and Sunlight",
+      "duration_minutes": 8,
+      "objective_ids": [
+        "LO-02"
+      ],
+      "content_blocks": [
+        {
+          "type": "definition",
+          "content": "Chlorophyll is any of several related photochemical catalysts and green pigments found in cyanobacteria and in the chloroplasts of algae and plants."
+        },
+        {
+          "type": "explanation",
+          "content": "Chlorophyll allows plants to absorb energy from light. Special chlorophyll molecules absorb the energy of photons, promoting electrons to a higher energy state."
+        },
+        {
+          "type": "example",
+          "content": "In light-dependent reactions, chlorophyll absorbs one photon and loses an electron, which starts an electron transport chain."
+        }
+      ],
+      "source_ids": [
+        "SRC-001",
+        "SRC-002",
+        "SRC-003"
+      ]
+    },
+    {
+      "section_id": "SEC-05",
+      "section_type": "worked_examples",
+      "title": "Examining Photosynthetic Energy Conversion",
+      "duration_minutes": 6,
+      "objective_ids": [
+        "LO-01",
+        "LO-02"
+      ],
+      "content_blocks": [
+        {
+          "type": "example",
+          "content": "When sunlight strikes chlorophyll in photosystem II, photons are absorbed with maximal absorption at 680 nm, exciting electrons that move down the electron transport chain to generate ATP and NADPH, while splitting water molecules to release oxygen."
+        }
+      ],
+      "source_ids": [
+        "SRC-001",
+        "SRC-003"
+      ]
+    },
+    {
+      "section_id": "SEC-06",
+      "section_type": "practical_application",
+      "title": "Mapping Photosynthesis Components",
+      "duration_minutes": 5,
+      "objective_ids": [
+        "LO-01",
+        "LO-02"
+      ],
+      "content_blocks": [
+        {
+          "type": "explanation",
+          "content": "Apply your knowledge by categorizing the inputs, outputs, and catalyst roles involved in oxygenic photosynthesis."
+        }
+      ],
+      "source_ids": [
+        "SRC-001",
+        "SRC-002"
+      ]
+    },
+    {
+      "section_id": "SEC-07",
+      "section_type": "knowledge_check",
+      "title": "Check Your Understanding",
+      "duration_minutes": 4,
+      "objective_ids": [
+        "LO-01",
+        "LO-02"
+      ],
+      "content_blocks": [
+        {
+          "type": "explanation",
+          "content": "Answer the following questions to verify your understanding of photosynthesis."
+        }
+      ],
+      "source_ids": [
+        "SRC-001",
+        "SRC-002"
+      ]
+    },
+    {
+      "section_id": "SEC-08",
+      "section_type": "final_assessment",
+      "title": "Final Assessment",
+      "duration_minutes": 4,
+      "objective_ids": [
+        "LO-01",
+        "LO-02"
+      ],
+      "content_blocks": [
+        {
+          "type": "explanation",
+          "content": "Complete the final evaluation questions."
+        }
+      ],
+      "source_ids": [
+        "SRC-001",
+        "SRC-002"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "claim_id": "CL-01",
+      "section_id": "SEC-01",
+      "text": "Photosynthesis is a system of biological processes by which photopigment-bearing autotrophic organisms convert light energy from sunlight into chemical energy.",
+      "claim_type": "factual",
+      "source_ids": [
+        "SRC-001"
+      ]
+    },
+    {
+      "claim_id": "CL-02",
+      "section_id": "SEC-01",
+      "text": "Most plants, algae, and cyanobacteria perform oxygenic photosynthesis, releasing oxygen as a byproduct of water splitting.",
+      "claim_type": "factual",
+      "source_ids": [
+        "SRC-001"
+      ]
+    },
+    {
+      "claim_id": "CL-03",
+      "section_id": "SEC-03",
+      "text": "Carbon dioxide is converted into sugars in a process called carbon fixation.",
+      "claim_type": "definition",
+      "source_ids": [
+        "SRC-001"
+      ]
+    },
+    {
+      "claim_id": "CL-04",
+      "section_id": "SEC-03",
+      "text": "Photosynthetic organisms store converted chemical energy within the bonds of intracellular organic compounds like carbohydrates, sugars, starches, and cellulose.",
+      "claim_type": "factual",
+      "source_ids": [
+        "SRC-001"
+      ]
+    },
+    {
+      "claim_id": "CL-05",
+      "section_id": "SEC-04",
+      "text": "Chlorophyll is any of several related photochemical catalysts and green pigments found in cyanobacteria and in the chloroplasts of algae and plants.",
+      "claim_type": "definition",
+      "source_ids": [
+        "SRC-002"
+      ]
+    },
+    {
+      "claim_id": "CL-06",
+      "section_id": "SEC-04",
+      "text": "Chlorophyll allows plants to absorb energy from light.",
+      "claim_type": "factual",
+      "source_ids": [
+        "SRC-002"
+      ]
+    },
+    {
+      "claim_id": "CL-07",
+      "section_id": "SEC-05",
+      "text": "Special chlorophyll molecules embedded in photosystem II absorb the energy of photons with maximal absorption at 680 nm, promoting electrons to a higher-energy state.",
+      "claim_type": "factual",
+      "source_ids": [
+        "SRC-003"
+      ]
+    },
+    {
+      "claim_id": "CL-08",
+      "section_id": "SEC-06",
+      "text": "Learner practices mapping inputs and outputs of photosynthesis.",
+      "claim_type": "hypothetical_example",
+      "source_ids": []
+    }
+  ],
+  "activities": [
+    {
+      "activity_id": "ACT-01",
+      "section_id": "SEC-06",
+      "title": "Photosynthesis Component Mapping",
+      "instructions": "Review the inputs (carbon dioxide and water) and outputs (carbohydrates and oxygen) of photosynthesis, and write a brief summary explaining how chlorophyll absorbs sunlight to drive this process.",
+      "duration_minutes": 5,
+      "objective_ids": [
+        "LO-01",
+        "LO-02"
+      ],
+      "is_mandatory": true
+    }
+  ],
+  "assessments": [
+    {
+      "question_id": "Q-01",
+      "section_id": "SEC-07",
+      "kind": "knowledge_check",
+      "question_type": "multiple_choice",
+      "prompt": "What is released as a byproduct of water splitting during oxygenic photosynthesis?",
+      "options": [
+        "Carbon dioxide",
+        "Oxygen",
+        "Nitrogen",
+        "Hydrogen peroxide"
+      ],
+      "answer_key": "Oxygen",
+      "explanation": "Oxygenic photosynthesis releases oxygen as a byproduct of water splitting.",
+      "objective_ids": [
+        "LO-01"
+      ],
+      "bloom_level": "understand"
+    },
+    {
+      "question_id": "Q-02",
+      "section_id": "SEC-07",
+      "kind": "knowledge_check",
+      "question_type": "true_false",
+      "prompt": "Chlorophyll is a green pigment that allows plants to absorb energy from light.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer_key": "True",
+      "explanation": "Chlorophyll is defined as a photochemical catalyst and green pigment that allows plants to absorb energy from light.",
+      "objective_ids": [
+        "LO-02"
+      ],
+      "bloom_level": "understand"
+    },
+    {
+      "question_id": "Q-03",
+      "section_id": "SEC-08",
+      "kind": "final",
+      "question_type": "multiple_choice",
+      "prompt": "Which process describes the conversion of carbon dioxide into sugars during photosynthesis?",
+      "options": [
+        "Cellular respiration",
+        "Carbon fixation",
+        "Photolysis",
+        "Senescence"
+      ],
+      "answer_key": "Carbon fixation",
+      "explanation": "Carbon dioxide is converted into sugars in a process called carbon fixation.",
+      "objective_ids": [
+        "LO-01"
+      ],
+      "bloom_level": "understand"
+    },
+    {
+      "question_id": "Q-04",
+      "section_id": "SEC-08",
+      "kind": "final",
+      "question_type": "multiple_choice",
+      "prompt": "What role does chlorophyll play when it absorbs a photon in the reaction center?",
+      "options": [
+        "It releases carbon dioxide into the air",
+        "It loses an electron through charge separation to start an electron transport chain",
+        "It splits water directly without sunlight",
+        "It converts light into stored soil nutrients"
+      ],
+      "answer_key": "It loses an electron through charge separation to start an electron transport chain",
+      "explanation": "When chlorophyll absorbs light energy, the absorbed energy transfers to an electron via charge separation, donating a high-energy electron to an electron transport chain.",
+      "objective_ids": [
+        "LO-02"
+      ],
+      "bloom_level": "understand"
+    }
+  ],
+  "videos": [
+    {
+      "video_id": "VID-01",
+      "title": "Photosynthesis | The Dr. Binocs Show | Learn Videos For Kids",
+      "url": "https://www.youtube.com/watch?v=D1Ymc311XS8",
+      "source_id": "SRC-007",
+      "section_id": null,
+      "duration_minutes": 4,
+      "is_mandatory": false
+    },
+    {
+      "video_id": "VID-02",
+      "title": "Photosynthesis 3D animation",
+      "url": "https://www.youtube.com/watch?v=-E4EL4bZbXU",
+      "source_id": "SRC-008",
+      "section_id": null,
+      "duration_minutes": 5,
+      "is_mandatory": false
+    },
+    {
+      "video_id": "VID-03",
+      "title": "Photosynthesis Explain in 3D Animation | Photosynthesis Kaise Hota Hai #photosynthesis #science #3d",
+      "url": "https://www.youtube.com/watch?v=idpuvbJwzV8",
+      "source_id": "SRC-009",
+      "section_id": null,
+      "duration_minutes": 1,
+      "is_mandatory": false
+    }
+  ]
+}

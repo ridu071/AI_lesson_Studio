@@ -1,0 +1,244 @@
+{
+  "qc1": {
+    "audit_id": "AUD-LES-001-V2-QC1",
+    "audit_type": "qc1",
+    "lesson_id": "LES-001",
+    "version": 2,
+    "content_hash": "d8e3853320c370cef28a1d040e1f61f7cfa0f1e10e92916901695d6b6f16f11f",
+    "rubric_version": "0.1.0",
+    "status": "passed",
+    "score": 100.0,
+    "subscores": [
+      {
+        "name": "claim_evidence_support",
+        "weight": 0.3,
+        "score": 100.0
+      },
+      {
+        "name": "source_credibility",
+        "weight": 0.2,
+        "score": 100.0
+      },
+      {
+        "name": "citation_integrity",
+        "weight": 0.15,
+        "score": 100.0
+      },
+      {
+        "name": "cross_source_consistency",
+        "weight": 0.15,
+        "score": 100.0
+      },
+      {
+        "name": "factual_correctness",
+        "weight": 0.15,
+        "score": 100.0
+      },
+      {
+        "name": "research_coverage",
+        "weight": 0.05,
+        "score": 100.0
+      }
+    ],
+    "evaluators": [
+      "citation_check",
+      "claim_verification",
+      "consistency_check",
+      "gap_detection",
+      "source_assessment"
+    ],
+    "llm_model": "gemini-3.5-flash-lite",
+    "prompt_versions": {
+      "qc1/llm_review": "0.1.0"
+    },
+    "issues": [],
+    "claim_assessments": [
+      {
+        "claim_id": "CL-01",
+        "verdict": "supported",
+        "evidence": [
+          {
+            "source_id": "SRC-001",
+            "passage_id": "EV-001",
+            "note": null
+          }
+        ],
+        "explanation": "Claim CL-01 is supported: The passage explicitly states that HTTP is a request-response protocol in the client-server model."
+      },
+      {
+        "claim_id": "CL-02",
+        "verdict": "supported",
+        "evidence": [
+          {
+            "source_id": "SRC-001",
+            "passage_id": "EV-011",
+            "note": null
+          }
+        ],
+        "explanation": "Claim CL-02 is supported: The passage states that a request identifies a method to classify the desired action to be performed on a resource."
+      },
+      {
+        "claim_id": "CL-03",
+        "verdict": "supported",
+        "evidence": [
+          {
+            "source_id": "SRC-001",
+            "passage_id": "EV-013",
+            "note": null
+          }
+        ],
+        "explanation": "Claim CL-03 is supported: The passage states that for GET, the server should only retrieve data and not modify state."
+      },
+      {
+        "claim_id": "CL-04",
+        "verdict": "supported",
+        "evidence": [
+          {
+            "source_id": "SRC-001",
+            "passage_id": "EV-016",
+            "note": null
+          }
+        ],
+        "explanation": "Claim CL-04 is supported: The passage confirms that a response is sent by the server and its start line consists of protocol version, status code, and optional reason phrase."
+      },
+      {
+        "claim_id": "CL-05",
+        "verdict": "supported",
+        "evidence": [
+          {
+            "source_id": "SRC-002",
+            "passage_id": "EV-026",
+            "note": null
+          }
+        ],
+        "explanation": "Claim CL-05 is supported: The passage states that a 4xx status code is for situations where an error seems to have been caused by the client."
+      },
+      {
+        "claim_id": "CL-06",
+        "verdict": "supported",
+        "evidence": [
+          {
+            "source_id": "SRC-002",
+            "passage_id": "EV-027",
+            "note": null
+          }
+        ],
+        "explanation": "Claim CL-06 is supported: The passage confirms that 5xx status indicates the server encountered an error or is incapable of performing the request."
+      },
+      {
+        "claim_id": "CL-07",
+        "verdict": "supported",
+        "evidence": [
+          {
+            "source_id": "SRC-002",
+            "passage_id": "EV-022",
+            "note": null
+          }
+        ],
+        "explanation": "Claim CL-07 is supported: The passage describes 2xx as the standard response for successful HTTP requests."
+      }
+    ],
+    "coverage": [],
+    "started_at": "2026-11-07T11:14:18.695978Z",
+    "completed_at": "2026-11-07T11:14:22.831628Z",
+    "error_message": null
+  },
+  "qc2": {
+    "audit_id": "AUD-LES-001-V2-QC2",
+    "audit_type": "qc2",
+    "lesson_id": "LES-001",
+    "version": 2,
+    "content_hash": "d8e3853320c370cef28a1d040e1f61f7cfa0f1e10e92916901695d6b6f16f11f",
+    "rubric_version": "0.1.0",
+    "status": "passed",
+    "score": 100.0,
+    "subscores": [
+      {
+        "name": "objective_alignment",
+        "weight": 0.25,
+        "score": 100.0
+      },
+      {
+        "name": "clarity",
+        "weight": 0.15,
+        "score": 100.0
+      },
+      {
+        "name": "learning_progression",
+        "weight": 0.15,
+        "score": 100.0
+      },
+      {
+        "name": "examples",
+        "weight": 0.1,
+        "score": 100.0
+      },
+      {
+        "name": "activities",
+        "weight": 0.1,
+        "score": 100.0
+      },
+      {
+        "name": "assessment_effectiveness",
+        "weight": 0.15,
+        "score": 100.0
+      },
+      {
+        "name": "engagement_accessibility",
+        "weight": 0.05,
+        "score": 100.0
+      },
+      {
+        "name": "time_feasibility",
+        "weight": 0.05,
+        "score": 100.0
+      }
+    ],
+    "evaluators": [
+      "assessment_check",
+      "coverage_check",
+      "duration_check",
+      "instructional_review",
+      "structure_check"
+    ],
+    "llm_model": "gemini-3.5-flash-lite",
+    "prompt_versions": {
+      "qc2/llm_review": "0.2.0"
+    },
+    "issues": [],
+    "claim_assessments": [],
+    "coverage": [
+      {
+        "objective_id": "LO-01",
+        "explained": true,
+        "exemplified": true,
+        "practiced": true,
+        "assessed": true
+      },
+      {
+        "objective_id": "LO-02",
+        "explained": true,
+        "exemplified": true,
+        "practiced": true,
+        "assessed": true
+      }
+    ],
+    "started_at": "2026-11-07T11:14:22.831628Z",
+    "completed_at": "2026-11-07T11:14:25.108562Z",
+    "error_message": null
+  },
+  "release": {
+    "lesson_id": "LES-001",
+    "version": 2,
+    "content_hash": "d8e3853320c370cef28a1d040e1f61f7cfa0f1e10e92916901695d6b6f16f11f",
+    "qc1_audit_id": "AUD-LES-001-V2-QC1",
+    "qc2_audit_id": "AUD-LES-001-V2-QC2",
+    "decision": "eligible_for_instructor_review",
+    "reasons": [
+      "QC1 passed with score 100.0.",
+      "QC2 passed with score 100.0."
+    ],
+    "blocking_issue_ids": [],
+    "decided_at": "2026-11-07T11:14:25.114561Z"
+  }
+}

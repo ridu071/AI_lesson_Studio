@@ -1,0 +1,270 @@
+{
+  "request_id": null,
+  "sources": [
+    {
+      "source_id": "SRC-001",
+      "source_type": "website",
+      "title": "HTTP (Wikipedia)",
+      "publisher": "Wikipedia",
+      "author": null,
+      "url": "https://en.wikipedia.org/wiki/HTTP",
+      "published_at": "2026-09-27",
+      "retrieved_at": "2026-11-07",
+      "access_status": "accessible",
+      "content_access": "excerpt",
+      "authority_category": "reference",
+      "relevance_score": 96.0,
+      "evidence_passages": [
+        {
+          "passage_id": "EV-001",
+          "text": "HTTP is a request–response protocol in the client–server model. A transaction starts with a client submitting a request to the server, the server attempts to satisfy the request and returns a response to the client that describes the disposition of the request and optionally contains a requested resource such as an HTML document or other content.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-002",
+          "text": "To allow intermediate HTTP nodes (proxy servers, web caches, etc.) to accomplish their functions, some of the HTTP headers (found in HTTP requests/responses) are managed hop-by-hop whereas other HTTP headers are managed end-to-end (managed only by the source client and by the target web server).",
+          "location": null
+        },
+        {
+          "passage_id": "EV-003",
+          "text": "Data is exchanged through a sequence of request–response messages which are exchanged by a session layer transport connection. An HTTP client initially tries to establish a connection, real or virtual, with a server. An HTTP server listening on the port accepts the connection and then waits for a client's request message. The client sends its HTTP request message. Upon receiving the request the server sends back an HTTP response message, which includes header(s) plus a body if it is required. The body of this response message is typically the requested resource, although an error message or other information may also be returned.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-004",
+          "text": "At any time and for many reasons, either the client or server can close the connection. Closing a connection is usually advertised by one or more HTTP headers in the last request or response.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-005",
+          "text": "HTTP/1.1 added also HTTP pipelining in order to further reduce lag time when using persistent connections by allowing clients to send multiple requests before waiting for each response.  This optimization was never considered really safe because a few web servers and many proxy servers, specially transparent proxy servers placed in Internet / Intranets between clients and servers, did not handle pipelined requests properly (they served only the first request discarding the others, they closed the connection because they saw more data after the first request or some proxies even returned responses out of order etc.).  Because of this, only HEAD and some GET requests (i.e.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-006",
+          "text": "HTTP/1.0 added headers to manage resources cached by a client in order to allow conditional GET requests.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-007",
+          "text": "A server must return the entire content of the requested resource only if its last modified time is not known by the client or if it changed since the last full response to a GET request.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-008",
+          "text": "As a stateless protocol, HTTP does not require the web server to retain information or status about each user for the duration of multiple requests. If a web application needs an application session, it implements it via HTTP cookies, hidden variables in a web form or another mechanism.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-009",
+          "text": "HTTP provides a general framework for access control and authentication, via an extensible set of challenge–response authentication schemes, which can be used by a server to challenge a client request and by a client to provide authentication information.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-010",
+          "text": "A request is sent by a client to a server. The start line includes a method name, a request URI and the protocol version with a single space between each field. The following request start line specifies method GET, URI /customer/123 and protocol version HTTP/1.1:",
+          "location": null
+        },
+        {
+          "passage_id": "EV-011",
+          "text": "A request identifies a method (sometimes informally called verb) to classify the desired action to be performed on a resource. The HTTP/1.0 specification defined the GET, HEAD, and POST methods as well as listing the PUT, DELETE, LINK and UNLINK methods under additional methods. However, the HTTP/1.1 specification added five new methods: PUT, DELETE, CONNECT, OPTIONS, and TRACE. Any client can use any method and the server can be configured to support any combination of methods. If a method is unknown to an intermediate, it will be treated as an unsafe and non-idempotent method.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-012",
+          "text": "There is no limit to the number of methods that can be defined, which allows for future methods to be specified without breaking existing infrastructure. For example, WebDAV defined seven new methods and RFC 5789 specified the PATCH method. A general-purpose web server is required to implement at least GET and HEAD, and all other methods are considered optional by the specification.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-013",
+          "text": "The request is for a representation of a resource. The server should only retrieve data; not modify state. For retrieving without making changes, GET is preferred over POST, as it can be addressed through a URL. This enables bookmarking and sharing and makes GET responses eligible for caching, which can save bandwidth. The W3C has published guidance principles on this distinction, saying, \"Web application design should be informed by the above principles, but also by the relevant limitations.\"",
+          "location": null
+        },
+        {
+          "passage_id": "EV-014",
+          "text": "A request method is safe if a request with that method has no intended effect on the server. The methods GET, HEAD, OPTIONS, TRACE, and QUERY are defined as safe. In other words, safe methods are intended to be read-only. Safe methods can still have side effects not seen by the client, such as appending request information to a log file or charging an advertising account.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-015",
+          "text": "A request method is cacheable if responses to requests with that method may be stored for future reuse. The methods GET, HEAD, and POST are defined as cacheable.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-016",
+          "text": "A response is sent to the client by the server. The start line of a response consists of the protocol version, a status code and optionally a reason phrase with fields separated by a single space character. The following response start line specifies protocol version HTTP/1.1, status code 400 and reason phrase Bad Request.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-017",
+          "text": "In the following response, the ETag (entity tag) header field is used to determine if a cached version of the requested resource is identical to the current version of the resource on the server. The Content-Type header field specifies the Internet media type of the data conveyed by the HTTP message, and Content-Length indicates its length in bytes. The HTTP/1.1 webserver publishes its ability to respond to requests for a byte range of the resource by including Accept-Ranges: bytes. This is useful, if the client needs to have only certain portions of a resource sent by the server, which is called byte serving.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-018",
+          "text": "Most of the header fields are optional but some are mandatory. When header Content-Length is missing from a response with a body, then this should be considered an error in HTTP/1.0 but it may not be an error in HTTP/1.1 if header Transfer-Encoding: chunked is present. Chunked transfer encoding uses a chunk size of 0 to mark the end of the content. Some old implementations of HTTP/1.0 omitted the header Content-Length when the length of the body was not known at the beginning of the response and so the transfer of data to client continued until server closed the socket.",
+          "location": null
+        }
+      ]
+    },
+    {
+      "source_id": "SRC-002",
+      "source_type": "website",
+      "title": "List of HTTP status codes (Wikipedia)",
+      "publisher": "Wikipedia",
+      "author": null,
+      "url": "https://en.wikipedia.org/wiki/List_of_HTTP_status_codes",
+      "published_at": "2026-10-11",
+      "retrieved_at": "2026-11-07",
+      "access_status": "accessible",
+      "content_access": "excerpt",
+      "authority_category": "reference",
+      "relevance_score": 100.0,
+      "evidence_passages": [
+        {
+          "passage_id": "EV-019",
+          "text": "An informational response indicates that the request was received and understood and is being processed. It alerts the client to wait for a final response. The message does not contain a body. As the HTTP/1.0 standard did not define any 1xx status codes, servers must not send a 1xx response to an HTTP/1.0 compliant client except under experimental conditions.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-020",
+          "text": "The server has received the request headers and the client should proceed to send the request body (in the case of a request for which a body needs to be sent, such as a POST request). Sending a large request body to a server after a request has been rejected for inappropriate headers would be inefficient. To have a server check the request's headers, a client must send Expect: 100-continue as a header in its initial request and receive a 100 Continue status code in response before sending the body. If the client receives an error code such as 403 (Forbidden) or 405 (Method Not Allowed) then it should not send the request's body.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-021",
+          "text": "A WebDAV request may contain many sub-requests involving file operations, requiring a long time to complete the request. This code indicates that the server has received and is processing the request, but no response is available yet. This prevents the client from timing out and assuming the request was lost. The status code is deprecated.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-022",
+          "text": "Standard response for successful HTTP requests. The actual response will depend on the request method used. In a GET request, the response will contain an entity corresponding to the requested resource. In a POST request, the response will contain an entity describing or containing the result of the action.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-023",
+          "text": "The link target was moved such that the request and future similar requests should be redirected to the given URI. If a client has link-editing capabilities, it should update references to the request URL. The response is cacheable unless indicated otherwise. Except for a GET request, the body should contain a hyperlink to the new URL(s). Except for a GET or HEAD request, the client must ask the user before redirecting.This code is considered best practice for upgrading users from HTTP to HTTPS.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-024",
+          "text": "Indicates that the resource is accessible via an alternate URL indicated in the Location header field. The HTTP/1.0 specification (which used reason phrase \"Moved Temporarily\") required the client to redirect with the same method, but popular browsers instead changed the request to GET. For this reason, HTTP/1.1 (RFC 2616) added two status codes: 303 which requires changing the request to a GET and 307 which preserves the original request type. Despite the greater clarity provided by this disambiguation, the 302 code is still used in web frameworks to preserve compatibility with browsers that do not support HTTP/1.1.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-025",
+          "text": "If a server responds to a POST or other non-idempotent request with this code and a location header field, the client is expected to issue a GET request to the specified location. To trigger a request to the target resource using the same method, the server responds with 307 instead.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-026",
+          "text": "A 4xx status code is for situations in which an error seems to have been caused by the client. Except when responding to a HEAD request, the server should include an entity containing an explanation of the error situation, and whether it is a temporary or permanent condition. These status codes are applicable to any request method. User agents should display any included entity to the user.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-027",
+          "text": "5xx status indicates that the server is aware that it has encountered an error or is otherwise incapable of performing the request. Except when responding to a HEAD request, the server should include an entity containing an explanation of the error situation, and indicate whether it is a temporary or permanent condition. Likewise, user agents should display any included entity to the user. These response codes are applicable to any request method.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-028",
+          "text": "Microsoft's Internet Information Services (IIS) web server expands the 4xx error space to signal errors with the client's request. IIS sometimes uses additional decimal sub-codes for more specific information, however these sub-codes only appear in the response payload and in documentation, not in the place of an actual HTTP status code.",
+          "location": null
+        }
+      ]
+    },
+    {
+      "source_id": "SRC-003",
+      "source_type": "book",
+      "title": "HTTP (1997)",
+      "publisher": "Open Library record",
+      "author": "David Gourley, Brian Totty, Linda Mui",
+      "url": "https://openlibrary.org/works/OL16026044W",
+      "published_at": null,
+      "retrieved_at": "2026-11-07",
+      "access_status": "accessible",
+      "content_access": "metadata_only",
+      "authority_category": "unknown",
+      "relevance_score": null,
+      "evidence_passages": []
+    },
+    {
+      "source_id": "SRC-004",
+      "source_type": "book",
+      "title": "JavaScript (1996)",
+      "publisher": "Open Library record",
+      "author": "David Flanagan",
+      "url": "https://openlibrary.org/works/OL1643770W",
+      "published_at": null,
+      "retrieved_at": "2026-11-07",
+      "access_status": "accessible",
+      "content_access": "metadata_only",
+      "authority_category": "unknown",
+      "relevance_score": null,
+      "evidence_passages": []
+    },
+    {
+      "source_id": "SRC-005",
+      "source_type": "book",
+      "title": "Het Achterhuis (1944)",
+      "publisher": "Open Library record",
+      "author": "Anne Frank",
+      "url": "https://openlibrary.org/works/OL266178W",
+      "published_at": null,
+      "retrieved_at": "2026-11-07",
+      "access_status": "accessible",
+      "content_access": "metadata_only",
+      "authority_category": "unknown",
+      "relevance_score": null,
+      "evidence_passages": []
+    },
+    {
+      "source_id": "SRC-006",
+      "source_type": "video",
+      "title": "The Http and the Web | Http Explained | Request-Response Cycle",
+      "publisher": "The TechCave",
+      "author": null,
+      "url": "https://www.youtube.com/watch?v=eesqK59rhGA",
+      "published_at": "2016-05-05",
+      "retrieved_at": "2026-11-07",
+      "access_status": "accessible",
+      "content_access": "metadata_only",
+      "authority_category": "unknown",
+      "relevance_score": null,
+      "evidence_passages": []
+    },
+    {
+      "source_id": "SRC-007",
+      "source_type": "video",
+      "title": "HTTP crash course | http Methods | http headers",
+      "publisher": "Chai aur Code",
+      "author": null,
+      "url": "https://www.youtube.com/watch?v=qgZiUvV41TI",
+      "published_at": "2023-11-16",
+      "retrieved_at": "2026-11-07",
+      "access_status": "accessible",
+      "content_access": "metadata_only",
+      "authority_category": "unknown",
+      "relevance_score": null,
+      "evidence_passages": []
+    },
+    {
+      "source_id": "SRC-008",
+      "source_type": "video",
+      "title": "31 HTTP Request Response structure",
+      "publisher": "Chai aur Code",
+      "author": null,
+      "url": "https://www.youtube.com/watch?v=rZNdo9UjF94",
+      "published_at": "2026-08-10",
+      "retrieved_at": "2026-11-07",
+      "access_status": "accessible",
+      "content_access": "metadata_only",
+      "authority_category": "unknown",
+      "relevance_score": null,
+      "evidence_passages": []
+    }
+  ],
+  "limitations": [
+    "Books and videos are metadata only (title, author/channel): their content was not read, so they are references, never evidence."
+  ]
+}
