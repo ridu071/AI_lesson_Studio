@@ -97,7 +97,7 @@ st.markdown("""
 .features span {cursor: help;}
 .you-get {font-size: .9rem; color: #374151; background: #F5F3FF; border-radius: 10px; padding: .55rem .8rem;
   margin: .2rem 0 .5rem 0;}
-.group-label {font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+.group-label {font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
   color: #4B5563; margin: .8rem 0 .3rem 0;}
 [data-testid="stVerticalBlockBorderWrapper"] {box-shadow: 0 6px 24px rgba(79, 70, 229, .08);}
 [data-testid="stDecoration"] {display: none;}
@@ -108,6 +108,62 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="radio"
   .build-wrap .build-title {font-size: 1.9rem;}
   .duck .body {font-size: 2.2rem;}
 }
+/* ================= sidebar lesson list ================= */
+.side-brand {font-weight: 800; font-size: 1.05rem; color: #1F2937; margin: 0 0 .6rem .1rem;}
+
+/* 14. "New lesson": the only solid indigo button */
+.st-key-newlesson button {background: #4F46E5; border: 1px solid #4F46E5; color: #fff; border-radius: 10px;}
+.st-key-newlesson button:hover {background: #4338CA; border-color: #4338CA; color: #fff;}
+
+/* 15. Search box styled like the cards, indigo ring when focused */
+.st-key-lsearch [data-baseweb="input"] {background: #fff; border: 1px solid #E5E7EB; border-radius: 10px;}
+.st-key-lsearch [data-baseweb="input"] > div, .st-key-lsearch input {background: #fff;}
+.st-key-lsearch [data-baseweb="input"]:focus-within {border-color: #4F46E5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, .18);}
+
+/* 6. Small, even gaps between cards */
+.st-key-llist [data-testid="stVerticalBlock"] {gap: .4rem;}
+
+/* 7 + 16. Group label: small, bold, uppercase, grey; more space above than below */
+.st-key-llist .group-label {font-size: .7rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
+  color: #6B7280; margin: .9rem 0 .15rem .15rem;}
+.st-key-llist [data-testid="stElementContainer"]:first-child .group-label {margin-top: .1rem;}
+
+/* 8. Card */
+[class*="st-key-lcard"] {background: #fff; border: 1px solid #E5E7EB; border-radius: 12px;
+  padding: .45rem .3rem .5rem .75rem; box-shadow: 0 1px 2px rgba(17, 24, 39, .04);
+  transition: background .15s, border-color .15s; gap: 0 !important;}
+[class*="st-key-lcard"] [data-testid="stVerticalBlock"] {gap: 0 !important;}
+/* 9. Hover */
+[class*="st-key-lcard-"]:hover {background: #F5F3FF; border-color: #C7D2FE;}
+/* 10. Selected lesson */
+[class*="st-key-lcardsel-"] {background: #EEF2FF; border-color: #C7D2FE; border-left: 4px solid #4F46E5;
+  padding-left: calc(.75rem - 3px);}
+
+/* 4 + 5. Title: bold, left-aligned, cut off with "…" */
+[class*="st-key-lcard"] [data-testid="stColumn"] {min-width: 0;}
+[class*="st-key-lcard"] [class*="st-key-open-"] button {justify-content: flex-start; text-align: left;
+  padding: 0; min-height: 0; width: 100%; color: #111827;}
+[class*="st-key-lcard"] [class*="st-key-open-"] button > div,
+[class*="st-key-lcard"] [class*="st-key-open-"] button [data-testid="stMarkdownContainer"] {min-width: 0; max-width: 100%;}
+[class*="st-key-lcard"] [class*="st-key-open-"] button p {font-weight: 650; font-size: .95rem; margin: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left;}
+[class*="st-key-lcard"] [class*="st-key-open-"] button:hover {color: #4338CA;}
+/* 11. Meta line (and goal snippet for repeated titles) */
+.lmeta, .lgoal {font-size: .76rem; color: #6B7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  line-height: 1.35;}
+.lgoal {color: #4B5563; font-style: italic;}
+
+/* 2 + 3 + 12. ⋮ menu: small, borderless, grey; indigo tint on hover; no dropdown arrow */
+[class*="st-key-lmenu-"] button {border: none !important; background: transparent !important; color: #6B7280;
+  padding: .15rem .25rem; min-height: 0; border-radius: 8px;}
+[class*="st-key-lmenu-"] button:hover {background: #EEF2FF !important; color: #4F46E5;}
+/* Streamlit renders the dropdown arrow as a trailing aria-hidden span after the label: hide only that. */
+[class*="st-key-lmenu-"] button div > [aria-hidden="true"]:last-child:not(:first-child) {display: none;}
+
+/* 13. Delete in red */
+[class*="st-key-ldel-"] button {color: #B91C1C; border-color: #FECACA;}
+[class*="st-key-ldel-"] button:hover:not(:disabled) {background: #FEF2F2; border-color: #F87171; color: #991B1B;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -393,55 +449,70 @@ def _when(created_at: str) -> tuple[str, str]:
     return ("This week" if age < timedelta(days=7) else "Earlier"), label
 
 
-def _lesson_row(p: Project) -> None:
+def _lesson_card(p: Project, duplicated: bool) -> None:
+    """One lesson = one card: bold title, meta line (and goal if the title repeats), ⋮ menu."""
     pid = p.meta["project_id"]
-    group_label = _when(p.meta["created_at"])[1]
-    failed = any(s["status"] == "failed" for s in p.meta["steps"].values())
-    state = "" if p.next_step() is None else (" · ⚠ needs retry" if failed else " · unfinished")
-    version = f" · v{p.current_version}" if p.current_version and p.current_version > 1 else ""
-    c1, c2 = st.columns([6, 1], vertical_alignment="center")
     current = st.session_state.get("project_id") == pid
-    if c1.button(p.display_name, key=f"open-{pid}", use_container_width=True,
-                 type="primary" if current else "secondary"):
-        go(pid)
-    c1.caption(f"{p.inputs.learner_level.capitalize()} · {group_label}{version}{state}")
-    with c2.popover("⋯", help="Rename or delete"):
-        new_name = st.text_input("Rename", p.display_name, key=f"rn-{pid}")
-        if st.button("Save name", key=f"rn-save-{pid}"):
-            try:
-                p.rename(new_name)
-                st.rerun()
-            except InputError as exc:
-                st.error(str(exc))
-        st.divider()
-        sure = st.checkbox("Yes, delete this lesson and all its versions", key=f"del-ok-{pid}")
-        if st.button("Delete lesson", key=f"del-{pid}", disabled=not sure):
-            p.delete()
-            if current:
-                st.session_state["project_id"] = None
-            st.rerun()
+    created = datetime.fromisoformat(p.meta["created_at"])
+    failed = any(s["status"] == "failed" for s in p.meta["steps"].values())
+    meta = [p.inputs.learner_level.capitalize(), _when(p.meta["created_at"])[1],
+            created.astimezone().strftime("%H:%M")]
+    if p.current_version and p.current_version > 1:
+        meta.append(f"v{p.current_version}")
+    if p.next_step() is not None:
+        meta.append("needs retry" if failed else "unfinished")
+
+    with st.container(key=f"{'lcardsel' if current else 'lcard'}-{pid}"):
+        c1, c2 = st.columns([9, 1], vertical_alignment="center", gap="small")
+        with c1:
+            if st.button(p.display_name, key=f"open-{pid}", type="tertiary", use_container_width=True,
+                         help=p.display_name):
+                go(pid)
+            goal = (f'<div class="lgoal">{escape(" ".join(p.inputs.objective.split()[:9]))}…</div>'
+                    if duplicated else "")
+            st.markdown(f'<div class="lmeta">{escape(" · ".join(meta))}</div>{goal}', unsafe_allow_html=True)
+        with c2:
+            with st.popover("", icon=":material/more_vert:", type="tertiary", key=f"lmenu-{pid}",
+                            help="Rename or delete"):
+                new_name = st.text_input("Rename", p.display_name, key=f"rn-{pid}")
+                if st.button("Save name", key=f"rn-save-{pid}", icon=":material/edit:"):
+                    try:
+                        p.rename(new_name)
+                        st.rerun()
+                    except InputError as exc:
+                        st.error(str(exc))
+                st.divider()
+                sure = st.checkbox("Yes, delete this lesson and all its versions", key=f"del-ok-{pid}")
+                with st.container(key=f"ldel-{pid}"):
+                    if st.button("Delete", key=f"del-{pid}", disabled=not sure, icon=":material/delete:"):
+                        p.delete()
+                        if current:
+                            st.session_state["project_id"] = None
+                        st.rerun()
 
 
 with st.sidebar:
-    st.markdown("### AI Lesson Studio")
-    if st.button("✨ New lesson", use_container_width=True, type="primary"):
-        go(None)
+    st.markdown('<div class="side-brand">AI Lesson Studio</div>', unsafe_allow_html=True)
+    with st.container(key="newlesson"):
+        if st.button("New lesson", use_container_width=True, type="primary", icon=":material/add:"):
+            go(None)
     lessons = Project.list_all()
-    if len(lessons) > 5:
-        query = st.text_input("Search lessons", placeholder="Search by topic...", key="lesson_search",
-                              label_visibility="collapsed")
-        if query.strip():
-            lessons = [p for p in lessons if query.casefold() in p.display_name.casefold()
-                       or query.casefold() in p.inputs.objective.casefold()]
-    with st.container(height=560, border=False):
+    with st.container(key="lsearch"):
+        query = st.text_input("Search lessons", placeholder="Search lessons", key="lesson_search",
+                              label_visibility="collapsed", icon=":material/search:")
+    if query.strip():
+        q = query.casefold()
+        lessons = [p for p in lessons if q in p.display_name.casefold() or q in p.inputs.objective.casefold()]
+    names = [p.display_name.casefold() for p in lessons]
+    with st.container(height=600, border=False, key="llist"):
         if not lessons:
-            st.caption("No lessons yet. Create your first one!")
+            st.caption("No lessons found." if query.strip() else "No lessons yet. Create your first one!")
         for group in ("Today", "This week", "Earlier"):
             members = [p for p in lessons if _when(p.meta["created_at"])[0] == group]
             if members:
                 st.markdown(f'<div class="group-label">{group}</div>', unsafe_allow_html=True)
                 for p in members:
-                    _lesson_row(p)
+                    _lesson_card(p, names.count(p.display_name.casefold()) > 1)
 
 try:
     llm()
