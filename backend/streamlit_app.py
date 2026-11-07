@@ -14,6 +14,8 @@ import streamlit as st
 
 from app.core.config import get_settings
 from app.generation.render import render_lesson_markdown, render_references
+from app.generation.grading import (CHOICE_TYPES, PAIR_TYPES, chosen_misconception, is_correct,
+                                    personal_line, score_objectives, final_questions)
 from app.generation.visuals import GRAPH_TYPES, chart_data, table_markdown, to_dot
 from app.llm.base import LLMConfigError
 from app.llm.factory import create_llm_client
@@ -246,6 +248,7 @@ button[kind="primary"]:disabled {background: #BBF7D0 !important; border-color: #
 .analogy ul {margin: .3rem 0 0 0;}
 .viz-caption {font-size: .88rem; color: #57534E; font-style: italic; margin-top: .2rem;}
 .sr-only {position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;}
+.q-head {font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #047857;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -515,7 +518,7 @@ def render_block(block) -> None:
         st.markdown(block.content)
 
 
-def _render_section(s, lesson, base: str) -> None:
+def _render_section(s, lesson, base: str, *, test_mode: bool = False) -> None:
     st.markdown(f'<div class="section-head"><h4 style="margin:0">{escape(s.title)}</h4>'
                 f'<span class="minutes">⏱ {s.duration_minutes} min</span></div>', unsafe_allow_html=True)
     for block in s.content_blocks:
@@ -534,9 +537,146 @@ def _render_section(s, lesson, base: str) -> None:
             if a.answer:
                 with st.expander("Show the answer"):
                     st.markdown(a.answer)
+    if test_mode:
+        render_test(lesson, base)
+        return
     for number, q in enumerate(lesson.assessments, start=1):
         if q.section_id == s.section_id:
             render_question(q, f"q-{base}-{q.question_id}", number)
+
+
+# ------------------------------------------------------------------- test
+
+
+def _shuffled(items: list, seed: str) -> list:
+    """A fixed, per-question shuffle (stable across reruns)."""
+    return random.Random(seed).sample(list(items), len(items))
+
+
+def _test_answers(base: str, lesson) -> dict:
+    return {q.question_id: st.session_state.get(f"ans-{base}-{q.question_id}") for q in final_questions(lesson)}
+
+
+def _test_question_input(q, store: str, locked: bool) -> None:
+    saved = st.session_state.get(store)
+    kind = q.question_type
+    if kind in CHOICE_TYPES:
+        options = q.options or ["True", "False"]
+        if kind is not QuestionType.TRUE_FALSE:
+            options = _shuffled(options, q.question_id)
+        value = st.radio("Your answer", options, index=options.index(saved) if saved in options else None,
+                         key=f"w-{store}", disabled=locked, label_visibility="collapsed")
+    elif kind is QuestionType.ORDER_STEPS:
+        value = st.multiselect("Click the steps in the right order", _shuffled(q.correct_order, q.question_id),
+                               default=[s for s in (saved or []) if s in q.correct_order],
+                               key=f"w-{store}", disabled=locked)
+    elif kind in PAIR_TYPES:
+        rights = _shuffled([p[1] for p in q.pairs], q.question_id)
+        saved = saved or {}
+        value = {}
+        for i, (left, _) in enumerate(q.pairs):
+            choice = st.selectbox(f"{left} =", ["—"] + rights,
+                                  index=(["—"] + rights).index(saved.get(left)) if saved.get(left) in rights else 0,
+                                  key=f"w-{store}-{i}", disabled=locked)
+            value[left] = None if choice == "—" else choice
+    elif kind is QuestionType.FILL_BLANK:
+        value = st.text_input("Fill in the blank", value=saved or "", key=f"w-{store}", disabled=locked)
+    else:
+        value = st.text_area("Your answer", value=saved or "", key=f"w-{store}", disabled=locked, height=80)
+    if not locked:
+        st.session_state[store] = value  # kept even when this step is hidden
+
+
+def _answer_text(q) -> str:
+    if q.question_type is QuestionType.ORDER_STEPS:
+        return " → ".join(q.correct_order)
+    if q.question_type in PAIR_TYPES:
+        return "; ".join(f"{left} = {right}" for left, right in q.pairs)
+    return q.answer_key
+
+
+def _review_section_title(lesson, section_id) -> str | None:
+    return next((s.title for s in lesson.sections if s.section_id == section_id), None)
+
+
+def _set_submitted(base: str, value: bool, clear_ids: list[str]) -> None:
+    """Button callback (runs before the rerun): submit, or reset for a retake."""
+    st.session_state[f"submitted-{base}"] = value
+    for qid in clear_ids:
+        st.session_state.pop(f"ans-{base}-{qid}", None)
+        for key in [k for k in st.session_state if str(k).startswith(f"w-ans-{base}-{qid}")]:
+            del st.session_state[key]
+
+
+def render_test(lesson, base: str) -> None:
+    """All test questions. No marks, answers or explanations until the test is submitted."""
+    submitted_key = f"submitted-{base}"
+    submitted = st.session_state.get(submitted_key, False)
+    questions = final_questions(lesson)
+    answers = _test_answers(base, lesson)
+
+    for n, q in enumerate(questions, start=1):
+        store = f"ans-{base}-{q.question_id}"
+        with st.container(border=True):
+            level = f" · {q.level.value}" if q.level else ""
+            st.markdown(f'<div class="q-head">Question {n} of {len(questions)}{level}</div>', unsafe_allow_html=True)
+            st.markdown(f"**{q.prompt}**")
+            if q.visual:
+                render_visual(q.visual)
+            _test_question_input(q, store, locked=submitted)
+            if not submitted and q.hint:
+                with st.expander("Need a hint?"):
+                    st.markdown(q.hint)
+            if submitted:
+                answer = answers.get(q.question_id)
+                if is_correct(q, answer):
+                    st.success(f"✓ Correct. {q.explanation}")
+                else:
+                    st.error(f"✗ Not quite. The answer is **{_answer_text(q)}**. {q.explanation}")
+                    mix_up = chosen_misconception(q, answer)
+                    if mix_up:
+                        st.markdown(f'<div class="callout mistake"><b>✗ Common mix-up</b> - {escape(mix_up)}</div>',
+                                    unsafe_allow_html=True)
+                    title = _review_section_title(lesson, q.review_section_id)
+                    if title:
+                        st.caption(f"Review: {title}")
+
+    if not submitted:
+        unanswered = sum(1 for q in questions if not answers.get(q.question_id))
+        if unanswered:
+            st.caption(f"{unanswered} question{'s' * (unanswered > 1)} not answered yet - "
+                       "you can still submit; unanswered questions count as wrong.")
+        st.button("Submit test", type="primary", key=f"submit-{base}", width="stretch",
+                  on_click=_set_submitted, args=(base, True, []))
+    else:
+        st.button("↺ Retake the test", key=f"retake-{base}",
+                  on_click=_set_submitted, args=(base, False, [q.question_id for q in questions]))
+
+
+def render_review(lesson, base: str) -> None:
+    """After submission: score per objective; below 70% opens that objective's remedial block."""
+    scores = score_objectives(lesson, _test_answers(base, lesson))
+    remedials = {r.objective_id: r for r in lesson.remedials}
+    st.markdown('<div class="section-head"><h4 style="margin:0">Your results and review</h4></div>',
+                unsafe_allow_html=True)
+    for s in scores:
+        with st.container(border=True):
+            st.markdown(f"**{s.objective_id} · {escape(s.description)}**", unsafe_allow_html=True)
+            st.progress(s.ratio, text=f"{s.correct} of {s.total} correct ({s.ratio:.0%})")
+            remedial = remedials.get(s.objective_id)
+            if not s.needs_review:
+                st.markdown("✓ Solid - no review needed.")
+            elif remedial:
+                st.markdown("Let's look at this one from a different angle.")
+                st.markdown(f'<div class="takeaway">{escape(remedial.takeaway)}</div>', unsafe_allow_html=True)
+                render_visual(remedial.visual)
+                for line in remedial.explanation:
+                    st.markdown(line)
+                if remedial.common_mix_ups:
+                    rows = "".join(f"<li><b>✗ {escape(m.misconception)}</b><br>✓ {escape(m.correction)}</li>"
+                                   for m in remedial.common_mix_ups)
+                    st.markdown(f'<div class="callout mistake"><b>Common mix-ups</b><ul>{rows}</ul></div>',
+                                unsafe_allow_html=True)
 
 
 def _step_to(key: str, index: int) -> None:
@@ -545,16 +685,28 @@ def _step_to(key: str, index: int) -> None:
 
 @st.fragment
 def render_learn(project: Project, lesson, research) -> None:
-    """One step at a time: objectives -> each section -> finish. Previous / Next move between them.
+    """One step at a time: each section -> (review, after the test) -> finish.
     A fragment, so moving between steps re-runs only this view (instant)."""
     package = research[0]
     base = f"{project.meta['project_id']}-v{lesson.version}"
     sections = [s for s in lesson.sections if s.section_type is not SectionType.LEARNING_OBJECTIVES]
-    steps = [s.title for s in sections] + ["Finish"]
+    has_test = bool(lesson.remedials) and bool(final_questions(lesson))  # the test format
+    steps: list[tuple[str, object]] = []
+    for s in sections:
+        steps.append(("section", s))
+        if has_test and s.section_type is SectionType.FINAL_ASSESSMENT:
+            steps.append(("review", None))
+    steps.append(("finish", None))
+    titles = [x.title if kind == "section" else ("Your results" if kind == "review" else "Finish")
+              for kind, x in steps]
+
     step_key = f"step-{base}"
     index = min(st.session_state.get(step_key, 0), len(steps) - 1)
+    kind, current = steps[index]
+    submitted = st.session_state.get(f"submitted-{base}", False)
+    on_test = has_test and kind == "section" and current.section_type is SectionType.FINAL_ASSESSMENT
 
-    st.progress((index + 1) / len(steps), text=f"Step {index + 1} of {len(steps)} · {steps[index]}")
+    st.progress((index + 1) / len(steps), text=f"Step {index + 1} of {len(steps)} · {titles[index]}")
 
     with st.container(border=True):
         if index == 0:  # lesson facts once, at the top of the first step
@@ -567,8 +719,14 @@ def render_learn(project: Project, lesson, research) -> None:
             st.markdown(f'<span class="badge">⏱ {minutes} min</span>'
                         f'<span class="badge">{lesson.learner_level.capitalize()}</span>'
                         f'<span class="badge">{len(sections)} sections</span>{badge}', unsafe_allow_html=True)
-        if index < len(sections):
-            _render_section(sections[index], lesson, base)
+        if kind == "section":
+            if has_test and submitted and current.section_type is SectionType.SUMMARY:
+                line = personal_line(lesson, _test_answers(base, lesson))
+                st.markdown(f'<div class="callout key"><b>Your results</b> - {escape(line)}</div>',
+                            unsafe_allow_html=True)
+            _render_section(current, lesson, base, test_mode=on_test)
+        elif kind == "review":
+            render_review(lesson, base)
         else:
             st.markdown("#### 🎉 You've completed the lesson. Great work!")
             st.markdown("Go back with **Previous** to review any section.")
@@ -586,9 +744,12 @@ def render_learn(project: Project, lesson, research) -> None:
     prev_col.button("← Previous", key=f"prev-{base}", width="stretch", disabled=index == 0,
                     on_click=_step_to, args=(step_key, index - 1))
     if index < len(steps) - 1:
-        label = "Finish →" if index == len(steps) - 2 else "Next →"
-        next_col.button(label, key=f"next-{base}", type="primary", width="stretch",
-                        on_click=_step_to, args=(step_key, index + 1))
+        if on_test and not submitted:
+            next_col.button("Submit the test first", key=f"next-{base}", width="stretch", disabled=True)
+        else:
+            label = "Finish →" if index == len(steps) - 2 else ("See my results →" if on_test else "Next →")
+            next_col.button(label, key=f"next-{base}", type="primary", width="stretch",
+                            on_click=_step_to, args=(step_key, index + 1))
     else:
         next_col.button("↺ Start again", key=f"restart-{base}", width="stretch",
                         on_click=_step_to, args=(step_key, 0))

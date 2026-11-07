@@ -217,7 +217,7 @@ These run without an LLM, so they are fast, free and always give the same result
 **QC2 coverage matrix** (per objective; uses the lesson's declared mappings)
 - explained: a concept_explanation section maps to it.
 - exemplified: a worked_examples section, or a section with an example block, maps to it.
-- practiced: a **mandatory** activity maps to it.
+- practiced: a **mandatory** activity maps to it, **or** a question at the apply level or higher (lessons may practise through test questions).
 - assessed: a **final** assessment question maps to it. Knowledge checks alone do not count.
 
 **QC2 assessments**

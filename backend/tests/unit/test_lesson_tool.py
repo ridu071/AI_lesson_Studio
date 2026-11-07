@@ -34,11 +34,33 @@ def draft_from(lesson_data: dict) -> dict:
     practice = lesson_data["activities"][0]
     practice.update(duration_minutes=2, hint="Ask: does the data have labels?",
                     answer="Labelled data means supervised.")
-    for n in (2, 3):
-        lesson_data["activities"].append(practice | {"activity_id": f"ACT-0{n}", "title": f"Task {n}"})
-    final = next(q for q in lesson_data["assessments"] if q["kind"] == "final")
-    for n in (5, 6, 7):
-        lesson_data["assessments"].append(final | {"question_id": f"Q-0{n}"})
+    # The test: 10 hinted final questions, 3 types, at least 2 per objective.
+    lesson_data["assessments"] = [q for q in lesson_data["assessments"] if q["kind"] != "final"]
+    common = {"section_id": "SEC-07", "kind": "final", "explanation": "Labels make it supervised.",
+              "hint": "Think about whether the data comes with answers.", "review_section_id": "SEC-03"}
+    for n in range(10):
+        objective = "LO-01" if n % 2 == 0 else "LO-02"
+        if n % 3 == 0:
+            q = {"question_type": "multiple_choice", "options": ["Supervised", "Unsupervised", "Neither", "Both"],
+                 "answer_key": "Supervised",
+                 "wrong_options": [{"option": "Unsupervised", "misconception_id": "M1",
+                                    "misconception": "Thinks labels are not needed."}]}
+        elif n % 3 == 1:
+            q = {"question_type": "order_steps", "correct_order": ["Collect data", "Label it", "Train"],
+                 "answer_key": "Collect data -> Label it -> Train"}
+        else:
+            q = {"question_type": "fill_blank", "answer_key": "labels", "accepted_answers": ["labelled data"]}
+        lesson_data["assessments"].append(common | q | {
+            "question_id": f"Q-{n + 10}", "prompt": f"Test question {n + 1} about ____ ?",
+            "objective_ids": [objective], "bloom_level": "analyze", "level": "apply"})
+    lesson_data["remedials"] = [{
+        "objective_id": oid, "takeaway": "Labels are the answers the model learns from.",
+        "visual": {"type": "visual", "visual_type": "analogy_scene",
+                   "elements": ["Teacher with answer sheet = labels", "Student = model"],
+                   "caption": "The answer sheet is what makes it supervised.", "alt_text": "A classroom scene."},
+        "explanation": ["If every example comes with its answer, the model is supervised."],
+        "common_mix_ups": [{"misconception": "Clusters are labels.", "correction": "Clusters are discovered."}],
+    } for oid in ("LO-01", "LO-02")]
     return {k: v for k, v in lesson_data.items() if k not in ("lesson_id", "version", "videos")}
 
 

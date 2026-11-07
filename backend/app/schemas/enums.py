@@ -94,7 +94,19 @@ class QuestionType(StrEnum):
     MULTIPLE_CHOICE = "multiple_choice"
     TRUE_FALSE = "true_false"
     SHORT_ANSWER = "short_answer"
-    SCENARIO = "scenario"
+    SCENARIO = "scenario"  # a short new situation + options (scored like multiple choice)
+    ORDER_STEPS = "order_steps"  # put `correct_order` in order
+    MATCH_PAIRS = "match_pairs"  # match each left item to its right item (`pairs`)
+    LABEL_VISUAL = "label_visual"  # match numbered parts of `visual` to labels (`pairs`)
+    FILL_BLANK = "fill_blank"  # type the missing word(s); `accepted_answers` lists variants
+
+
+class QuestionLevel(StrEnum):
+    """Test difficulty band, easy to hard."""
+
+    UNDERSTAND = "understand"
+    APPLY = "apply"
+    TRANSFER = "transfer"
 
 
 class SourceType(StrEnum):

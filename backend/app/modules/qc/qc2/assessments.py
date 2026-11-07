@@ -67,6 +67,34 @@ def check_answer_keys(lesson: LessonVersion, issues: IssueCollector) -> None:
                     recommendation="Set the answer key to the correct option.",
                 )
 
+        elif q.question_type is QuestionType.ORDER_STEPS:
+            steps = [_norm(s) for s in q.correct_order]
+            if len(steps) < 3 or len(set(steps)) != len(steps):
+                issues.add(
+                    IssueType.WEAK_ASSESSMENT,
+                    f"{q.question_id} asks to order steps but has fewer than 3 distinct steps.",
+                    section_id=q.section_id,
+                    recommendation="List at least 3 distinct steps in their correct order.",
+                )
+
+        elif q.question_type in (QuestionType.MATCH_PAIRS, QuestionType.LABEL_VISUAL):
+            pairs = [p for p in q.pairs if len(p) == 2 and p[0].strip() and p[1].strip()]
+            lefts, rights = [_norm(p[0]) for p in pairs], [_norm(p[1]) for p in pairs]
+            if len(pairs) < 3 or len(set(lefts)) != len(lefts) or len(set(rights)) != len(rights):
+                issues.add(
+                    IssueType.WEAK_ASSESSMENT,
+                    f"{q.question_id} needs at least 3 pairs, each item used once.",
+                    section_id=q.section_id,
+                    recommendation="Give 3+ pairs with no repeated items, so only one matching is correct.",
+                )
+            if q.question_type is QuestionType.LABEL_VISUAL and q.visual is None:
+                issues.add(
+                    IssueType.WEAK_ASSESSMENT,
+                    f"{q.question_id} asks to label a visual but has no visual.",
+                    section_id=q.section_id,
+                    recommendation="Attach the visual whose numbered parts are to be labelled.",
+                )
+
         elif q.question_type is QuestionType.TRUE_FALSE:
             if set(options) != _TRUE_FALSE:
                 issues.add(

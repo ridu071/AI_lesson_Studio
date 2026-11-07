@@ -84,20 +84,33 @@ def test_knowledge_check_alone_does_not_count_as_assessed(lesson_data, research_
     assert T.OBJECTIVE_NOT_ASSESSED in types(run(lesson_data, research_data))
 
 
-def test_objective_without_activity_is_flagged(lesson_data, research_data):
+def _lo2_only_tested_at_understand_level(lesson_data):
+    """LO-02 keeps an assessment but loses its activity and its applied questions."""
     lesson_data["activities"][0]["objective_ids"] = ["LO-01"]
+    for q in lesson_data["assessments"]:
+        if q["kind"] == "final":
+            q["objective_ids"] = ["LO-01"]
+    lesson_data["assessments"].append({
+        "question_id": "Q-05", "section_id": "SEC-07", "kind": "final", "question_type": "multiple_choice",
+        "prompt": "Which task groups data without labels?", "options": ["Clustering", "Classification"],
+        "answer_key": "Clustering", "explanation": "Clustering needs no labels.",
+        "objective_ids": ["LO-02"], "bloom_level": "understand"})
+
+
+def test_objective_without_practice_is_flagged(lesson_data, research_data):
+    _lo2_only_tested_at_understand_level(lesson_data)
     [issue] = run(lesson_data, research_data).issues
     assert issue.issue_type is T.OBJECTIVE_NOT_PRACTICED
     assert issue.objective_id == "LO-02"
     assert issue.severity is Severity.MEDIUM
 
 
-def test_optional_activity_does_not_count_as_practice(lesson_data, research_data):
+def test_applied_question_counts_as_practice(lesson_data, research_data):
+    # No activity at all, but both objectives have analyze-level questions: practised.
     lesson_data["activities"][0]["is_mandatory"] = False
-    assert types(run(lesson_data, research_data)) == [
-        T.OBJECTIVE_NOT_PRACTICED,
-        T.OBJECTIVE_NOT_PRACTICED,
-    ]
+    result = run(lesson_data, research_data)
+    assert result.issues == []
+    assert all(row.practiced for row in result.coverage)
 
 
 def test_objective_never_explained_is_flagged(lesson_data, research_data):

@@ -24,12 +24,14 @@ from app.schemas.lesson import (
     LessonSection,
     LessonVersion,
     LessonVideo,
+    Remedial,
 )
 from app.schemas.research import ResearchPackage
 
 MIN_MINUTES, MAX_MINUTES = 40, 45
 MIN_EVIDENCE_CLAIMS = 5
-MIN_CHECKS, MIN_FINALS, MIN_PRACTICE = 2, 4, 2
+# Check questions are requested but not required: a lesson is not failed for lacking them.
+MIN_CHECKS, MIN_TEST_QUESTIONS = 0, 8
 # A whole lesson is a large answer; allow two corrections before giving up.
 GENERATION_ATTEMPTS = 3
 EVIDENCE_CLAIMS = {ClaimType.FACTUAL, ClaimType.DEFINITION}
@@ -113,6 +115,7 @@ class GeneratedLesson(ContractModel):
     claims: list[Claim] = []
     activities: list[Activity] = []
     assessments: list[AssessmentQuestion] = []
+    remedials: list[Remedial] = []
 
 
 def _inline(schema: dict) -> dict:
@@ -181,15 +184,27 @@ def _validator(lesson_id: str, version: int, research: ResearchPackage, videos: 
         uncited = [c.claim_id for c in lesson.claims if c.claim_type in EVIDENCE_CLAIMS and not c.source_ids]
         if uncited:
             problems.append(f"factual/definition claims must cite a source: {uncited}")
-        kinds = [q.kind for q in lesson.assessments]
-        checks, finals = kinds.count(AssessmentKind.KNOWLEDGE_CHECK), kinds.count(AssessmentKind.FINAL)
-        if checks < MIN_CHECKS or finals < MIN_FINALS:
-            problems.append(f"you wrote {checks} knowledge_check and {finals} final questions; write one "
-                            f"check question in each core idea section and {MIN_FINALS}+ final multiple-choice "
-                            "questions in the Practice and test section")
-        if len(lesson.activities) < MIN_PRACTICE:
-            problems.append(f"you wrote {len(lesson.activities)} practice tasks; write 3 activities with a "
-                            "hint and an answer in the Practice and test section")
+        checks = [q for q in lesson.assessments if q.kind is AssessmentKind.KNOWLEDGE_CHECK]
+        finals = [q for q in lesson.assessments if q.kind is AssessmentKind.FINAL]
+        if len(checks) < MIN_CHECKS:
+            problems.append(f"you wrote {len(checks)} check questions; write one knowledge_check "
+                            "short_answer question in each core idea section")
+        if len(finals) < MIN_TEST_QUESTIONS:
+            problems.append(f"you wrote {len(finals)} test questions; the Test section needs 10 "
+                            "final questions")
+        types = {q.question_type for q in finals}
+        if finals and len(types) < 3:
+            problems.append(f"the test uses {len(types)} question types; use at least 3 different types")
+        no_hint = [q.question_id for q in finals if not (q.hint or "").strip()]
+        if no_hint:
+            problems.append(f"every test question needs a hint; missing in {no_hint}")
+        for o in lesson.learning_objectives:
+            n = sum(o.id in q.objective_ids for q in finals)
+            if finals and n < 2:
+                problems.append(f"objective {o.id} has {n} test question(s); give every objective at least 2")
+        missing_remedial = sorted({o.id for o in lesson.learning_objectives} - {r.objective_id for r in lesson.remedials})
+        if missing_remedial:
+            problems.append(f"write one remedial per objective; missing for {missing_remedial}")
         no_visual = [s.section_id for s in lesson.sections
                      if not any(b.type is ContentBlockType.VISUAL for b in s.content_blocks)]
         if no_visual:

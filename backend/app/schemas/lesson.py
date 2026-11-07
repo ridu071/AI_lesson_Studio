@@ -37,6 +37,7 @@ from app.schemas.enums import (
     ClaimType,
     ContentBlockType,
     LearnerLevel,
+    QuestionLevel,
     QuestionType,
     SectionType,
     VisualType,
@@ -117,6 +118,14 @@ class Activity(ContractModel):
     answer: str | None = None  # shown in a collapsible "Answer"
 
 
+class WrongOption(ContractModel):
+    """A wrong answer and the specific mix-up it represents."""
+
+    option: NonEmptyStr
+    misconception_id: NonEmptyStr
+    misconception: NonEmptyStr
+
+
 class AssessmentQuestion(ContractModel):
     question_id: QuestionId
     section_id: SectionId
@@ -128,6 +137,31 @@ class AssessmentQuestion(ContractModel):
     explanation: NonEmptyStr
     objective_ids: list[ObjectiveId] = []
     bloom_level: BloomLevel
+    # --- test questions ---
+    level: QuestionLevel | None = None
+    hint: str | None = None  # nudges toward the idea; never gives the answer
+    wrong_options: list[WrongOption] = []
+    review_section_id: SectionId | None = None  # where to go back to if answered wrongly
+    correct_order: list[NonEmptyStr] = []  # order_steps
+    pairs: list[list[str]] = []  # match_pairs / label_visual: [left, right]
+    visual: ContentBlock | None = None  # optional visual (required for label_visual)
+    accepted_answers: list[str] = []  # fill_blank: other acceptable spellings
+
+
+class MixUp(ContractModel):
+    misconception: NonEmptyStr
+    correction: NonEmptyStr
+
+
+class Remedial(ContractModel):
+    """Shown after the test only if the learner scores below 70% on this objective:
+    a different angle on the same idea."""
+
+    objective_id: ObjectiveId
+    takeaway: NonEmptyStr
+    visual: ContentBlock
+    explanation: list[NonEmptyStr] = Field(min_length=1, max_length=4)
+    common_mix_ups: list[MixUp] = []
 
 
 class LessonVideo(ContractModel):
@@ -155,6 +189,7 @@ class LessonVersion(ContractModel):
     activities: list[Activity] = []
     assessments: list[AssessmentQuestion] = []
     videos: list[LessonVideo] = []
+    remedials: list[Remedial] = []
 
     @model_validator(mode="after")
     def _check_internal_references(self) -> "LessonVersion":
@@ -197,6 +232,10 @@ class LessonVersion(ContractModel):
             check_objectives(q.question_id, q.objective_ids)
         for v in self.videos:
             check_section(v.video_id, v.section_id)
+        for q in self.assessments:
+            check_section(f"{q.question_id} review link", q.review_section_id)
+        for r in self.remedials:
+            check_objectives("remedial", [r.objective_id])
 
         if problems:
             raise ValueError("Lesson structure is invalid: " + "; ".join(problems))

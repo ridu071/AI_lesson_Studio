@@ -61,15 +61,34 @@ def render_lesson_markdown(lesson: LessonVersion, research: ResearchPackage, *,
         for q in [q for q in lesson.assessments if q.section_id == section.section_id]:
             number += 1
             lines += [f"**Q{number}. {q.prompt}**", ""]
+            if q.visual:
+                lines += [visual_markdown(q.visual), ""]
             lines += [f"- {option}" for option in q.options]
-            if q.options:
+            if q.question_type.value == "order_steps":
+                lines += [f"- {step}" for step in sorted(q.correct_order)]  # shuffled for the learner
+            if q.question_type.value in ("match_pairs", "label_visual"):
+                lines += [f"- {left} = ____" for left, _ in q.pairs]
+            if q.options or q.correct_order or q.pairs:
                 lines.append("")
+            if q.hint:
+                lines += [f"*Hint:* {q.hint}", ""]
     if include_answers and lesson.assessments:
         lines += ["## Answer key", ""]
         for n, q in enumerate(lesson.assessments, start=1):
-            kind = "final" if q.kind is AssessmentKind.FINAL else "check"
-            lines += [f"{n}. ({kind}) **{q.answer_key}** - {q.explanation}"]
+            kind = "test" if q.kind is AssessmentKind.FINAL else "check"
+            level = f", {q.level.value}" if q.level else ""
+            lines += [f"{n}. ({kind}{level}) **{q.answer_key}** - {q.explanation}"]
+            lines += [f"   - Wrong: \"{w.option}\" ({w.misconception_id}) - {w.misconception}" for w in q.wrong_options]
+            if q.review_section_id:
+                lines.append(f"   - Review: {q.review_section_id}")
         lines.append("")
+    if lesson.remedials:
+        lines += ["## Review material (shown when a learner scores below 70% on an objective)", ""]
+        for r in lesson.remedials:
+            lines += [f"### {r.objective_id}: {r.takeaway}", "", visual_markdown(r.visual), ""]
+            lines += r.explanation + [""]
+            lines += [f"- **Mix-up:** {m.misconception} **Correction:** {m.correction}" for m in r.common_mix_ups]
+            lines.append("")
     answered = [a for a in lesson.activities if a.answer]
     if answered:
         lines += ["## Practice answers", ""]

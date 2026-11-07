@@ -1,5 +1,5 @@
 ---
-version: 0.2.0
+version: 0.3.0
 layer: qc2
 evaluators: instructional_review
 ---
@@ -29,7 +29,8 @@ Allowed issue types (use exactly these names):
 - weak_example: an example that does not illustrate its concept, or misleads.
 - unclear_activity: activity instructions a learner could not follow.
 - weak_assessment: a question that is ambiguous, has more than one defensible
-  answer, or gives its answer away.
+  answer, or gives its answer away - including a hint that states the answer,
+  names the correct option or eliminates options.
 - incorrect_answer_key: the answer key or its explanation is wrong.
 - bloom_mismatch: a final assessment question does not really require the
   cognitive level its objective states (e.g. "analyze" tested by recall).

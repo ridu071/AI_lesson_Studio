@@ -3,7 +3,8 @@
 For each learning objective:
 - explained:   a concept_explanation section is mapped to it
 - exemplified: a worked_examples section, or a section with an example block, is mapped to it
-- practiced:   a mandatory activity is mapped to it
+- practiced:   a mandatory activity, OR a question at the apply level or higher, is mapped to it
+               (lessons without practice tasks practise through applied test questions)
 - assessed:    a FINAL assessment question is mapped to it (knowledge checks
                alone do not count: the final assessment is what measures the objective)
 
@@ -14,7 +15,7 @@ the objective well is judged by the LLM evaluators in Step 6.
 from app.modules.qc.enums import IssueType
 from app.modules.qc.issues import IssueCollector
 from app.modules.qc.schemas import ObjectiveCoverage
-from app.schemas.enums import AssessmentKind, ContentBlockType, SectionType
+from app.schemas.enums import AssessmentKind, BloomLevel, ContentBlockType, SectionType, bloom_rank
 from app.schemas.lesson import LessonVersion
 
 
@@ -34,6 +35,9 @@ def build_coverage(lesson: LessonVersion) -> list[ObjectiveCoverage]:
                 ),
                 practiced=any(
                     a.is_mandatory and oid in a.objective_ids for a in lesson.activities
+                ) or any(
+                    oid in q.objective_ids and bloom_rank(q.bloom_level) >= bloom_rank(BloomLevel.APPLY)
+                    for q in lesson.assessments
                 ),
                 assessed=any(
                     q.kind is AssessmentKind.FINAL and oid in q.objective_ids
@@ -50,8 +54,9 @@ _GAPS = (
      "Add an explanation of this objective in a concept_explanation section."),
     ("exemplified", IssueType.OBJECTIVE_NOT_EXEMPLIFIED, "illustrated with an example",
      "Add a worked example for this objective."),
-    ("practiced", IssueType.OBJECTIVE_NOT_PRACTICED, "practised in a mandatory activity",
-     "Add a practical activity for this objective."),
+    ("practiced", IssueType.OBJECTIVE_NOT_PRACTICED,
+     "practised (no mandatory activity and no question at the apply level or above)",
+     "Add a practical activity or an applied question for this objective."),
     ("assessed", IssueType.OBJECTIVE_NOT_ASSESSED, "tested in the final assessment",
      "Add a final assessment question that tests this objective."),
 )
