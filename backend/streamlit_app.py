@@ -24,7 +24,7 @@ st.set_page_config(page_title="AI Lesson Studio", page_icon="🎓", layout="wide
 
 st.markdown("""
 <style>
-.block-container {padding-top: 1.2rem; max-width: 1200px;}
+.block-container {padding-top: 3.8rem; max-width: 1200px;}
 .hero {background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%); color: white;
        padding: 2rem 2.2rem; border-radius: 18px; margin-bottom: 1.5rem;}
 .hero h1 {color: white; margin: 0 0 .4rem 0; font-size: 2.1rem;}
@@ -47,7 +47,7 @@ st.markdown("""
 .minutes {color: #6B7280; font-size: .9rem;}
 
 /* ---- landing ---- */
-.landing-title {text-align: center; font-size: 2.2rem; font-weight: 800; margin: 1.2rem 0 .2rem 0;
+.landing-title {text-align: center; font-size: 2.2rem; font-weight: 800; margin: 0 0 .2rem 0;
   white-space: nowrap;
   background: linear-gradient(135deg, #4F46E5, #7C3AED); -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;}
@@ -395,8 +395,9 @@ if project is not None and st.session_state.get("building") == project.meta["pro
     st.session_state.pop("building")
     st.session_state.setdefault("last_title", project.inputs.title)
     st.session_state.setdefault("last_objective", project.inputs.objective)
-    st.button("← Back", on_click=go_home, help="Stop and go back to the first screen. "
-              "Anything already finished is saved.")
+    _, back_col, _ = st.columns([1, 6, 1])
+    back_col.button("← Back", on_click=go_home, help="Stop and go back to the first screen. "
+                    "Anything already finished is saved.")
     if generate_with_progress(project):
         time.sleep(1.5)
         st.rerun()
