@@ -215,7 +215,7 @@ def lesson_pdf(lesson: LessonVersion, research: ResearchPackage) -> bytes:
     for s in lesson.sections:
         if s.section_type is SectionType.LEARNING_OBJECTIVES:
             continue
-        story.append(_p(f"{s.title}  ({s.duration_minutes} min)", st["h2"]))
+        story.append(_p(s.title, st["h2"]))
         for block in s.content_blocks:
             story += _block(block, st)
         for a in [a for a in lesson.activities if a.section_id == s.section_id]:

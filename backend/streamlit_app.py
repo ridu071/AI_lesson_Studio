@@ -31,10 +31,12 @@ st.set_page_config(page_title="AI Lesson Studio", page_icon="🎓", layout="wide
 
 st.markdown("""
 <style>
-.block-container {padding-top: 3.8rem; max-width: 1200px;}
+.block-container {padding-top: .9rem; max-width: 1200px;}
+[data-testid="stHeader"] {background: transparent; pointer-events: none;}
+[data-testid="stHeader"] button, [data-testid="stHeader"] a {pointer-events: auto;}
 .hero {background: linear-gradient(135deg, #047857 0%, #064E3B 100%); color: white;
-       padding: 2rem 2.2rem; border-radius: 18px; margin-bottom: 1.5rem;}
-.hero h1 {color: white; margin: 0 0 .4rem 0; font-size: 2.1rem;}
+       padding: 1.3rem 2rem; border-radius: 18px; margin-bottom: 1rem;}
+.hero h1 {color: white; margin: 0 0 .3rem 0; font-size: 2rem; padding: 0;}
 .hero p {color: #DCFCE7; margin: 0; font-size: 1.05rem;}
 .badge {display: inline-block; padding: .18rem .65rem; border-radius: 999px; font-size: .82rem;
         font-weight: 600; margin-right: .35rem; background: #DCFCE7; color: #065F46;}
@@ -521,13 +523,13 @@ def render_block(block) -> None:
 
 
 def _render_section(s, lesson, base: str, *, test_mode: bool = False) -> None:
-    st.markdown(f'<div class="section-head"><h4 style="margin:0">{escape(s.title)}</h4>'
-                f'<span class="minutes">⏱ {s.duration_minutes} min</span></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="section-head"><h4 style="margin:0">{escape(s.title)}</h4></div>',
+                unsafe_allow_html=True)
     for block in s.content_blocks:
         render_block(block)
     for a in [a for a in lesson.activities if a.section_id == s.section_id]:
         with st.container(border=True):
-            st.markdown(f"**🛠 {escape(a.title)}** · {a.duration_minutes} min")
+            st.markdown(f"**🛠 {escape(a.title)}**")
             st.markdown(a.instructions)
             store = f"act-{base}-{a.activity_id}-saved"
             st.text_area("Your work", value=st.session_state.get(store, ""), height=90,
@@ -1004,11 +1006,6 @@ def landing_form() -> None:
 
 
 if project is None:
-    st.markdown("""<style>
-    .block-container {padding-top: .6rem !important;}
-    [data-testid="stHeader"] {background: transparent;}
-    .landing-title {margin-top: 0;}
-    </style>""", unsafe_allow_html=True)
     _, middle, _ = st.columns([0.6, 4, 0.6])
     with middle:
         st.markdown('<div class="landing-title">What do you want to learn today?</div>'
