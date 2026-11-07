@@ -30,7 +30,7 @@ Fill in `backend/.env`:
 | Setting | Where to get it |
 |---|---|
 | `LLM_API_KEY` | Google AI Studio: aistudio.google.com, "Get API key" (Gemini) |
-| `LLM_MODEL` | `gemini-3.5-flash-lite` (tested; fast) |
+| `LLM_MODEL` | `gemini-3.1-flash-lite` (tested; fast; free tier allows 500 requests/day) |
 | `YOUTUBE_API_KEY` | Google Cloud Console: enable "YouTube Data API v3", then Credentials, Create API key (optional; without it, no videos) |
 
 Run the app and open http://localhost:8501:
@@ -43,7 +43,7 @@ Other commands (from `backend/`):
 
 | Command | Purpose |
 |---|---|
-| `pytest` | 247 offline tests (a fake LLM; no network, no keys) |
+| `pytest` | 249 offline tests (a fake LLM; no network, no keys) |
 | `python scripts/check_setup.py` | Checks Python, packages, folders and settings |
 | `python scripts/run_benchmark.py` | QC benchmark, deterministic checks only (free, instant) |
 | `python scripts/run_benchmark.py --llm` | QC benchmark with the AI evaluators (about 52 calls) |
@@ -164,22 +164,23 @@ Details, and both versions' QC reports, are in [`demo/README.md`](demo/README.md
 facts, 60-minute lessons, untested objectives, wrong answer keys, jargon for beginners,
 ...) and control cases that must **not** be flagged. See [`evaluation/`](evaluation/).
 
-Latest run (2026-11-07, current prompts: QC1 0.1.0, QC2 0.3.0, `gemini-3.5-flash-lite`):
+Latest run (2026-11-07, current prompts: QC1 0.1.0, QC2 0.3.0, `gemini-3.1-flash-lite`):
 
 | Mode | Cases scored | Passed | Recall | Precision | Block accuracy | Exact decisions |
 |---|---|---|---|---|---|---|
 | Deterministic checks only | 21 (6 need the AI) | 21 | 100% | 100% | 100% | n/a |
-| Full (with AI evaluators) | 23 of 26 (run before I-015 was added) | **23** | **100%** (25/25) | **100%** | **100%** | **100%** |
+| Full (with AI evaluators) | 27 of 27 | **25** | **96.7%** (29/30) | **93.5%** | **100%** | **100%** |
 
-The free-tier daily quota ran out after 23 cases. The 3 that did not run (I-012 to
-I-014) passed in the previous full run (25/26, earlier QC2 prompt), whose one false
-alarm (F-009) is fixed in the current prompt.
+Every case gets the right release decision, and nothing is wrongly blocked or missed.
+The two failures are minor: F-005 misses one secondary research-gap note, and F-009
+adds two extra (reasonable) issues about the planted wrong claim. With the previous
+model (`gemini-3.5-flash-lite`) the 23 cases that fitted in its daily quota all passed;
+the app was moved to `gemini-3.1-flash-lite` for its much larger free quota.
 
 I-015 (added after the demo) plants the kind of error QC missed in the Photosynthesis
-lesson: two final questions asking the same thing with opposite answer keys. It has not
-been run with the AI evaluators yet (quota), so it is an open test, not a claimed pass.
+lesson: two final questions asking the same thing with opposite answer keys. It passes.
 
-Repeatability (3 runs × 26 cases, earlier prompt versions): 100% identical decisions,
+Repeatability (3 runs × 26 cases, earlier model and prompt versions): 100% identical decisions,
 96.2% identical issue sets.
 
 > Caveat: the checks and the benchmark cases were written by the same author, on one
@@ -219,7 +220,7 @@ backend/
   app/modules/qc/        QC1, QC2, rubrics and scoring, decision rules, reports
   app/llm/               Gemini client (retries, quota handling, structured JSON output)
   app/schemas/           lesson and research data contracts
-  tests/                 247 unit tests
+  tests/                 249 unit tests
 prompts/                 versioned prompts (research, generation, qc1, qc2)
 evaluation/              QC benchmark: base lesson + 27 cases
 demo/                    exported demo lessons, PDFs, summary images, QC reports
@@ -236,7 +237,7 @@ docs/                    QC specification, demo video script
   articles it uses.
 - **Open Library** (Internet Archive) search API: book suggestions.
 - **YouTube Data API v3** (Google): video search and metadata.
-- **Google Gemini** (`gemini-3.5-flash-lite`): research planning, lesson generation
+- **Google Gemini** (`gemini-3.1-flash-lite`; the demo lessons were made with `gemini-3.5-flash-lite`): research planning, lesson generation
   and the AI parts of both QC layers.
 
 **Open-source libraries**: Streamlit, Pydantic and pydantic-settings, ReportLab, Pillow,

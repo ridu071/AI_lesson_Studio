@@ -208,3 +208,18 @@ def test_terse_model_reasons_do_not_crash_qc(lesson_data, research_data):
     result = run(lesson_data, research_data, FakeLLM(qc1=terse))
     assert result.qc1.status is AuditStatus.PASSED
     assert result.qc1.claim_assessments[0].explanation.startswith("Claim CL-001 is supported")
+
+
+def test_answer_key_complaint_about_case_or_spacing_only_is_dropped(lesson_data, research_data):
+    lesson_data["assessments"][0]["answer_key"] = "labelled   DATA"  # names the option 'Labelled data'
+    llm = FakeLLM(qc2={"issues": [qc2_issue("incorrect_answer_key", question_id="Q-01")]})
+    result = run(lesson_data, research_data, llm)
+    assert result.qc2.issues == []
+    assert result.release.decision is ReleaseDecision.ELIGIBLE
+
+
+def test_answer_key_complaint_about_an_exact_option_is_kept(lesson_data, research_data):
+    # The key matches an option exactly, so the model may be saying it is the wrong option.
+    llm = FakeLLM(qc2={"issues": [qc2_issue("incorrect_answer_key", question_id="Q-01")]})
+    result = run(lesson_data, research_data, llm)
+    assert [i.issue_type for i in result.qc2.issues] == [T.INCORRECT_ANSWER_KEY]

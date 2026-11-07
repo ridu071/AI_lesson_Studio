@@ -13,6 +13,7 @@ from app.llm.base import LLMClient, LLMInvalidOutputError, call_structured, to_p
 from app.llm.prompts import load_prompt
 from app.modules.qc.enums import IssueType
 from app.modules.qc.issues import IssueCollector
+from app.modules.qc.qc2.assessments import _norm
 from app.modules.qc.schemas import QCInput
 from app.schemas.common import ContractModel, NonEmptyStr
 
@@ -137,11 +138,18 @@ def run_qc2_llm_review(qc_input: QCInput, issues: IssueCollector, client: LLMCli
         validate=make_validator(qc_input),
     )
     section_of_question = {q.question_id: q.section_id for q in qc_input.lesson.assessments}
+    formatting_only = {q.question_id for q in qc_input.lesson.assessments
+                       if q.options and q.answer_key not in q.options
+                       and _norm(q.answer_key) in {_norm(o) for o in q.options}}
 
     for found in review.issues:
         # A question's own section is authoritative.
         section_id = section_of_question.get(found.question_id, found.section_id)
         if _already_reported(issues, found.issue_type, section_id, found.objective_id):
+            continue
+        if found.issue_type is IssueType.INCORRECT_ANSWER_KEY and found.question_id in formatting_only:
+            # The key names an option, differing only in case/spacing, which grading
+            # ignores; the model is objecting to formatting, not to the answer.
             continue
         where = f"{found.question_id}: " if found.question_id else ""
         explanation = f"{where}{found.explanation}"

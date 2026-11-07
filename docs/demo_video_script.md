@@ -82,7 +82,7 @@ Open **Teacher tools** (top right):
 > "It's built in Python: Gemini for planning, writing and the AI parts of QC; Pydantic
 > for strict data contracts; Streamlit for the interface; ReportLab and Pillow for the
 > exports. Every step is saved, so a failure can be retried without losing work. There
-> are 247 unit tests, run automatically on GitHub, and a 27-case benchmark of planted errors; the results and the
+> are 249 unit tests, run automatically on GitHub, and a 27-case benchmark of planted errors; the results and the
 > known limitations are in the README."
 
 **Tips**
