@@ -1,0 +1,17 @@
+{
+  "case_id": "I-004",
+  "title": "Long optional video (control)",
+  "rationale": "Optional supplementary videos never count toward the 45 minutes.",
+  "base": "ml_intro",
+  "mutations": [
+    {
+      "op": "replace",
+      "path": "/lesson/videos/0/duration_minutes",
+      "value": 60
+    }
+  ],
+  "expected": {
+    "decision": "eligible_for_instructor_review",
+    "issues": []
+  }
+}

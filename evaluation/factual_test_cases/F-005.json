@@ -1,0 +1,29 @@
+{
+  "case_id": "F-005",
+  "title": "Key source has become inaccessible",
+  "rationale": "SRC-001 is the only source for CL-001 and CL-002. Without it they cannot be verified.",
+  "base": "ml_intro",
+  "mutations": [
+    {
+      "op": "replace",
+      "path": "/research/sources/0/access_status",
+      "value": "inaccessible"
+    }
+  ],
+  "expected": {
+    "decision": "manual_review",
+    "issues": [
+      {
+        "issue_type": "inaccessible_source"
+      },
+      {
+        "issue_type": "unverifiable_claim",
+        "claim_id": "CL-001"
+      },
+      {
+        "issue_type": "unverifiable_claim",
+        "claim_id": "CL-002"
+      }
+    ]
+  }
+}

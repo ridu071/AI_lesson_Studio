@@ -1,0 +1,25 @@
+{
+  "case_id": "I-014",
+  "title": "Explanation too technical for beginners",
+  "rationale": "Jargon such as 'empirical risk minimisation' is unsuitable for the stated beginner level.",
+  "base": "ml_intro",
+  "requires_evaluators": [
+    "instructional_review"
+  ],
+  "mutations": [
+    {
+      "op": "replace",
+      "path": "/lesson/sections/2/content_blocks/1/content",
+      "value": "Supervised learning is empirical risk minimisation over a parametric hypothesis class, fitted to i.i.d. samples drawn from a joint distribution P(X, Y)."
+    }
+  ],
+  "expected": {
+    "decision": "eligible_for_instructor_review",
+    "issues": [
+      {
+        "issue_type": "unclear_explanation",
+        "section_id": "SEC-03"
+      }
+    ]
+  }
+}

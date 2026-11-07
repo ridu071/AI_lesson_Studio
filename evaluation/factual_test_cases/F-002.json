@@ -1,0 +1,25 @@
+{
+  "case_id": "F-002",
+  "title": "Fabricated citation in a section's references",
+  "rationale": "Section-level references must exist too.",
+  "base": "ml_intro",
+  "mutations": [
+    {
+      "op": "replace",
+      "path": "/lesson/sections/3/source_ids",
+      "value": [
+        "SRC-002",
+        "SRC-404"
+      ]
+    }
+  ],
+  "expected": {
+    "decision": "blocked",
+    "issues": [
+      {
+        "issue_type": "fabricated_citation",
+        "section_id": "SEC-04"
+      }
+    ]
+  }
+}

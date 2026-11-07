@@ -1,0 +1,77 @@
+{
+  "request_id": "REQ-001",
+  "sources": [
+    {
+      "source_id": "SRC-001",
+      "source_type": "website",
+      "title": "Introduction to Machine Learning - Course Notes",
+      "publisher": "Example University",
+      "author": "Example Author",
+      "url": "https://example.org/ml/intro",
+      "published_at": "2026-01-10",
+      "retrieved_at": "2026-11-07",
+      "access_status": "accessible",
+      "content_access": "full_text",
+      "authority_category": "academic",
+      "relevance_score": 94,
+      "evidence_passages": [
+        {
+          "passage_id": "EV-001",
+          "text": "Machine learning is a branch of artificial intelligence concerned with systems that learn patterns from data, rather than relying solely on explicitly programmed rules.",
+          "location": "Section 1"
+        },
+        {
+          "passage_id": "EV-002",
+          "text": "In supervised learning, the training data consists of labelled examples: each input is paired with the desired output, and the model learns a mapping from inputs to outputs.",
+          "location": "Section 2"
+        }
+      ]
+    },
+    {
+      "source_id": "SRC-002",
+      "source_type": "documentation",
+      "title": "Machine Learning Concepts Guide",
+      "publisher": "Example Docs",
+      "url": "https://example.org/docs/ml-concepts",
+      "published_at": "2025-09-01",
+      "retrieved_at": "2026-11-07",
+      "access_status": "accessible",
+      "content_access": "full_text",
+      "authority_category": "official",
+      "relevance_score": 88,
+      "evidence_passages": [
+        {
+          "passage_id": "EV-003",
+          "text": "Unsupervised learning algorithms work on unlabelled data and attempt to discover structure, for example by grouping similar data points into clusters.",
+          "location": "Unsupervised learning"
+        },
+        {
+          "passage_id": "EV-004",
+          "text": "Classifying emails as spam or not spam is a standard example of supervised classification, where the model is trained on emails that have already been labelled.",
+          "location": "Classification"
+        },
+        {
+          "passage_id": "EV-005",
+          "text": "Clustering is widely used for customer segmentation, grouping customers with similar behaviour without predefined categories.",
+          "location": "Clustering"
+        }
+      ]
+    },
+    {
+      "source_id": "SRC-003",
+      "source_type": "video",
+      "title": "Supervised vs Unsupervised Learning Explained",
+      "publisher": "Example Channel",
+      "url": "https://example.org/videos/supervised-vs-unsupervised",
+      "published_at": "2025-05-20",
+      "retrieved_at": "2026-11-07",
+      "access_status": "accessible",
+      "content_access": "metadata_only",
+      "authority_category": "educational",
+      "relevance_score": 75
+    }
+  ],
+  "limitations": [
+    "No transcript was available for SRC-003, so the video's content was not verified."
+  ]
+}

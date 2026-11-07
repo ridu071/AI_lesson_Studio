@@ -1,0 +1,30 @@
+{
+  "case_id": "F-008",
+  "title": "Definition contradicted by the evidence",
+  "rationale": "The lesson says supervised learning uses unlabelled data; EV-002 says the opposite. Critical.",
+  "base": "ml_intro",
+  "requires_evaluators": [
+    "claim_verification"
+  ],
+  "mutations": [
+    {
+      "op": "replace",
+      "path": "/lesson/claims/1/text",
+      "value": "Supervised learning trains a model on unlabelled examples, where no input comes with the correct output."
+    },
+    {
+      "op": "replace",
+      "path": "/lesson/sections/2/content_blocks/1/content",
+      "value": "Supervised learning trains a model on unlabelled examples: no input comes with the correct output, and the model works out the mapping itself."
+    }
+  ],
+  "expected": {
+    "decision": "blocked",
+    "issues": [
+      {
+        "issue_type": "contradicted_claim",
+        "claim_id": "CL-002"
+      }
+    ]
+  }
+}

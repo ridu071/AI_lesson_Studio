@@ -1,0 +1,47 @@
+{
+  "case_id": "I-012",
+  "title": "Practice comes before the explanation",
+  "rationale": "Students are asked to classify scenarios before the concepts are taught.",
+  "base": "ml_intro",
+  "mutations": [
+    {
+      "op": "remove",
+      "path": "/lesson/sections/4"
+    },
+    {
+      "op": "add",
+      "path": "/lesson/sections/1",
+      "value": {
+        "section_id": "SEC-05",
+        "section_type": "practical_application",
+        "title": "Classify the scenario",
+        "duration_minutes": 8,
+        "objective_ids": [
+          "LO-01",
+          "LO-02"
+        ],
+        "content_blocks": [
+          {
+            "type": "explanation",
+            "content": "Apply the key question to six short scenarios and decide which type of learning each one uses."
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "decision": "eligible_for_instructor_review",
+    "issues": [
+      {
+        "issue_type": "poor_sequencing",
+        "section_id": "SEC-05",
+        "objective_id": "LO-01"
+      },
+      {
+        "issue_type": "poor_sequencing",
+        "section_id": "SEC-05",
+        "objective_id": "LO-02"
+      }
+    ]
+  }
+}

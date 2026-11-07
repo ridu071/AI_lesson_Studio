@@ -1,0 +1,31 @@
+{
+  "case_id": "I-005",
+  "title": "Objective missing from the final assessment",
+  "rationale": "LO-02 is never tested in the final assessment, so achievement cannot be measured (E2E-006).",
+  "base": "ml_intro",
+  "mutations": [
+    {
+      "op": "replace",
+      "path": "/lesson/assessments/2/objective_ids",
+      "value": [
+        "LO-01"
+      ]
+    },
+    {
+      "op": "replace",
+      "path": "/lesson/assessments/3/objective_ids",
+      "value": [
+        "LO-01"
+      ]
+    }
+  ],
+  "expected": {
+    "decision": "blocked",
+    "issues": [
+      {
+        "issue_type": "objective_not_assessed",
+        "objective_id": "LO-02"
+      }
+    ]
+  }
+}

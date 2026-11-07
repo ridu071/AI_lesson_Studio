@@ -1,0 +1,24 @@
+{
+  "case_id": "F-001",
+  "title": "Fabricated citation on a factual claim",
+  "rationale": "SRC-999 was never produced by research. Citing it is a fabricated reference (E2E-005).",
+  "base": "ml_intro",
+  "mutations": [
+    {
+      "op": "replace",
+      "path": "/lesson/claims/3/source_ids",
+      "value": [
+        "SRC-999"
+      ]
+    }
+  ],
+  "expected": {
+    "decision": "blocked",
+    "issues": [
+      {
+        "issue_type": "fabricated_citation",
+        "claim_id": "CL-004"
+      }
+    ]
+  }
+}

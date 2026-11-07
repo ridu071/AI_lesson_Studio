@@ -1,0 +1,26 @@
+{
+  "case_id": "I-001",
+  "title": "Lesson takes 60 minutes",
+  "rationale": "Mandatory content must fit in 45 minutes (E2E-007).",
+  "base": "ml_intro",
+  "mutations": [
+    {
+      "op": "replace",
+      "path": "/lesson/sections/2/duration_minutes",
+      "value": 27
+    },
+    {
+      "op": "replace",
+      "path": "/lesson/stated_duration_minutes",
+      "value": 60
+    }
+  ],
+  "expected": {
+    "decision": "blocked",
+    "issues": [
+      {
+        "issue_type": "duration_exceeded"
+      }
+    ]
+  }
+}

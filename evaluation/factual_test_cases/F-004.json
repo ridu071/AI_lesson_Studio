@@ -1,0 +1,24 @@
+{
+  "case_id": "F-004",
+  "title": "Claim backed only by a video nobody watched",
+  "rationale": "SRC-003 is metadata only (no transcript), so it cannot prove the claim. A human must judge.",
+  "base": "ml_intro",
+  "mutations": [
+    {
+      "op": "replace",
+      "path": "/lesson/claims/3/source_ids",
+      "value": [
+        "SRC-003"
+      ]
+    }
+  ],
+  "expected": {
+    "decision": "manual_review",
+    "issues": [
+      {
+        "issue_type": "unverifiable_claim",
+        "claim_id": "CL-004"
+      }
+    ]
+  }
+}

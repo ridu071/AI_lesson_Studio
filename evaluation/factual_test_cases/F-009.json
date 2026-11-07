@@ -1,0 +1,41 @@
+{
+  "case_id": "F-009",
+  "title": "Claim the evidence does not support",
+  "rationale": "No passage says supervised learning needs a million examples. The claim is unsupported.",
+  "base": "ml_intro",
+  "requires_evaluators": [
+    "claim_verification"
+  ],
+  "mutations": [
+    {
+      "op": "add",
+      "path": "/lesson/sections/2/content_blocks/-",
+      "value": {
+        "type": "explanation",
+        "content": "Supervised learning always requires at least one million labelled examples."
+      }
+    },
+    {
+      "op": "add",
+      "path": "/lesson/claims/-",
+      "value": {
+        "claim_id": "CL-007",
+        "section_id": "SEC-03",
+        "text": "Supervised learning always requires at least one million labelled examples.",
+        "claim_type": "factual",
+        "source_ids": [
+          "SRC-001"
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "decision": "revision_required",
+    "issues": [
+      {
+        "issue_type": "unsupported_claim",
+        "claim_id": "CL-007"
+      }
+    ]
+  }
+}

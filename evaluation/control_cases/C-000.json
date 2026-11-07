@@ -1,0 +1,11 @@
+{
+  "case_id": "C-000",
+  "title": "Clean lesson",
+  "rationale": "The base lesson is accurate, fully cited, 45 minutes and fully aligned. QC must find nothing.",
+  "base": "ml_intro",
+  "mutations": [],
+  "expected": {
+    "decision": "eligible_for_instructor_review",
+    "issues": []
+  }
+}

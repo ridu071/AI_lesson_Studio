@@ -1,0 +1,27 @@
+{
+  "case_id": "F-010",
+  "title": "Real source cited for something it does not say",
+  "rationale": "SRC-001 exists and is readable but never mentions spam filtering.",
+  "base": "ml_intro",
+  "requires_evaluators": [
+    "claim_verification"
+  ],
+  "mutations": [
+    {
+      "op": "replace",
+      "path": "/lesson/claims/3/source_ids",
+      "value": [
+        "SRC-001"
+      ]
+    }
+  ],
+  "expected": {
+    "decision": "revision_required",
+    "issues": [
+      {
+        "issue_type": "misleading_citation",
+        "claim_id": "CL-004"
+      }
+    ]
+  }
+}

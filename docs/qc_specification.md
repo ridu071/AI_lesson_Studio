@@ -1,6 +1,6 @@
 # QC Engine Specification
 
-Status: **Milestone 1, Step 4: scoring and decision engine.** Rubric version `0.1.0`
+Status: **Milestone 1, Step 5: benchmark dataset.** Rubric version `0.1.0`
 (defined in `scoring/rubrics.py`, next to the weights it describes).
 
 This document defines what the QC engine receives, what it produces, and the
@@ -250,6 +250,6 @@ exposes no-op revisions.
 | 2 | Data contracts, sample lesson, this document | done |
 | 3 | Deterministic checks: duration, structure, citation existence, coverage matrix, answer keys | done |
 | 4 | Scoring weights and decision engine (sections 5, 5a) | done |
-| 5 | Benchmark dataset with intentionally broken lessons, plus a detection runner | next |
-| 6 | LLM modules: claim extraction and verification, clarity, Bloom alignment | |
+| 5 | Benchmark dataset with intentionally broken lessons, plus a detection runner (see `evaluation/README.md`) | done |
+| 6 | LLM modules: claim extraction and verification, clarity, Bloom alignment | next |
 | 7 | Human-readable reports and a repeatability check | |

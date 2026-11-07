@@ -10,7 +10,9 @@ from datetime import UTC, datetime
 
 from app.core.config import Settings, get_settings
 from app.modules.qc.enums import AuditType, Evaluator
+from app.modules.qc.qc1.deterministic import EVALUATORS as QC1_DETERMINISTIC
 from app.modules.qc.qc1.deterministic import run_qc1_checks
+from app.modules.qc.qc2.deterministic import EVALUATORS as QC2_DETERMINISTIC
 from app.modules.qc.qc2.deterministic import run_qc2_checks
 from app.modules.qc.schemas import (
     AuditReport,
@@ -24,6 +26,10 @@ from app.modules.qc.schemas import (
 from app.modules.qc.scoring.rubrics import RUBRIC_VERSION
 from app.modules.qc.scoring.scorer import score_rubric
 from app.modules.qc.validation.decision import audit_outcome, decide
+
+
+# Everything run_deterministic_qc() covers.
+DETERMINISTIC_EVALUATORS = QC1_DETERMINISTIC | QC2_DETERMINISTIC
 
 
 @dataclass(frozen=True)

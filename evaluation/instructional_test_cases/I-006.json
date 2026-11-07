@@ -1,0 +1,24 @@
+{
+  "case_id": "I-006",
+  "title": "Objective never explained",
+  "rationale": "LO-02 appears only in examples and activities, never in a concept explanation.",
+  "base": "ml_intro",
+  "mutations": [
+    {
+      "op": "replace",
+      "path": "/lesson/sections/2/objective_ids",
+      "value": [
+        "LO-01"
+      ]
+    }
+  ],
+  "expected": {
+    "decision": "revision_required",
+    "issues": [
+      {
+        "issue_type": "objective_not_explained",
+        "objective_id": "LO-02"
+      }
+    ]
+  }
+}

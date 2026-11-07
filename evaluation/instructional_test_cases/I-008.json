@@ -1,0 +1,31 @@
+{
+  "case_id": "I-008",
+  "title": "Final assessment only tests recall",
+  "rationale": "'Differentiate' (analyze) cannot be measured with remember-level questions.",
+  "base": "ml_intro",
+  "mutations": [
+    {
+      "op": "replace",
+      "path": "/lesson/assessments/2/bloom_level",
+      "value": "remember"
+    },
+    {
+      "op": "replace",
+      "path": "/lesson/assessments/3/bloom_level",
+      "value": "remember"
+    }
+  ],
+  "expected": {
+    "decision": "revision_required",
+    "issues": [
+      {
+        "issue_type": "bloom_mismatch",
+        "objective_id": "LO-01"
+      },
+      {
+        "issue_type": "bloom_mismatch",
+        "objective_id": "LO-02"
+      }
+    ]
+  }
+}

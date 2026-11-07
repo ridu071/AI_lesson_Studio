@@ -1,0 +1,24 @@
+{
+  "case_id": "I-007",
+  "title": "Objective never practised",
+  "rationale": "The only activity no longer covers LO-02.",
+  "base": "ml_intro",
+  "mutations": [
+    {
+      "op": "replace",
+      "path": "/lesson/activities/0/objective_ids",
+      "value": [
+        "LO-01"
+      ]
+    }
+  ],
+  "expected": {
+    "decision": "eligible_for_instructor_review",
+    "issues": [
+      {
+        "issue_type": "objective_not_practiced",
+        "objective_id": "LO-02"
+      }
+    ]
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "case_id": "I-002",
+  "title": "Stated duration disagrees with the sections",
+  "rationale": "The lesson claims 40 minutes but its sections add up to 45.",
+  "base": "ml_intro",
+  "mutations": [
+    {
+      "op": "replace",
+      "path": "/lesson/stated_duration_minutes",
+      "value": 40
+    }
+  ],
+  "expected": {
+    "decision": "eligible_for_instructor_review",
+    "issues": [
+      {
+        "issue_type": "duration_mismatch"
+      }
+    ]
+  }
+}

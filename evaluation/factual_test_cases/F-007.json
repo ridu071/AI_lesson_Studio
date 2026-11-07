@@ -1,0 +1,22 @@
+{
+  "case_id": "F-007",
+  "title": "Opinion without a citation (control)",
+  "rationale": "Opinions and recommendations do not need sources. QC must not flag this.",
+  "base": "ml_intro",
+  "mutations": [
+    {
+      "op": "add",
+      "path": "/lesson/claims/-",
+      "value": {
+        "claim_id": "CL-007",
+        "section_id": "SEC-04",
+        "text": "Spam filtering is a good first machine learning project for beginners.",
+        "claim_type": "opinion"
+      }
+    }
+  ],
+  "expected": {
+    "decision": "eligible_for_instructor_review",
+    "issues": []
+  }
+}

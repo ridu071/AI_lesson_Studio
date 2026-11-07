@@ -1,0 +1,261 @@
+{
+  "lesson_id": "LES-001",
+  "version": 1,
+  "title": "Introduction to Machine Learning",
+  "learner_level": "beginner",
+  "stated_duration_minutes": 45,
+  "learning_objectives": [
+    {
+      "id": "LO-01",
+      "description": "Differentiate supervised and unsupervised learning",
+      "bloom_level": "analyze"
+    },
+    {
+      "id": "LO-02",
+      "description": "Identify real-world applications of supervised and unsupervised learning",
+      "bloom_level": "understand"
+    }
+  ],
+  "sections": [
+    {
+      "section_id": "SEC-01",
+      "section_type": "introduction",
+      "title": "Why machine learning?",
+      "duration_minutes": 3,
+      "content_blocks": [
+        {
+          "type": "explanation",
+          "content": "Many everyday tools, from email filters to music recommendations, improve by learning from data instead of following fixed rules. This lesson explains the two most common ways they learn."
+        }
+      ]
+    },
+    {
+      "section_id": "SEC-02",
+      "section_type": "learning_objectives",
+      "title": "What you will learn",
+      "duration_minutes": 0,
+      "objective_ids": ["LO-01", "LO-02"],
+      "content_blocks": [
+        {
+          "type": "note",
+          "content": "By the end you will be able to tell supervised and unsupervised learning apart and recognise where each is used."
+        }
+      ]
+    },
+    {
+      "section_id": "SEC-03",
+      "section_type": "concept_explanation",
+      "title": "Supervised and unsupervised learning",
+      "duration_minutes": 12,
+      "objective_ids": ["LO-01", "LO-02"],
+      "source_ids": ["SRC-001", "SRC-002"],
+      "content_blocks": [
+        {
+          "type": "definition",
+          "content": "Machine learning is a field of artificial intelligence in which systems learn patterns from data rather than following only explicitly programmed rules."
+        },
+        {
+          "type": "definition",
+          "content": "Supervised learning trains a model on labelled examples: each input comes with the correct output, and the model learns to map inputs to outputs."
+        },
+        {
+          "type": "definition",
+          "content": "Unsupervised learning works with unlabelled data. The model looks for structure on its own, such as groups (clusters) of similar items."
+        },
+        {
+          "type": "explanation",
+          "content": "The key question is: does the training data include the answer? If yes, it is supervised. If the model must discover the structure itself, it is unsupervised."
+        },
+        {
+          "type": "explanation",
+          "content": "This also tells you where each one is used. Supervised learning suits tasks with past examples whose answers are known, such as classifying or predicting. Unsupervised learning suits exploring data whose groups are not known in advance, such as finding similar customers."
+        }
+      ]
+    },
+    {
+      "section_id": "SEC-04",
+      "section_type": "worked_examples",
+      "title": "Examples from real systems",
+      "duration_minutes": 8,
+      "objective_ids": ["LO-01", "LO-02"],
+      "source_ids": ["SRC-002"],
+      "content_blocks": [
+        {
+          "type": "example",
+          "content": "Spam filtering: a model is trained on emails already marked 'spam' or 'not spam'. Because every training email has a label, this is supervised learning."
+        },
+        {
+          "type": "example",
+          "content": "Customer segmentation: a shop groups customers by purchasing behaviour without deciding the groups in advance. Because there are no labels, this is unsupervised learning."
+        },
+        {
+          "type": "example",
+          "content": "Imagine a shop with 1,000 photos, each tagged 'shoe' or 'bag'. Training a model to tag new photos is supervised, because the tags are the labels."
+        }
+      ]
+    },
+    {
+      "section_id": "SEC-05",
+      "section_type": "practical_application",
+      "title": "Classify the scenario",
+      "duration_minutes": 8,
+      "objective_ids": ["LO-01", "LO-02"],
+      "content_blocks": [
+        {
+          "type": "explanation",
+          "content": "Apply the key question to six short scenarios and decide which type of learning each one uses."
+        }
+      ]
+    },
+    {
+      "section_id": "SEC-06",
+      "section_type": "knowledge_check",
+      "title": "Quick check",
+      "duration_minutes": 5,
+      "objective_ids": ["LO-01", "LO-02"],
+      "content_blocks": [
+        {
+          "type": "note",
+          "content": "Answer two quick questions before the final assessment."
+        }
+      ]
+    },
+    {
+      "section_id": "SEC-07",
+      "section_type": "final_assessment",
+      "title": "Final assessment",
+      "duration_minutes": 6,
+      "objective_ids": ["LO-01", "LO-02"],
+      "content_blocks": [
+        {
+          "type": "note",
+          "content": "Read each scenario, choose the type of learning, and justify your choice."
+        }
+      ]
+    },
+    {
+      "section_id": "SEC-08",
+      "section_type": "summary",
+      "title": "Key takeaways",
+      "duration_minutes": 3,
+      "content_blocks": [
+        {
+          "type": "explanation",
+          "content": "Supervised learning learns from labelled examples; unsupervised learning finds structure in unlabelled data. Ask whether the training data contains the answer."
+        }
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "claim_id": "CL-001",
+      "section_id": "SEC-03",
+      "text": "Machine learning is a field of artificial intelligence in which systems learn patterns from data rather than following only explicitly programmed rules.",
+      "claim_type": "definition",
+      "source_ids": ["SRC-001"]
+    },
+    {
+      "claim_id": "CL-002",
+      "section_id": "SEC-03",
+      "text": "Supervised learning trains a model on labelled examples, where each input comes with the correct output.",
+      "claim_type": "definition",
+      "source_ids": ["SRC-001"]
+    },
+    {
+      "claim_id": "CL-003",
+      "section_id": "SEC-03",
+      "text": "Unsupervised learning works with unlabelled data and looks for structure such as clusters.",
+      "claim_type": "definition",
+      "source_ids": ["SRC-002"]
+    },
+    {
+      "claim_id": "CL-004",
+      "section_id": "SEC-04",
+      "text": "Email spam filtering is a common application of supervised classification.",
+      "claim_type": "factual",
+      "source_ids": ["SRC-002"]
+    },
+    {
+      "claim_id": "CL-005",
+      "section_id": "SEC-04",
+      "text": "Customer segmentation commonly uses clustering, an unsupervised learning technique.",
+      "claim_type": "factual",
+      "source_ids": ["SRC-002"]
+    },
+    {
+      "claim_id": "CL-006",
+      "section_id": "SEC-04",
+      "text": "Imagine a shop with 1,000 photos, each tagged 'shoe' or 'bag'.",
+      "claim_type": "hypothetical_example"
+    }
+  ],
+  "activities": [
+    {
+      "activity_id": "ACT-01",
+      "section_id": "SEC-05",
+      "title": "Supervised or unsupervised?",
+      "instructions": "For each of the six scenarios, write 'supervised' or 'unsupervised' and one sentence explaining whether the data has labels.",
+      "duration_minutes": 8,
+      "objective_ids": ["LO-01", "LO-02"]
+    }
+  ],
+  "assessments": [
+    {
+      "question_id": "Q-01",
+      "section_id": "SEC-06",
+      "kind": "knowledge_check",
+      "question_type": "multiple_choice",
+      "prompt": "What kind of training data does supervised learning require?",
+      "options": ["Labelled data", "Unlabelled data", "No data"],
+      "answer_key": "Labelled data",
+      "explanation": "Supervised learning needs each training input paired with its correct output, which is what a label is.",
+      "objective_ids": ["LO-01"],
+      "bloom_level": "remember"
+    },
+    {
+      "question_id": "Q-02",
+      "section_id": "SEC-06",
+      "kind": "knowledge_check",
+      "question_type": "true_false",
+      "prompt": "Grouping customers by behaviour without predefined groups is an example of unsupervised learning.",
+      "options": ["True", "False"],
+      "answer_key": "True",
+      "explanation": "No labels are given; the model discovers the groups itself, so it is unsupervised.",
+      "objective_ids": ["LO-02"],
+      "bloom_level": "understand"
+    },
+    {
+      "question_id": "Q-03",
+      "section_id": "SEC-07",
+      "kind": "final",
+      "question_type": "scenario",
+      "prompt": "A bank has past transactions, each marked 'fraud' or 'not fraud', and wants to flag new fraudulent transactions. Is this supervised or unsupervised learning? Justify your answer.",
+      "answer_key": "Supervised learning, because every past transaction carries a label (fraud or not fraud) that the model learns to predict.",
+      "explanation": "The presence of labels in the training data is what makes a task supervised.",
+      "objective_ids": ["LO-01", "LO-02"],
+      "bloom_level": "analyze"
+    },
+    {
+      "question_id": "Q-04",
+      "section_id": "SEC-07",
+      "kind": "final",
+      "question_type": "scenario",
+      "prompt": "A music service wants to group listeners with similar tastes, without deciding the groups beforehand. Which type of learning fits, and why is the other type not suitable?",
+      "answer_key": "Unsupervised learning (clustering), because there are no labels; supervised learning is not suitable because it needs a known correct group for each listener.",
+      "explanation": "Without labels, the model can only discover structure, which is unsupervised learning.",
+      "objective_ids": ["LO-01", "LO-02"],
+      "bloom_level": "analyze"
+    }
+  ],
+  "videos": [
+    {
+      "video_id": "VID-01",
+      "title": "Supervised vs unsupervised learning (supplementary)",
+      "url": "https://example.org/videos/supervised-vs-unsupervised",
+      "source_id": "SRC-003",
+      "section_id": "SEC-03",
+      "duration_minutes": 10,
+      "is_mandatory": false
+    }
+  ]
+}

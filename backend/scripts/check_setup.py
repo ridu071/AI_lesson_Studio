@@ -21,7 +21,9 @@ REQUIRED_PATHS = [
     "tests/unit",
     "../prompts/qc1",
     "../prompts/qc2",
-    "../evaluation/benchmark_lessons",
+    "../evaluation/benchmark_lessons/ml_intro/lesson.json",
+    "../evaluation/factual_test_cases",
+    "../evaluation/instructional_test_cases",
 ]
 
 results: list[tuple[str, bool, str]] = []

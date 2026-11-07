@@ -1,0 +1,22 @@
+{
+  "case_id": "I-009",
+  "title": "Multiple-choice answer key is not an option",
+  "rationale": "Students could never select the 'correct' answer.",
+  "base": "ml_intro",
+  "mutations": [
+    {
+      "op": "replace",
+      "path": "/lesson/assessments/0/answer_key",
+      "value": "Labelled and unlabelled data"
+    }
+  ],
+  "expected": {
+    "decision": "revision_required",
+    "issues": [
+      {
+        "issue_type": "incorrect_answer_key",
+        "section_id": "SEC-06"
+      }
+    ]
+  }
+}

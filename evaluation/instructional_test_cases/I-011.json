@@ -1,0 +1,25 @@
+{
+  "case_id": "I-011",
+  "title": "Summary section missing",
+  "rationale": "Every lesson needs a closing summary of key takeaways.",
+  "base": "ml_intro",
+  "mutations": [
+    {
+      "op": "remove",
+      "path": "/lesson/sections/7"
+    },
+    {
+      "op": "replace",
+      "path": "/lesson/stated_duration_minutes",
+      "value": 42
+    }
+  ],
+  "expected": {
+    "decision": "eligible_for_instructor_review",
+    "issues": [
+      {
+        "issue_type": "missing_section"
+      }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "case_id": "I-010",
+  "title": "Answer key differs only in case and spacing (control)",
+  "rationale": "'  labelled   DATA ' is the same answer as 'Labelled data'.",
+  "base": "ml_intro",
+  "mutations": [
+    {
+      "op": "replace",
+      "path": "/lesson/assessments/0/answer_key",
+      "value": "  labelled   DATA "
+    }
+  ],
+  "expected": {
+    "decision": "eligible_for_instructor_review",
+    "issues": []
+  }
+}

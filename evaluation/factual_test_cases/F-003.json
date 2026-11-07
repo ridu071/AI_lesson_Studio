@@ -1,0 +1,22 @@
+{
+  "case_id": "F-003",
+  "title": "Factual claim with no citation",
+  "rationale": "A factual claim must cite evidence. Medium severity: a recommendation, not a blocker.",
+  "base": "ml_intro",
+  "mutations": [
+    {
+      "op": "replace",
+      "path": "/lesson/claims/3/source_ids",
+      "value": []
+    }
+  ],
+  "expected": {
+    "decision": "eligible_for_instructor_review",
+    "issues": [
+      {
+        "issue_type": "missing_citation",
+        "claim_id": "CL-004"
+      }
+    ]
+  }
+}

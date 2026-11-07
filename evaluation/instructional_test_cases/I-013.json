@@ -1,0 +1,25 @@
+{
+  "case_id": "I-013",
+  "title": "Scenario answer key is wrong",
+  "rationale": "Fraud labels make this supervised; the key says unsupervised. Needs language understanding to detect.",
+  "base": "ml_intro",
+  "requires_evaluators": [
+    "instructional_review"
+  ],
+  "mutations": [
+    {
+      "op": "replace",
+      "path": "/lesson/assessments/2/answer_key",
+      "value": "Unsupervised learning, because the model must discover fraud patterns on its own."
+    }
+  ],
+  "expected": {
+    "decision": "revision_required",
+    "issues": [
+      {
+        "issue_type": "incorrect_answer_key",
+        "section_id": "SEC-07"
+      }
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "case_id": "I-003",
+  "title": "Mandatory video pushes the lesson over 45 minutes",
+  "rationale": "A 10-minute video made mandatory brings the total to 55.",
+  "base": "ml_intro",
+  "mutations": [
+    {
+      "op": "replace",
+      "path": "/lesson/videos/0/is_mandatory",
+      "value": true
+    }
+  ],
+  "expected": {
+    "decision": "blocked",
+    "issues": [
+      {
+        "issue_type": "duration_exceeded"
+      },
+      {
+        "issue_type": "duration_mismatch"
+      }
+    ]
+  }
+}

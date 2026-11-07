@@ -1,0 +1,37 @@
+{
+  "case_id": "F-006",
+  "title": "Inaccessible source with a readable alternative (control)",
+  "rationale": "CL-001 and CL-002 also cite SRC-002, which is readable. Report the dead source, but the claims are not unverifiable.",
+  "base": "ml_intro",
+  "mutations": [
+    {
+      "op": "replace",
+      "path": "/research/sources/0/access_status",
+      "value": "inaccessible"
+    },
+    {
+      "op": "replace",
+      "path": "/lesson/claims/0/source_ids",
+      "value": [
+        "SRC-001",
+        "SRC-002"
+      ]
+    },
+    {
+      "op": "replace",
+      "path": "/lesson/claims/1/source_ids",
+      "value": [
+        "SRC-001",
+        "SRC-002"
+      ]
+    }
+  ],
+  "expected": {
+    "decision": "eligible_for_instructor_review",
+    "issues": [
+      {
+        "issue_type": "inaccessible_source"
+      }
+    ]
+  }
+}
