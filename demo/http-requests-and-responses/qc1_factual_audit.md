@@ -1,6 +1,6 @@
 # QC1 - Factual accuracy - audit report
 
-Lesson: **HTTP Requests and Responses** - version 2 - content hash `d8e3853320c3`
+Lesson: **HTTP Requests and Responses** - version 1 - content hash `2575a3c989ce`
 
 
 Status: **passed** - score: **100 / 100**
@@ -21,12 +21,12 @@ No issues found.
 | Claim | Verdict | Evidence |
 |---|---|---|
 | CL-01 | supported | EV-001 (SRC-001) |
-| CL-02 | supported | EV-011 (SRC-001) |
+| CL-02 | supported | EV-008 (SRC-001) |
 | CL-03 | supported | EV-013 (SRC-001) |
-| CL-04 | supported | EV-016 (SRC-001) |
-| CL-05 | supported | EV-026 (SRC-002) |
-| CL-06 | supported | EV-027 (SRC-002) |
-| CL-07 | supported | EV-022 (SRC-002) |
+| CL-04 | supported | EV-014 (SRC-001) |
+| CL-05 | supported | EV-021 (SRC-002) |
+| CL-06 | supported | EV-026 (SRC-002) |
+| CL-07 | supported | EV-027 (SRC-002) |
 
 ---
 

@@ -77,31 +77,26 @@
         },
         {
           "passage_id": "EV-013",
-          "text": "The request is for a representation of a resource. The server should only retrieve data; not modify state. For retrieving without making changes, GET is preferred over POST, as it can be addressed through a URL. This enables bookmarking and sharing and makes GET responses eligible for caching, which can save bandwidth. The W3C has published guidance principles on this distinction, saying, \"Web application design should be informed by the above principles, but also by the relevant limitations.\"",
-          "location": null
-        },
-        {
-          "passage_id": "EV-014",
           "text": "A request method is safe if a request with that method has no intended effect on the server. The methods GET, HEAD, OPTIONS, TRACE, and QUERY are defined as safe. In other words, safe methods are intended to be read-only. Safe methods can still have side effects not seen by the client, such as appending request information to a log file or charging an advertising account.",
           "location": null
         },
         {
-          "passage_id": "EV-015",
+          "passage_id": "EV-014",
           "text": "A request method is cacheable if responses to requests with that method may be stored for future reuse. The methods GET, HEAD, and POST are defined as cacheable.",
           "location": null
         },
         {
-          "passage_id": "EV-016",
+          "passage_id": "EV-015",
           "text": "A response is sent to the client by the server. The start line of a response consists of the protocol version, a status code and optionally a reason phrase with fields separated by a single space character. The following response start line specifies protocol version HTTP/1.1, status code 400 and reason phrase Bad Request.",
           "location": null
         },
         {
-          "passage_id": "EV-017",
+          "passage_id": "EV-016",
           "text": "In the following response, the ETag (entity tag) header field is used to determine if a cached version of the requested resource is identical to the current version of the resource on the server. The Content-Type header field specifies the Internet media type of the data conveyed by the HTTP message, and Content-Length indicates its length in bytes. The HTTP/1.1 webserver publishes its ability to respond to requests for a byte range of the resource by including Accept-Ranges: bytes. This is useful, if the client needs to have only certain portions of a resource sent by the server, which is called byte serving.",
           "location": null
         },
         {
-          "passage_id": "EV-018",
+          "passage_id": "EV-017",
           "text": "Most of the header fields are optional but some are mandatory. When header Content-Length is missing from a response with a body, then this should be considered an error in HTTP/1.0 but it may not be an error in HTTP/1.1 if header Transfer-Encoding: chunked is present. Chunked transfer encoding uses a chunk size of 0 to mark the end of the content. Some old implementations of HTTP/1.0 omitted the header Content-Length when the length of the body was not known at the beginning of the response and so the transfer of data to client continued until server closed the socket.",
           "location": null
         }
@@ -122,18 +117,23 @@
       "relevance_score": 100.0,
       "evidence_passages": [
         {
-          "passage_id": "EV-019",
+          "passage_id": "EV-018",
           "text": "An informational response indicates that the request was received and understood and is being processed. It alerts the client to wait for a final response. The message does not contain a body. As the HTTP/1.0 standard did not define any 1xx status codes, servers must not send a 1xx response to an HTTP/1.0 compliant client except under experimental conditions.",
           "location": null
         },
         {
-          "passage_id": "EV-020",
+          "passage_id": "EV-019",
           "text": "The server has received the request headers and the client should proceed to send the request body (in the case of a request for which a body needs to be sent, such as a POST request). Sending a large request body to a server after a request has been rejected for inappropriate headers would be inefficient. To have a server check the request's headers, a client must send Expect: 100-continue as a header in its initial request and receive a 100 Continue status code in response before sending the body. If the client receives an error code such as 403 (Forbidden) or 405 (Method Not Allowed) then it should not send the request's body.",
           "location": null
         },
         {
-          "passage_id": "EV-021",
+          "passage_id": "EV-020",
           "text": "A WebDAV request may contain many sub-requests involving file operations, requiring a long time to complete the request. This code indicates that the server has received and is processing the request, but no response is available yet. This prevents the client from timing out and assuming the request was lost. The status code is deprecated.",
+          "location": null
+        },
+        {
+          "passage_id": "EV-021",
+          "text": "A success status indicates that the action requested by the client was received, understood, and accepted.",
           "location": null
         },
         {
@@ -236,11 +236,11 @@
     {
       "source_id": "SRC-007",
       "source_type": "video",
-      "title": "HTTP crash course | http Methods | http headers",
+      "title": "31 HTTP Request Response structure",
       "publisher": "Chai aur Code",
       "author": null,
-      "url": "https://www.youtube.com/watch?v=qgZiUvV41TI",
-      "published_at": "2023-11-16",
+      "url": "https://www.youtube.com/watch?v=rZNdo9UjF94",
+      "published_at": "2026-08-10",
       "retrieved_at": "2026-11-07",
       "access_status": "accessible",
       "content_access": "metadata_only",
@@ -251,11 +251,11 @@
     {
       "source_id": "SRC-008",
       "source_type": "video",
-      "title": "31 HTTP Request Response structure",
+      "title": "HTTP crash course | http Methods | http headers",
       "publisher": "Chai aur Code",
       "author": null,
-      "url": "https://www.youtube.com/watch?v=rZNdo9UjF94",
-      "published_at": "2026-08-10",
+      "url": "https://www.youtube.com/watch?v=qgZiUvV41TI",
+      "published_at": "2023-11-16",
       "retrieved_at": "2026-11-07",
       "access_status": "accessible",
       "content_access": "metadata_only",

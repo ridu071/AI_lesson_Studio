@@ -1,6 +1,6 @@
 # QC1 - Factual accuracy - audit report
 
-Lesson: **Photosynthesis** - version 1 - content hash `676e4c49fd76`
+Lesson: **Photosynthesis** - version 1 - content hash `0436d5ed78c2`
 
 
 Status: **passed** - score: **100 / 100**
@@ -21,12 +21,8 @@ No issues found.
 | Claim | Verdict | Evidence |
 |---|---|---|
 | CL-01 | supported | EV-001 (SRC-001) |
-| CL-02 | supported | EV-001 (SRC-001) |
-| CL-03 | supported | EV-004 (SRC-001) |
-| CL-04 | supported | EV-001 (SRC-001) |
-| CL-05 | supported | EV-020 (SRC-002) |
-| CL-06 | supported | EV-020 (SRC-002), EV-021 (SRC-002) |
-| CL-07 | supported | EV-026 (SRC-003) |
+| CL-02 | supported | EV-001 (SRC-001), EV-004 (SRC-001), EV-005 (SRC-001) |
+| CL-03 | supported | EV-022 (SRC-002) |
 
 ---
 

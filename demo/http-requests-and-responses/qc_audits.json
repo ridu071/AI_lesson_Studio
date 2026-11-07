@@ -1,10 +1,10 @@
 {
   "qc1": {
-    "audit_id": "AUD-LES-001-V2-QC1",
+    "audit_id": "AUD-LES-001-V1-QC1",
     "audit_type": "qc1",
     "lesson_id": "LES-001",
-    "version": 2,
-    "content_hash": "d8e3853320c370cef28a1d040e1f61f7cfa0f1e10e92916901695d6b6f16f11f",
+    "version": 1,
+    "content_hash": "2575a3c989ced441805695227e1d9e3e775c522763b0e3827b7126eb52c51b4a",
     "rubric_version": "0.1.0",
     "status": "passed",
     "score": 100.0,
@@ -63,7 +63,7 @@
             "note": null
           }
         ],
-        "explanation": "Claim CL-01 is supported: The passage explicitly states that HTTP is a request-response protocol in the client-server model."
+        "explanation": "Claim CL-01 is supported: Passage states that HTTP is a request-response protocol in the client-server model."
       },
       {
         "claim_id": "CL-02",
@@ -71,11 +71,11 @@
         "evidence": [
           {
             "source_id": "SRC-001",
-            "passage_id": "EV-011",
+            "passage_id": "EV-008",
             "note": null
           }
         ],
-        "explanation": "Claim CL-02 is supported: The passage states that a request identifies a method to classify the desired action to be performed on a resource."
+        "explanation": "Claim CL-02 is supported: Passage states that HTTP is a stateless protocol and does not require the server to retain user status across multiple requests."
       },
       {
         "claim_id": "CL-03",
@@ -87,7 +87,7 @@
             "note": null
           }
         ],
-        "explanation": "Claim CL-03 is supported: The passage states that for GET, the server should only retrieve data and not modify state."
+        "explanation": "Claim CL-03 is supported: Passage states that GET is defined as a safe, read-only method."
       },
       {
         "claim_id": "CL-04",
@@ -95,14 +95,26 @@
         "evidence": [
           {
             "source_id": "SRC-001",
-            "passage_id": "EV-016",
+            "passage_id": "EV-014",
             "note": null
           }
         ],
-        "explanation": "Claim CL-04 is supported: The passage confirms that a response is sent by the server and its start line consists of protocol version, status code, and optional reason phrase."
+        "explanation": "Claim CL-04 is supported: Passage states that POST is defined as a cacheable request method."
       },
       {
         "claim_id": "CL-05",
+        "verdict": "supported",
+        "evidence": [
+          {
+            "source_id": "SRC-002",
+            "passage_id": "EV-021",
+            "note": null
+          }
+        ],
+        "explanation": "Claim CL-05 is supported: Passage states a success status indicates the requested action was received, understood, and accepted."
+      },
+      {
+        "claim_id": "CL-06",
         "verdict": "supported",
         "evidence": [
           {
@@ -111,10 +123,10 @@
             "note": null
           }
         ],
-        "explanation": "Claim CL-05 is supported: The passage states that a 4xx status code is for situations where an error seems to have been caused by the client."
+        "explanation": "Claim CL-06 is supported: Passage states a 4xx status is for situations where an error seems to have been caused by the client."
       },
       {
-        "claim_id": "CL-06",
+        "claim_id": "CL-07",
         "verdict": "supported",
         "evidence": [
           {
@@ -123,32 +135,20 @@
             "note": null
           }
         ],
-        "explanation": "Claim CL-06 is supported: The passage confirms that 5xx status indicates the server encountered an error or is incapable of performing the request."
-      },
-      {
-        "claim_id": "CL-07",
-        "verdict": "supported",
-        "evidence": [
-          {
-            "source_id": "SRC-002",
-            "passage_id": "EV-022",
-            "note": null
-          }
-        ],
-        "explanation": "Claim CL-07 is supported: The passage describes 2xx as the standard response for successful HTTP requests."
+        "explanation": "Claim CL-07 is supported: Passage states a 5xx status indicates the server is aware it encountered an error or is incapable of performing the request."
       }
     ],
     "coverage": [],
-    "started_at": "2026-11-07T11:14:18.695978Z",
-    "completed_at": "2026-11-07T11:14:22.831628Z",
+    "started_at": "2026-11-07T16:30:49.115479Z",
+    "completed_at": "2026-11-07T16:30:51.694646Z",
     "error_message": null
   },
   "qc2": {
-    "audit_id": "AUD-LES-001-V2-QC2",
+    "audit_id": "AUD-LES-001-V1-QC2",
     "audit_type": "qc2",
     "lesson_id": "LES-001",
-    "version": 2,
-    "content_hash": "d8e3853320c370cef28a1d040e1f61f7cfa0f1e10e92916901695d6b6f16f11f",
+    "version": 1,
+    "content_hash": "2575a3c989ced441805695227e1d9e3e775c522763b0e3827b7126eb52c51b4a",
     "rubric_version": "0.1.0",
     "status": "passed",
     "score": 100.0,
@@ -203,7 +203,7 @@
     ],
     "llm_model": "gemini-3.5-flash-lite",
     "prompt_versions": {
-      "qc2/llm_review": "0.2.0"
+      "qc2/llm_review": "0.3.0"
     },
     "issues": [],
     "claim_assessments": [],
@@ -223,22 +223,22 @@
         "assessed": true
       }
     ],
-    "started_at": "2026-11-07T11:14:22.831628Z",
-    "completed_at": "2026-11-07T11:14:25.108562Z",
+    "started_at": "2026-11-07T16:30:51.696799Z",
+    "completed_at": "2026-11-07T16:32:01.573047Z",
     "error_message": null
   },
   "release": {
     "lesson_id": "LES-001",
-    "version": 2,
-    "content_hash": "d8e3853320c370cef28a1d040e1f61f7cfa0f1e10e92916901695d6b6f16f11f",
-    "qc1_audit_id": "AUD-LES-001-V2-QC1",
-    "qc2_audit_id": "AUD-LES-001-V2-QC2",
+    "version": 1,
+    "content_hash": "2575a3c989ced441805695227e1d9e3e775c522763b0e3827b7126eb52c51b4a",
+    "qc1_audit_id": "AUD-LES-001-V1-QC1",
+    "qc2_audit_id": "AUD-LES-001-V1-QC2",
     "decision": "eligible_for_instructor_review",
     "reasons": [
       "QC1 passed with score 100.0.",
       "QC2 passed with score 100.0."
     ],
     "blocking_issue_ids": [],
-    "decided_at": "2026-11-07T11:14:25.114561Z"
+    "decided_at": "2026-11-07T16:32:01.576045Z"
   }
 }

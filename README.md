@@ -1,153 +1,247 @@
 # AI Lesson Studio
 
-An AI-powered lesson creation tool. From a **lesson title** and a **learning
-objective** it researches websites, books and YouTube videos, writes a
-structured lesson that takes at most 45 minutes, and checks it with **two
-independent QC layers**. An instructor can then review, edit, apply QC
-recommendations, preview and export the lesson.
+An AI-powered lesson creation tool. From a **lesson title** and a **learning objective**
+it researches websites, books and YouTube videos, writes a structured, visual lesson
+that takes **45 minutes**, and checks it with **two independent quality-control (QC)
+layers**. Instructors can review the audits, apply QC recommendations, edit, preview and
+export. Students learn step by step and finish with a 10-question test and a review
+tailored to their results.
 
-## Run it
+> Built for the AI Research Intern assignment. Runs locally; deployment is not required.
 
-Windows, Python 3.11+. From `backend/`:
+---
 
-```
-py -3.12 -m venv .venv
-.venv\Scripts\activate
+## Quick start
+
+Needs Python 3.11+ and two free API keys.
+
+```bash
+cd backend
+python -m venv .venv
+.venv\Scripts\activate            # macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
-copy .env.example .env      # then set LLM_API_KEY (Gemini) and YOUTUBE_API_KEY
+copy .env.example .env            # macOS/Linux: cp .env.example .env
+```
+
+Fill in `backend/.env`:
+
+| Setting | Where to get it |
+|---|---|
+| `LLM_API_KEY` | Google AI Studio: aistudio.google.com, "Get API key" (Gemini) |
+| `LLM_MODEL` | `gemini-3.5-flash-lite` (tested; fast) |
+| `YOUTUBE_API_KEY` | Google Cloud Console: enable "YouTube Data API v3", then Credentials, Create API key (optional; without it, no videos) |
+
+Run the app and open http://localhost:8501:
+
+```bash
 streamlit run streamlit_app.py
 ```
-
-Open http://localhost:8501, then enter a title and objective and press **Research and generate**.
 
 Other commands (from `backend/`):
 
 | Command | Purpose |
 |---|---|
-| `pytest` | 223 offline tests (a fake LLM; no network) |
-| `python scripts/run_benchmark.py --llm` | QC accuracy on 26 benchmark cases with planted errors |
-| `python scripts/run_repeatability.py` | Do repeated QC runs give the same results? |
+| `pytest` | 245 offline tests (a fake LLM; no network, no keys) |
+| `python scripts/check_setup.py` | Checks Python, packages, folders and settings |
+| `python scripts/run_benchmark.py` | QC benchmark, deterministic checks only (free, instant) |
+| `python scripts/run_benchmark.py --llm` | QC benchmark with the AI evaluators (about 52 calls) |
+| `python scripts/run_repeatability.py` | Runs every case 3 times: are QC results stable? |
+| `python scripts/qc_report.py --case F-001 --llm` | One lesson's full QC report |
 
-## The flow
+---
 
-```
-Title + objective ──► validate inputs
-   │
-   ▼
-1. RESEARCH   LLM plans key concepts and queries (it never produces URLs)
-              ├─ Wikipedia   full articles; relevant paragraphs kept WORD FOR WORD as evidence
-              ├─ Open Library books (metadata only: references / further reading)
-              └─ YouTube     videos + durations (metadata only: supplementary)
-              coverage check: a key concept with no evidence gets its own search
-   │
-   ▼
-2. GENERATE   LLM writes the structured lesson from the evidence only; every fact
-              is recorded as a claim citing its source. Code attaches videos and
-              builds the reference list, so no link can be invented.
-              Draft rejected and retried if: >45 or <40 min, cites non-evidence, too thin.
-   │
-   ▼
-3. QC         QC1 factual accuracy  ┐ independent: separate prompts and calls;
-              QC2 instructional     ┘ neither sees the other's results
-              ──► two separate audit reports + a release decision
-   │
-   ▼
-4. REVIEW     preview · edit and save · apply QC recommendations (AI revision,
-              then automatic re-QC) · dismiss issues · version history · export
-```
+## What it does (mapped to the brief)
 
-## How each requirement is met
-
-| Requirement | Where |
+| Requirement | How |
 |---|---|
-| Title and objective inputs, empty or invalid input rejected | `app/workflow.py` `validate_inputs` |
-| Research books, websites, YouTube | `app/research/` (Open Library, Wikipedia, YouTube Data API) |
-| Explanations, examples, practical application, knowledge checks | 7-segment visual lesson (intro 4, overview 3, two core ideas 8+8, worked example 7, practice and test 10, recap 5 min) with check questions, 3 practice tasks with hints, a 5-question quiz and visuals drawn by the app (flowcharts, concept maps, tables, timelines, charts, formula cards, code, analogy scenes): `prompts/generation/lesson.md`, `app/generation/` |
-| YouTube videos as supplementary resources | Attached by code from research; optional, not counted in the 45 minutes |
-| Reference links at the end | Built by code from research (`app/generation/render.py`) |
-| 45-minute limit | The generator rejects drafts outside 40-45 min; QC2 enforces it as a hard rule |
-| QC1: factual correctness, unsupported or misleading claims, source reliability, gaps, inconsistencies | `app/modules/qc/qc1/` |
-| QC2: objective alignment, clarity, structure, gaps in explanations, examples and practice | `app/modules/qc/qc2/` |
-| Separate audit reports with issues and suggested fixes | `qc1_factual_audit.md`, `qc2_instructional_audit.md` |
-| Review, edit, save | App tab **Edit**: each save is a new version |
-| Review and apply QC recommendations | Tab **Apply recommendations**: AI revision → new version → re-QC |
-| Preview | Tab **Preview** |
-| Export lesson, references, QC reports | Tab **Export**: Markdown, JSON or one zip |
-| AI and research failures, preserved work, retry | Every step checkpointed to disk; a failed step shows its error and a **Retry** button |
+| Title + objective inputs; empty/invalid input handled | Validated before anything runs; friendly messages; duplicate topics detected |
+| Research **websites** | Wikipedia articles; the most relevant paragraphs are kept **word for word** as evidence |
+| Research **books** | Open Library (title, author, link): references and further reading |
+| Research **YouTube** | YouTube Data API: videos with channel and length, as optional extra viewing |
+| Structured, engaging content | 7 segments: Intro and goal (4 min), Overview (3), Core idea 1 (8), Core idea 2 (8), Worked example + "Try it" activity (7), Test (10), Recap (5) |
+| Explanations, examples, practical application, activities, knowledge checks | Short chunks, analogies and examples; a hands-on "Try it" task with hint and answer; a check question in each core idea; a 10-question test |
+| Visuals | Flowcharts, concept maps, timelines, labelled diagrams, tables, charts, formula cards, code and analogy scenes, **drawn by the app** from a structured spec |
+| 45 minutes | Enforced: section minutes must add up to 40-45; QC2 blocks anything over 45 |
+| Reference links at the end | Built by code from the research (never written by the AI) |
+| **QC1: research and factual accuracy** | Every factual claim checked against the evidence passages; fabricated / contradicted / unsupported / misleading citations; source credibility and freshness; research gaps; internal contradictions |
+| **QC2: instructional quality** | Objective coverage matrix (explained, exemplified, practised, assessed), Bloom-level alignment, structure and sequencing, clarity for the learner level, answer-key checks, hint quality |
+| Separate audit reports with fixes | `qc1_factual_audit.md` and `qc2_instructional_audit.md`, each issue with location, evidence and a suggested fix |
+| Review, edit, save | Teacher tools, then Edit: text, visuals, questions; every save is a new version |
+| Review and apply QC recommendations | Teacher tools, then Improve: pick issues or write an instruction; the AI revises and the new version is re-checked automatically |
+| Preview | The Learn view (exactly what students see), plus a preview of any earlier version |
+| Export | **PDF notes**, a **summary image**, and lesson / references / both QC reports as Markdown, JSON or a zip |
+| Error handling | Every step is checkpointed to disk; a failed step shows why and offers **Try again** (resumes there); versions are never overwritten |
 
-## Key technical decisions
+### The student experience
 
-- **Evidence before confidence.** QC1 does not ask the LLM "is this true?".
-  For each claim, the LLM labels how each evidence passage relates to it
-  (supports, partially supports, contradicts), and **code** decides the
-  verdict. The model is not told which source a claim cites, so it can't just
-  rubber-stamp the citation. "Supported" requires a quoted passage.
-- **Rules beat scores.** Each layer scores a weighted rubric, but hard rules
-  always win. A fabricated citation, a contradicted claim, more than 45 minutes,
-  or an objective that is never assessed **blocks** the lesson, whatever the score.
-- **The LLM never creates links.** Videos and references come from the
-  research APIs, and the generator can cite only sources that have evidence
-  passages.
-- **Books and videos are metadata only.** A title doesn't prove content, so
-  they are references and supplementary material, never evidence.
-- **Untrusted content.** All prompts treat lesson and web text as data, not
-  instructions. Research can reach only an allowlist of HTTPS API hosts.
-- **Nothing is overwritten.** Every revision or edit is a new version with
-  its own QC audit, which is pinned to that version's content hash.
-- **Stack:** Python, Pydantic contracts, Gemini (`gemini-3.5-flash-lite`) via
-  REST behind a provider-neutral interface, Streamlit for the UI, and plain
-  JSON files for storage (`data/projects/`). These are simple choices for a
-  local tool; the design rules are in `docs/qc_specification.md`.
+1. A centred form: topic, level and goal (or one of 4 example topics).
+2. A loading screen where five ducks swim across a pond, one per real step:
+   planning, finding sources, writing, fact check, teaching check.
+3. **Learn**: one section at a time, with Previous / Next and a progress bar.
+4. **Test**: 10 questions (multiple choice, scenario, order steps, match pairs,
+   fill in the blank, label a diagram), a hint on each, and **no answers until every
+   question is answered and submitted**.
+5. **Your results**: a score per objective; below 70% opens a **review block** with a
+   new visual or analogy, a different explanation and the common mix-ups. Wrong answers
+   show the misconception behind them and the section to revisit.
+6. **Recap** opens with a personal line ("You scored 8 out of 10. Strongest area ...").
+7. **Sources** tab (websites, playable videos, books) and **Export** tab (PDF, summary image).
 
-## Demo results (2026-11-07)
+---
 
-Exported lessons, references and both QC reports are in [`demo/`](demo/).
+## How it works
+
+```
+title + objective
+   │  validate inputs
+   ▼
+1 RESEARCH   AI plans key concepts and queries (it never produces URLs)
+             Wikipedia (evidence, verbatim) · Open Library (books) · YouTube (videos)
+             coverage check: a concept without evidence gets its own search
+   ▼
+2 GENERATE   AI writes the 7-segment lesson as structured JSON, using ONLY the evidence;
+             every fact is recorded as a claim with its source.
+             Code: renumbers IDs, repairs small slips, attaches videos and references,
+             rejects drafts that break the rules (45 min, 10 test questions, hints, visuals...)
+             and fills in a missing check question or "Try it" task with one small extra call
+   ▼
+3 QC1 + QC2  two independent audits (separate prompts and calls; neither sees the other)
+             = deterministic checks + AI evaluators -> scores, issues, release decision
+   ▼
+4 REVIEW     instructor: audits, Improve (AI revision -> new version -> re-QC), Edit,
+             history, exports  ·  student: Learn -> Test -> Results -> Recap
+```
+
+### Key technical decisions
+
+- **Evidence before confidence.** QC1 does not ask the AI "is this true?". The AI only
+  labels how each evidence passage relates to each claim (supports / partially supports
+  / contradicts), and **code** decides the verdict. The AI is **not told which source a
+  claim cites**, so it cannot just rubber-stamp the citation. "Supported" requires a
+  quoted passage.
+- **Rules beat scores.** Each layer has a weighted rubric score, but hard rules always
+  win: a fabricated citation, a contradicted claim, more than 45 minutes, or an
+  objective that is never assessed **blocks** the lesson, whatever its score.
+- **Honest scoring.** A rubric category is scored only if every check that can find its
+  issues actually ran; otherwise it shows "not evaluated" instead of a made-up number.
+- **The AI never creates links.** References and videos come from the research APIs;
+  the generator may only cite sources that have evidence passages (books and videos are
+  metadata only, so they are never treated as evidence).
+- **Repair, don't fail.** Small model slips (wrong ID format, text in the wrong field,
+  more than 10 test questions, a missing hint, citing a book) are fixed in code; real
+  problems (an unsourced fact, too few questions) are sent back to the model with the
+  exact reason.
+- **Nothing is lost.** Each step is saved the moment it succeeds; every edit or revision
+  is a new version with its own QC audit, pinned to that version's content hash.
+- **Safety.** Lesson and web text are treated as untrusted data in every prompt (prompt
+  injection), research can only reach an allowlist of HTTPS API hosts (SSRF), and user
+  or model text is escaped before it is shown in the page.
+- **Stack.** Python 3.12, Pydantic (data contracts), Gemini via REST behind a
+  provider-neutral interface, Streamlit (UI, Graphviz diagrams), ReportLab (PDF),
+  Pillow (summary image), JSON files for storage. Simple choices for a local tool; the
+  QC design is documented in `docs/qc_specification.md`.
+
+---
+
+## Results
+
+### Demo lessons (`demo/`)
 
 | | HTTP Requests and Responses (sample) | Photosynthesis (own choice) |
 |---|---|---|
-| Research | Wikipedia *HTTP* (17 passages), *List of HTTP status codes* (11); 3 books; 3 videos | *Photosynthesis* (19), *Chlorophyll* (5), *Photosystem* (4); 3 books; 3 videos |
-| v1 QC | QC1 100, QC2 100, eligible | QC1 100, QC2 95.5. QC2 found 3 issues: beginner-unfriendly jargon (x2) and a missing summary |
-| Revision | Instructor note: explain POST properly and add the activity's sample data → v2, both QC pass | Applied all 3 QC recommendations → v2: jargon removed, summary added, QC2 100 |
-| Duration | 42 min | 42 min |
+| Research | Wikipedia *HTTP*, *List of HTTP status codes*; 3 books; 3 videos | Wikipedia *Photosynthesis*, *Chlorophyll*, *Photosystem*; 3 books; 3 videos |
+| Lesson | 7 segments, 45 min, 10 visuals, 2 checks, "Try it", 10-question test | same |
+| QC | QC1 100, QC2 100: eligible for instructor review | v1 and v2 both 100 |
+| Manual fact check | All claims and answer keys correct | All correct, **but** two questions used "primary electron donor" for different things; neither QC layer caught it. Fixed via Improve with an instructor instruction (v2) |
 
-**Factual verification.** Each claim QC1 marked "supported" was checked by
-hand against its evidence passage: 14 claims, plus all answer keys. All were
-correct; most claims are near-verbatim from the passage. One mild
-generalisation: "standard response for successful requests is 2xx" is
-backed by the passage on 200 OK, which is a 2xx code.
+Details, and both versions' QC reports, are in [`demo/README.md`](demo/README.md).
 
-**QC accuracy benchmark** (26 cases with deliberately planted problems, see
-`evaluation/`): 100% of problems found, 96.7% precision, 100% correct
-block/no-block decisions. Over 3 repeated runs, 100% of decisions were identical.
+### QC accuracy benchmark
 
-## Known limitations (honest)
+26 lessons with deliberately planted problems (fabricated citations, contradicted
+facts, 60-minute lessons, untested objectives, wrong answer keys, jargon for beginners,
+...) and control cases that must **not** be flagged. See [`evaluation/`](evaluation/).
 
-1. **QC1 verifies the claims the generator records.** A factual sentence the
-   generator did not record as a claim is not checked. Seen in the HTTP v2
-   revision: a correct sentence about POST was added without a claim. The fix
-   is an independent claim extractor (designed, not built).
-2. **QC2 on a lite model can miss issues.** It passed an activity that
-   referred to sample logs without providing them; the instructor caught it
-   in review. It sometimes also labels a false statement "unclear" (a
-   duplicate of QC1's finding; the decision is unaffected).
-3. **Research depth.** Wikipedia is the only evidence source. It is a solid
-   tertiary reference for introductory topics, but not for specialist or
-   very recent topics. Books and videos are not read.
-4. **Free-tier LLM key.** Rate limits apply, and free-tier prompts may be used
-   for training by the provider, so use synthetic topics only.
+Latest run (2026-11-07, current prompts: QC1 0.1.0, QC2 0.3.0, `gemini-3.5-flash-lite`):
 
-## Layout
+| Mode | Cases scored | Passed | Recall | Precision | Block accuracy | Exact decisions |
+|---|---|---|---|---|---|---|
+| Deterministic checks only | 21 (5 need the AI) | 21 | 100% | 100% | 100% | n/a |
+| Full (with AI evaluators) | 23 of 26 | **23** | **100%** (25/25) | **100%** | **100%** | **100%** |
+
+The free-tier daily quota ran out after 23 cases. The 3 that did not run (I-012 to
+I-014) passed in the previous full run (25/26, earlier QC2 prompt), whose one false
+alarm (F-009) is fixed in the current prompt.
+
+Repeatability (3 runs × 26 cases, earlier prompt versions): 100% identical decisions,
+96.2% identical issue sets.
+
+> Caveat: the checks and the benchmark cases were written by the same author, on one
+> topic. These numbers show the engine does what it was designed to do; confidence on
+> real lessons needs cases written by instructors.
+
+---
+
+## Known limitations
+
+1. **QC1 verifies the claims the generator records.** A factual sentence that was not
+   recorded as a claim is not checked against evidence. (An independent claim extractor
+   is designed in `docs/qc_specification.md` but not built.)
+2. **QC is good, not perfect.** The demo shows a confusing pair of test questions that
+   both layers passed; the instructor review step exists for exactly this.
+3. **The lite model writes tersely**: about 450-500 words per lesson instead of the
+   1,200-1,500 the prompt asks for, so the visuals carry more of the teaching. A larger
+   model would follow the specification more closely (one line in `.env`).
+4. **Evidence comes only from Wikipedia.** It is a solid tertiary source for
+   introductory topics, but not for specialist or very recent ones. Books and videos are
+   listed but not read.
+5. **The PDF shows diagrams as tables and arrow lists**, because graph drawing happens
+   in the browser.
+6. **Free-tier API keys**: rate limits apply, and the provider may use free-tier prompts
+   for training, so do not send real student data.
+
+---
+
+## Project layout
 
 ```
 backend/
-  streamlit_app.py     the instructor app
-  app/workflow.py      steps, checkpoints, retry, versions, export
-  app/research/        Wikipedia, Open Library, YouTube; allowlisted HTTP
-  app/generation/      lesson generation, AI revision, Markdown rendering
-  app/modules/qc/      QC1, QC2, scoring, decision rules, reports
-  app/llm/             Gemini client (retries, structured JSON output)
-prompts/               versioned prompts (research, generation, qc1, qc2)
-evaluation/            QC benchmark cases
-demo/                  exported demo lessons and QC reports
-docs/                  QC specification
+  streamlit_app.py       the app (student pages + teacher tools)
+  app/workflow.py        steps, checkpoints, retry, versions, export
+  app/research/          Wikipedia, Open Library, YouTube; allowlisted HTTP
+  app/generation/        generation, revision, completion, visuals, grading, PDF/image export
+  app/modules/qc/        QC1, QC2, rubrics and scoring, decision rules, reports
+  app/llm/               Gemini client (retries, quota handling, structured JSON output)
+  app/schemas/           lesson and research data contracts
+  tests/                 245 unit tests
+prompts/                 versioned prompts (research, generation, qc1, qc2)
+evaluation/              QC benchmark: base lesson + 26 cases
+demo/                    exported demo lessons, PDFs, summary images, QC reports
+docs/                    QC specification, demo video script
 ```
+
+---
+
+## Acknowledgements
+
+**Data sources and services**
+- **Wikipedia** (via the MediaWiki API): evidence passages are quoted from Wikipedia
+  articles, which are licensed under CC BY-SA 4.0; every lesson links back to the
+  articles it uses.
+- **Open Library** (Internet Archive) search API: book suggestions.
+- **YouTube Data API v3** (Google): video search and metadata.
+- **Google Gemini** (`gemini-3.5-flash-lite`): research planning, lesson generation
+  and the AI parts of both QC layers.
+
+**Open-source libraries**: Streamlit, Pydantic and pydantic-settings, ReportLab, Pillow,
+pandas, pytest (and pypdf in one optional test). Diagrams are rendered by Streamlit's
+built-in Graphviz support.
+
+**AI assistance**: this project was built with the help of an AI coding assistant
+(Claude Code by Anthropic), used for writing and debugging code, tests and
+documentation, as the brief allows. The architecture, design decisions and
+trade-offs were reviewed and directed by me, and I can explain every part of the
+implementation.
+
+The lesson content in `demo/` was generated by the tool itself and fact-checked by hand
+as described in `demo/README.md`.

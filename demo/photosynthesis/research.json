@@ -156,35 +156,35 @@
     {
       "source_id": "SRC-003",
       "source_type": "website",
-      "title": "Photosystem (Wikipedia)",
+      "title": "Chlorophyll a (Wikipedia)",
       "publisher": "Wikipedia",
       "author": null,
-      "url": "https://en.wikipedia.org/wiki/Photosystem",
-      "published_at": "2026-09-26",
+      "url": "https://en.wikipedia.org/wiki/Chlorophyll_a",
+      "published_at": "2026-09-07",
       "retrieved_at": "2026-11-07",
       "access_status": "accessible",
       "content_access": "excerpt",
       "authority_category": "reference",
-      "relevance_score": 56.0,
+      "relevance_score": 64.0,
       "evidence_passages": [
         {
           "passage_id": "EV-025",
-          "text": "PSII is a complex highly organized transmembrane structure that contains a water splitting complex, chlorophylls and carotenoid pigments, a reaction center (P680), pheophytin (a pigment similar to chlorophyll), and two quinones. It uses the energy of sunlight to oxidize water to a mobile electron carrier in the membrane called plastoquinone:",
+          "text": "Chlorophyll a is a specific form of chlorophyll used in oxygenic photosynthesis. It absorbs most energy from wavelengths of violet-blue and orange-red light. It is a poor absorber of green and near-green portions of the spectrum, which makes chlorophyll-containing tissues appear green. This photosynthetic pigment is essential for photosynthesis in eukaryotes, cyanobacteria and prochlorophytes because of its role as primary electron donor in the electron transport chain. Chlorophyll a also transfers resonance energy in the antenna complex, ending in the reaction center where specific chlorophylls P680 and P700 are located.",
           "location": null
         },
         {
           "passage_id": "EV-026",
-          "text": "The excitation P680 → P680* of the reaction center pigment P680 occurs here. These special chlorophyll molecules embedded in PSII absorb the energy of photons, with maximal absorption at 680 nm. Electrons within these molecules are promoted to a higher-energy state. This is one of two core processes in photosynthesis, and it occurs with astonishing efficiency (greater than 90%) because, in addition to direct excitation by light at 680 nm, the energy of light first harvested by antenna proteins at other wavelengths in the light-harvesting system is also transferred to these special chlorophyll molecules.",
+          "text": "Chlorophyll a is essential for most photosynthetic organisms to release chemical energy but is not the only pigment that can be used for photosynthesis. All oxygenic photosynthetic organisms use chlorophyll a, but differ in accessory pigments like chlorophyll b. Chlorophyll a can also be found in very small quantities in the green sulfur bacteria, an anaerobic photoautotroph. These organisms use bacteriochlorophyll and some chlorophyll a but do not produce oxygen. Anoxygenic photosynthesis is the term applied to this process, unlike oxygenic photosynthesis where oxygen is produced during the light reactions of photosynthesis.",
           "location": null
         },
         {
           "passage_id": "EV-027",
-          "text": "This is followed by the electron transfer P680* → pheophytin, and then on to plastoquinol, which occurs within the reaction center of PSII. The electrons are transferred to plastoquinone and two protons, generating plastoquinol, which released into the membrane as a mobile electron carrier. This is the second core process in photosynthesis. The initial stages occur within picoseconds, with an efficiency of 100%. The seemingly impossible efficiency is due to the precise positioning of molecules within the reaction center.  This is a solid-state process, not a typical chemical reaction. It occurs within an essentially crystalline environment created by the macromolecular structure of PSII.",
+          "text": "Chlorophyll a absorbs light within the violet, blue and red wavelengths. Accessory photosynthetic pigments broaden the spectrum of light absorbed, increasing the range of wavelengths that can be used in photosynthesis. The addition of chlorophyll b next to chlorophyll a extends the absorption spectrum. In low light conditions, plants produce a greater ratio of chlorophyll b to chlorophyll a molecules, increasing photosynthetic yield.",
           "location": null
         },
         {
           "passage_id": "EV-028",
-          "text": "The photosynthesis process in chloroplasts begins when an electron of P680 of PSII attains a higher-energy level. This energy is used to reduce a chain of electron acceptors that have subsequently higher redox potentials. This chain of electron acceptors is known as an electron transport chain. When this chain reaches PSI, an electron is again excited, creating a high redox-potential. The electron transport chain of photosynthesis is often put in a diagram called the Z-scheme, because the redox diagram from P680 to P700 resembles the letter Z.",
+          "text": "Chlorophyll a is very important in the energy phase of photosynthesis. Two electrons need to be passed to an electron acceptor for the process of photosynthesis to proceed. Within the reaction centers of both photosystems there are a pair of chlorophyll a molecules that pass electrons on to the transport chain through redox reactions.",
           "location": null
         }
       ]
@@ -192,10 +192,10 @@
     {
       "source_id": "SRC-004",
       "source_type": "book",
-      "title": "Biology (1990)",
+      "title": "Biology of plants (2013)",
       "publisher": "Open Library record",
-      "author": "Kenneth R. Miller, Joseph S. Levine, Prentice-Hall, inc.",
-      "url": "https://openlibrary.org/works/OL277185W",
+      "author": "Peter H. Raven",
+      "url": "https://openlibrary.org/works/OL16626503W",
       "published_at": null,
       "retrieved_at": "2026-11-07",
       "access_status": "accessible",
@@ -207,10 +207,10 @@
     {
       "source_id": "SRC-005",
       "source_type": "book",
-      "title": "Biology (1994)",
+      "title": "Biology (1981)",
       "publisher": "Open Library record",
-      "author": "Neil Allison Campbell, Lawrence G. Mitchell, Jane B. Reece",
-      "url": "https://openlibrary.org/works/OL1983083W",
+      "author": "Cecie Starr, Ralph Taggart",
+      "url": "https://openlibrary.org/works/OL37408566W",
       "published_at": null,
       "retrieved_at": "2026-11-07",
       "access_status": "accessible",
@@ -222,10 +222,10 @@
     {
       "source_id": "SRC-006",
       "source_type": "book",
-      "title": "Biology (1986)",
+      "title": "Aquatic photosynthesis (1997)",
       "publisher": "Open Library record",
-      "author": "Peter H. Raven, George B. Johnson",
-      "url": "https://openlibrary.org/works/OL2012527W",
+      "author": "Paul G. Falkowski, John A. Raven",
+      "url": "https://openlibrary.org/works/OL3299072W",
       "published_at": null,
       "retrieved_at": "2026-11-07",
       "access_status": "accessible",
@@ -237,11 +237,11 @@
     {
       "source_id": "SRC-007",
       "source_type": "video",
-      "title": "Photosynthesis | The Dr. Binocs Show | Learn Videos For Kids",
-      "publisher": "Peekaboo Kidz",
+      "title": "Photosynthesis 3D animation",
+      "publisher": "ANIMATED BIOLOGY 3D+",
       "author": null,
-      "url": "https://www.youtube.com/watch?v=D1Ymc311XS8",
-      "published_at": "2015-05-13",
+      "url": "https://www.youtube.com/watch?v=-E4EL4bZbXU",
+      "published_at": "2022-04-17",
       "retrieved_at": "2026-11-07",
       "access_status": "accessible",
       "content_access": "metadata_only",
@@ -252,11 +252,11 @@
     {
       "source_id": "SRC-008",
       "source_type": "video",
-      "title": "Photosynthesis 3D animation",
-      "publisher": "ANIMATED BIOLOGY 3D+",
+      "title": "Photosynthesis | The Dr. Binocs Show | Learn Videos For Kids",
+      "publisher": "Peekaboo Kidz",
       "author": null,
-      "url": "https://www.youtube.com/watch?v=-E4EL4bZbXU",
-      "published_at": "2022-04-17",
+      "url": "https://www.youtube.com/watch?v=D1Ymc311XS8",
+      "published_at": "2015-05-13",
       "retrieved_at": "2026-11-07",
       "access_status": "accessible",
       "content_access": "metadata_only",

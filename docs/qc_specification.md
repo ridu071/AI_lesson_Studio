@@ -1,6 +1,6 @@
 # QC Engine Specification
 
-Status: **Milestone 1 complete (QC engine).** Rubric version `0.1.0`
+Status: **Milestone 1 complete (QC engine); used by the lesson tool.** Rubric version `0.1.0`
 (defined in `scoring/rubrics.py`, next to the weights it describes).
 
 This document defines what the QC engine receives, what it produces, and the

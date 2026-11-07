@@ -3,16 +3,16 @@
   "version": 2,
   "title": "Photosynthesis",
   "learner_level": "beginner",
-  "stated_duration_minutes": 42,
+  "stated_duration_minutes": 45,
   "learning_objectives": [
     {
       "id": "LO-01",
-      "description": "Describe the inputs and outputs of photosynthesis",
+      "description": "Describe the inputs and outputs of photosynthesis.",
       "bloom_level": "understand"
     },
     {
       "id": "LO-02",
-      "description": "Explain the role of chlorophyll and sunlight in the process",
+      "description": "Explain the role of chlorophyll and sunlight in the photosynthetic process.",
       "bloom_level": "understand"
     }
   ],
@@ -20,63 +20,293 @@
     {
       "section_id": "SEC-01",
       "section_type": "introduction",
-      "title": "Introduction to Photosynthesis",
-      "duration_minutes": 5,
+      "title": "Intro and goal",
+      "duration_minutes": 4,
       "objective_ids": [
         "LO-01",
         "LO-02"
       ],
       "content_blocks": [
         {
-          "type": "explanation",
-          "content": "Photosynthesis is the process by which plants, algae, and cyanobacteria use sunlight to convert light energy into chemical energy."
+          "type": "takeaway",
+          "content": "Plants feed the world by transforming simple ingredients into life-giving energy using sunlight.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
         },
         {
           "type": "example",
-          "content": "Plants perform photosynthesis, releasing oxygen as a byproduct when they split water."
+          "content": "Imagine a bright green houseplant sitting on a windowsill, soaking up the afternoon sun and growing steadily without ever eating soil or food from a package.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "bullets",
+          "content": "",
+          "items": [
+            "Describe the inputs and outputs of photosynthesis.",
+            "Explain the role of chlorophyll and sunlight in the photosynthetic process."
+          ],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "visual",
+          "content": "",
+          "items": [],
+          "label": null,
+          "visual_type": "analogy_scene",
+          "elements": [
+            "Sunlight as power source",
+            "Leaf as solar factory",
+            "Water and air as raw materials",
+            "Sugars as finished product"
+          ],
+          "connections": [],
+          "rows": [],
+          "caption": "A plant functions like a solar-powered factory.",
+          "alt_text": "An analogy scene showing a plant acting as a factory powered by the sun."
         }
       ],
       "source_ids": [
-        "SRC-001"
+        "SRC-001",
+        "SRC-002"
       ]
     },
     {
       "section_id": "SEC-02",
-      "section_type": "learning_objectives",
-      "title": "Lesson Goals",
-      "duration_minutes": 2,
+      "section_type": "concept_explanation",
+      "title": "Overview of Photosynthesis",
+      "duration_minutes": 3,
       "objective_ids": [
         "LO-01",
         "LO-02"
       ],
       "content_blocks": [
         {
+          "type": "takeaway",
+          "content": "Photosynthesis is the foundational process that converts light energy into chemical energy.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
           "type": "explanation",
-          "content": "In this lesson, you will learn to describe the inputs and outputs of photosynthesis, and explain how chlorophyll and sunlight play their roles."
+          "content": "Organisms like plants and algae capture light energy to fuel their metabolism and produce organic compounds.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "definition",
+          "content": "Photosynthesis: A system of biological processes by which autotrophic organisms convert light energy into chemical energy.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "definition",
+          "content": "Chlorophyll: A green pigment found in chloroplasts that allows plants to absorb light energy.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "definition",
+          "content": "Carbon fixation: The process where carbon dioxide is converted into sugars.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "definition",
+          "content": "Photolysis: The splitting of a water molecule by light energy to release oxygen and replace electrons.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "visual",
+          "content": "",
+          "items": [],
+          "label": null,
+          "visual_type": "concept_map",
+          "elements": [
+            "Sunlight",
+            "Chlorophyll",
+            "Water",
+            "Carbon Dioxide",
+            "Photosynthesis",
+            "Sugars",
+            "Oxygen"
+          ],
+          "connections": [
+            "Sunlight -> Photosynthesis: drives",
+            "Chlorophyll -> Photosynthesis: enables",
+            "Water -> Photosynthesis: input",
+            "Carbon Dioxide -> Photosynthesis: input",
+            "Photosynthesis -> Sugars: output",
+            "Photosynthesis -> Oxygen: byproduct"
+          ],
+          "rows": [],
+          "caption": "The core relationships in photosynthesis.",
+          "alt_text": "Concept map linking inputs, pigments, and outputs of photosynthesis."
         }
       ],
-      "source_ids": []
+      "source_ids": [
+        "SRC-001",
+        "SRC-002"
+      ]
     },
     {
       "section_id": "SEC-03",
       "section_type": "concept_explanation",
-      "title": "Inputs and Outputs of Photosynthesis",
+      "title": "Core idea 1: Inputs and Outputs of Photosynthesis",
       "duration_minutes": 8,
       "objective_ids": [
         "LO-01"
       ],
       "content_blocks": [
         {
-          "type": "definition",
-          "content": "Carbon fixation is the process where carbon dioxide is converted into sugars."
+          "type": "takeaway",
+          "content": "Photosynthesis takes in water, carbon dioxide, and light energy to produce carbohydrates and oxygen.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "visual",
+          "content": "",
+          "items": [],
+          "label": null,
+          "visual_type": "table",
+          "elements": [],
+          "connections": [],
+          "rows": [
+            [
+              "Category",
+              "Substance",
+              "Role"
+            ],
+            [
+              "Input",
+              "Water",
+              "Electron donor and mass source"
+            ],
+            [
+              "Input",
+              "Carbon Dioxide",
+              "Converted into sugars via carbon fixation"
+            ],
+            [
+              "Output",
+              "Carbohydrates",
+              "Stored chemical energy (sugars)"
+            ],
+            [
+              "Output",
+              "Oxygen",
+              "Released as a byproduct"
+            ]
+          ],
+          "caption": "Summary of photosynthetic inputs and outputs.",
+          "alt_text": "Table detailing inputs like water and carbon dioxide and outputs like carbohydrates and oxygen."
         },
         {
           "type": "explanation",
-          "content": "Photosynthesis captures energy from sunlight to convert carbon dioxide into carbohydrates. In oxygenic photosynthesis, water is used as an electron donor, releasing oxygen."
+          "content": "Plants build their biomass primarily from carbon dioxide and water rather than soil nutrients alone.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
         },
         {
           "type": "example",
-          "content": "Organic compounds stored include carbohydrates like sugars (glucose, fructose, sucrose), starches, and cellulose."
+          "content": "When Jan van Helmont weighed a growing tree and its soil, he found the soil mass changed very little, proving the plant's massive growth came from water and air inputs.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "visual",
+          "content": "",
+          "items": [],
+          "label": null,
+          "visual_type": "flowchart",
+          "elements": [
+            "Water + Carbon Dioxide",
+            "Light Energy Capture",
+            "Carbon Fixation",
+            "Carbohydrates + Oxygen"
+          ],
+          "connections": [
+            "Water + Carbon Dioxide -> Light Energy Capture",
+            "Light Energy Capture -> Carbon Fixation",
+            "Carbon Fixation -> Carbohydrates + Oxygen"
+          ],
+          "rows": [],
+          "caption": "Flow from raw inputs to final outputs.",
+          "alt_text": "Flowchart showing raw inputs moving through energy capture to final outputs."
         }
       ],
       "source_ids": [
@@ -86,23 +316,89 @@
     {
       "section_id": "SEC-04",
       "section_type": "concept_explanation",
-      "title": "Role of Chlorophyll and Sunlight",
+      "title": "Core idea 2: The Role of Chlorophyll and Sunlight",
       "duration_minutes": 8,
       "objective_ids": [
         "LO-02"
       ],
       "content_blocks": [
         {
-          "type": "definition",
-          "content": "Chlorophyll is any of several related photochemical catalysts and green pigments found in cyanobacteria and in the chloroplasts of algae and plants."
+          "type": "takeaway",
+          "content": "Sunlight provides the photons that chlorophyll absorbs to initiate electron flow and energy storage.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "visual",
+          "content": "",
+          "items": [],
+          "label": null,
+          "visual_type": "labeled_diagram",
+          "elements": [
+            "Chloroplast structure",
+            "Light-harvesting antenna",
+            "Chlorophyll pigment",
+            "Reaction center",
+            "Electron transport chain"
+          ],
+          "connections": [
+            "Chloroplast structure -> Light-harvesting antenna",
+            "Light-harvesting antenna -> Chlorophyll pigment",
+            "Chlorophyll pigment -> Reaction center",
+            "Reaction center -> Electron transport chain"
+          ],
+          "rows": [],
+          "caption": "Path of light absorption inside the chloroplast.",
+          "alt_text": "Diagram showing the pathway from chloroplast to electron transport chain."
         },
         {
           "type": "explanation",
-          "content": "Chlorophyll allows plants to absorb energy from light. Special chlorophyll molecules absorb the energy of photons, promoting electrons to a higher energy state."
+          "content": "Chlorophyll a absorbs violet-blue and orange-red light while reflecting green, making leaves appear green.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
         },
         {
           "type": "example",
-          "content": "In light-dependent reactions, chlorophyll absorbs one photon and loses an electron, which starts an electron transport chain."
+          "content": "Chlorophyll acts like a solar panel collector: it catches light photons, releases high-energy electrons, and starts the chemical machinery moving.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "visual",
+          "content": "",
+          "items": [],
+          "label": null,
+          "visual_type": "formula_card",
+          "elements": [
+            "Light + 6CO2 + 6H2O -> C6H12O6 + 6O2",
+            "Light: Energy source from sunlight",
+            "CO2: Carbon dioxide gas from air",
+            "H2O: Water absorbed from soil",
+            "C6H12O6: Glucose sugar",
+            "O2: Oxygen byproduct"
+          ],
+          "connections": [],
+          "rows": [],
+          "caption": "The net chemical equation for oxygenic photosynthesis.",
+          "alt_text": "Formula card displaying the balanced equation of photosynthesis."
         }
       ],
       "source_ids": [
@@ -114,27 +410,162 @@
     {
       "section_id": "SEC-05",
       "section_type": "worked_examples",
-      "title": "Examining Photosynthetic Energy Conversion",
-      "duration_minutes": 4,
+      "title": "Worked example: Tracing Photosynthesis Step-by-Step",
+      "duration_minutes": 7,
       "objective_ids": [
         "LO-01",
         "LO-02"
       ],
       "content_blocks": [
         {
-          "type": "example",
-          "content": "When sunlight strikes chlorophyll, the green pigment absorbs light energy, allowing plants to capture energy from the sun while water molecules are split to help drive the process."
+          "type": "takeaway",
+          "content": "Follow how light, water, and carbon dioxide become oxygen and sugar.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "bullets",
+          "content": "",
+          "items": [
+            "Step 1: A plant absorbs water from the soil through its roots. Why: Water acts as the essential electron donor.",
+            "Step 2: Sunlight shines on the leaves. Why: Photons provide the necessary energy input.",
+            "Step 3: Chlorophyll pigments absorb the light. Why: This triggers photoinduced charge separation and loosens electrons.",
+            "Step 4: Water molecules undergo photolysis. Why: Splitting water replaces lost electrons and releases oxygen.",
+            "Step 5: Carbon dioxide is fixed into carbohydrates. Why: This stores chemical energy as sugars for the plant."
+          ],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "visual",
+          "content": "",
+          "items": [],
+          "label": null,
+          "visual_type": "flowchart",
+          "elements": [
+            "Root absorbs water",
+            "Leaf captures sunlight",
+            "Chlorophyll absorbs photon",
+            "Water splits into oxygen",
+            "Carbon dioxide fixed into sugar"
+          ],
+          "connections": [
+            "Root absorbs water -> Leaf captures sunlight",
+            "Leaf captures sunlight -> Chlorophyll absorbs photon",
+            "Chlorophyll absorbs photon -> Water splits into oxygen",
+            "Water splits into oxygen -> Carbon dioxide fixed into sugar"
+          ],
+          "rows": [],
+          "caption": "Step-by-step sequence of photosynthetic events.",
+          "alt_text": "Flowchart tracing the sequence from water absorption to sugar creation."
+        },
+        {
+          "type": "visual",
+          "content": "",
+          "items": [],
+          "label": null,
+          "visual_type": "table",
+          "elements": [],
+          "connections": [],
+          "rows": [
+            [
+              "Stage",
+              "Key Component",
+              "Result"
+            ],
+            [
+              "Light Reaction",
+              "Chlorophyll + Sunlight",
+              "Oxygen released & ATP made"
+            ],
+            [
+              "Carbon Fixation",
+              "Carbon Dioxide",
+              "Sugars synthesized"
+            ]
+          ],
+          "caption": "Overview of light and fixation stages.",
+          "alt_text": "Table summarizing the light reaction and carbon fixation stages."
         }
       ],
       "source_ids": [
         "SRC-001",
-        "SRC-002"
+        "SRC-002",
+        "SRC-003"
       ]
     },
     {
       "section_id": "SEC-06",
-      "section_type": "practical_application",
-      "title": "Mapping Photosynthesis Components",
+      "section_type": "final_assessment",
+      "title": "Test",
+      "duration_minutes": 10,
+      "objective_ids": [
+        "LO-01",
+        "LO-02"
+      ],
+      "content_blocks": [
+        {
+          "type": "explanation",
+          "content": "You have 10 questions to test your understanding of photosynthesis inputs, outputs, chlorophyll, and sunlight. Hints are available, and answers appear after submission.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "visual",
+          "content": "",
+          "items": [],
+          "label": null,
+          "visual_type": "table",
+          "elements": [],
+          "connections": [],
+          "rows": [
+            [
+              "Objective",
+              "Topic Covered",
+              "Question Count"
+            ],
+            [
+              "LO-01",
+              "Inputs and Outputs",
+              "5 Questions"
+            ],
+            [
+              "LO-02",
+              "Chlorophyll and Sunlight",
+              "5 Questions"
+            ]
+          ],
+          "caption": "Assessment coverage breakdown.",
+          "alt_text": "Table showing test question counts per learning objective."
+        }
+      ],
+      "source_ids": [
+        "SRC-001",
+        "SRC-002",
+        "SRC-003"
+      ]
+    },
+    {
+      "section_id": "SEC-07",
+      "section_type": "summary",
+      "title": "Recap",
       "duration_minutes": 5,
       "objective_ids": [
         "LO-01",
@@ -142,68 +573,98 @@
       ],
       "content_blocks": [
         {
-          "type": "explanation",
-          "content": "Apply your knowledge by categorizing the inputs, outputs, and catalyst roles involved in oxygenic photosynthesis."
-        }
-      ],
-      "source_ids": [
-        "SRC-001",
-        "SRC-002"
-      ]
-    },
-    {
-      "section_id": "SEC-07",
-      "section_type": "knowledge_check",
-      "title": "Check Your Understanding",
-      "duration_minutes": 4,
-      "objective_ids": [
-        "LO-01",
-        "LO-02"
-      ],
-      "content_blocks": [
+          "type": "takeaway",
+          "content": "You have mastered the basics of how plants convert light and air into life-sustaining energy.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
         {
-          "type": "explanation",
-          "content": "Answer the following questions to verify your understanding of photosynthesis."
-        }
-      ],
-      "source_ids": [
-        "SRC-001",
-        "SRC-002"
-      ]
-    },
-    {
-      "section_id": "SEC-08",
-      "section_type": "final_assessment",
-      "title": "Final Assessment",
-      "duration_minutes": 4,
-      "objective_ids": [
-        "LO-01",
-        "LO-02"
-      ],
-      "content_blocks": [
+          "type": "bullets",
+          "content": "",
+          "items": [
+            "Photosynthesis takes in water, carbon dioxide, and sunlight.",
+            "Chlorophyll absorbs light energy and initiates electron transport.",
+            "Water splitting releases oxygen as a vital byproduct.",
+            "Carbon dioxide is fixed into carbohydrates to store energy."
+          ],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
         {
-          "type": "explanation",
-          "content": "Complete the final evaluation questions."
-        }
-      ],
-      "source_ids": [
-        "SRC-001",
-        "SRC-002"
-      ]
-    },
-    {
-      "section_id": "SEC-09",
-      "section_type": "summary",
-      "title": "Lesson Summary",
-      "duration_minutes": 2,
-      "objective_ids": [
-        "LO-01",
-        "LO-02"
-      ],
-      "content_blocks": [
+          "type": "visual",
+          "content": "",
+          "items": [],
+          "label": null,
+          "visual_type": "table",
+          "elements": [],
+          "connections": [],
+          "rows": [
+            [
+              "Concept",
+              "Key Fact",
+              "Primary Role"
+            ],
+            [
+              "Water",
+              "Absorbed from soil",
+              "Electron donor / Oxygen source"
+            ],
+            [
+              "Carbon Dioxide",
+              "Taken from air",
+              "Converted into sugars"
+            ],
+            [
+              "Chlorophyll",
+              "Green pigment",
+              "Absorbs light photons"
+            ],
+            [
+              "Sunlight",
+              "Light energy",
+              "Drives electron flow"
+            ]
+          ],
+          "caption": "Quick cheat sheet for photosynthesis.",
+          "alt_text": "Table summarizing all key concepts, facts, and roles."
+        },
         {
-          "type": "explanation",
-          "content": "In this lesson, we explored how photosynthesis takes in carbon dioxide and water, uses sunlight and chlorophyll, and produces sugars and oxygen."
+          "type": "takeaway",
+          "content": "Next steps:",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "bullets",
+          "content": "",
+          "items": [
+            "Observe a green plant outdoors and consider how sunlight fuels its growth.",
+            "Explore how cellular respiration is the reverse process of photosynthesis."
+          ],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
         }
       ],
       "source_ids": [
@@ -215,8 +676,8 @@
   "claims": [
     {
       "claim_id": "CL-01",
-      "section_id": "SEC-01",
-      "text": "Photosynthesis is the process by which plants, algae, and cyanobacteria use sunlight to convert light energy into chemical energy.",
+      "section_id": "SEC-02",
+      "text": "Photosynthesis converts light energy into chemical energy.",
       "claim_type": "factual",
       "source_ids": [
         "SRC-001"
@@ -224,8 +685,8 @@
     },
     {
       "claim_id": "CL-02",
-      "section_id": "SEC-01",
-      "text": "Most plants, algae, and cyanobacteria perform oxygenic photosynthesis, releasing oxygen as a byproduct of water splitting.",
+      "section_id": "SEC-03",
+      "text": "Water and carbon dioxide are inputs, while carbohydrates and oxygen are outputs.",
       "claim_type": "factual",
       "source_ids": [
         "SRC-001"
@@ -233,165 +694,510 @@
     },
     {
       "claim_id": "CL-03",
-      "section_id": "SEC-03",
-      "text": "Carbon dioxide is converted into sugars in a process called carbon fixation.",
-      "claim_type": "definition",
-      "source_ids": [
-        "SRC-001"
-      ]
-    },
-    {
-      "claim_id": "CL-04",
-      "section_id": "SEC-03",
-      "text": "Photosynthetic organisms store converted chemical energy within the bonds of intracellular organic compounds like carbohydrates, sugars, starches, and cellulose.",
-      "claim_type": "factual",
-      "source_ids": [
-        "SRC-001"
-      ]
-    },
-    {
-      "claim_id": "CL-05",
       "section_id": "SEC-04",
-      "text": "Chlorophyll is any of several related photochemical catalysts and green pigments found in cyanobacteria and in the chloroplasts of algae and plants.",
-      "claim_type": "definition",
-      "source_ids": [
-        "SRC-002"
-      ]
-    },
-    {
-      "claim_id": "CL-06",
-      "section_id": "SEC-04",
-      "text": "Chlorophyll allows plants to absorb energy from light.",
+      "text": "Chlorophyll absorbs light energy and transfers it to electrons.",
       "claim_type": "factual",
       "source_ids": [
         "SRC-002"
       ]
-    },
-    {
-      "claim_id": "CL-07",
-      "section_id": "SEC-05",
-      "text": "When sunlight strikes chlorophyll, the green pigment absorbs light energy, allowing plants to capture energy from the sun while water molecules are split.",
-      "claim_type": "factual",
-      "source_ids": [
-        "SRC-001",
-        "SRC-002"
-      ]
-    },
-    {
-      "claim_id": "CL-08",
-      "section_id": "SEC-06",
-      "text": "Learner practices mapping inputs and outputs of photosynthesis.",
-      "claim_type": "hypothetical_example",
-      "source_ids": []
     }
   ],
   "activities": [
     {
       "activity_id": "ACT-01",
-      "section_id": "SEC-06",
-      "title": "Photosynthesis Component Mapping",
-      "instructions": "Review the inputs (carbon dioxide and water) and outputs (carbohydrates and oxygen) of photosynthesis, and write a brief summary explaining how chlorophyll absorbs sunlight to drive this process.",
-      "duration_minutes": 5,
+      "section_id": "SEC-05",
+      "title": "Try it: Mapping Photosynthesis Elements",
+      "instructions": "List the two main inputs and two main outputs of photosynthesis, and explain in one sentence what role chlorophyll plays when sunlight hits the leaf.",
+      "duration_minutes": 2,
       "objective_ids": [
         "LO-01",
         "LO-02"
       ],
-      "is_mandatory": true
+      "is_mandatory": true,
+      "hint": "Think about what goes into a plant from the soil and air, what comes out, and how green pigments capture light.",
+      "answer": "Inputs: water and carbon dioxide. Outputs: carbohydrates (sugars) and oxygen. Chlorophyll absorbs light energy and transfers high-energy electrons to start the process."
     }
   ],
   "assessments": [
     {
       "question_id": "Q-01",
-      "section_id": "SEC-07",
+      "section_id": "SEC-03",
       "kind": "knowledge_check",
-      "question_type": "multiple_choice",
-      "prompt": "What is released as a byproduct of water splitting during oxygenic photosynthesis?",
-      "options": [
-        "Carbon dioxide",
-        "Oxygen",
-        "Nitrogen",
-        "Hydrogen peroxide"
-      ],
-      "answer_key": "Oxygen",
-      "explanation": "Oxygenic photosynthesis releases oxygen as a byproduct of water splitting.",
+      "question_type": "short_answer",
+      "prompt": "What gas is released as a byproduct during oxygenic photosynthesis?",
+      "options": [],
+      "answer_key": "oxygen",
+      "explanation": "Water splitting during the light reactions releases oxygen as a byproduct.",
       "objective_ids": [
         "LO-01"
       ],
-      "bloom_level": "understand"
+      "bloom_level": "understand",
+      "level": "understand",
+      "hint": "Think about what humans and animals breathe out versus what plants release.",
+      "wrong_options": [],
+      "review_section_id": "SEC-03",
+      "correct_order": [],
+      "pairs": [],
+      "visual": null,
+      "accepted_answers": [
+        "O2",
+        "Oxygen"
+      ]
     },
     {
       "question_id": "Q-02",
-      "section_id": "SEC-07",
+      "section_id": "SEC-04",
       "kind": "knowledge_check",
-      "question_type": "true_false",
-      "prompt": "Chlorophyll is a green pigment that allows plants to absorb energy from light.",
-      "options": [
-        "True",
-        "False"
-      ],
-      "answer_key": "True",
-      "explanation": "Chlorophyll is defined as a photochemical catalyst and green pigment that allows plants to absorb energy from light.",
+      "question_type": "short_answer",
+      "prompt": "Which green pigment in chloroplasts allows plants to absorb energy from light?",
+      "options": [],
+      "answer_key": "chlorophyll",
+      "explanation": "Chlorophyll is the primary green photochemical catalyst that absorbs light energy.",
       "objective_ids": [
         "LO-02"
       ],
-      "bloom_level": "understand"
+      "bloom_level": "understand",
+      "level": "understand",
+      "hint": "It is the pigment that gives leaves their green color.",
+      "wrong_options": [],
+      "review_section_id": "SEC-04",
+      "correct_order": [],
+      "pairs": [],
+      "visual": null,
+      "accepted_answers": [
+        "Chlorophyll"
+      ]
     },
     {
       "question_id": "Q-03",
-      "section_id": "SEC-08",
+      "section_id": "SEC-06",
       "kind": "final",
       "question_type": "multiple_choice",
-      "prompt": "Which process describes the conversion of carbon dioxide into sugars during photosynthesis?",
+      "prompt": "What is the ultimate source of the electrons in oxygenic photosynthesis?",
       "options": [
-        "Cellular respiration",
-        "Carbon fixation",
-        "Photolysis",
-        "Senescence"
+        "Water",
+        "Carbon dioxide",
+        "Glucose",
+        "Nitrogen"
       ],
-      "answer_key": "Carbon fixation",
-      "explanation": "Carbon dioxide is converted into sugars in a process called carbon fixation.",
+      "answer_key": "Water",
+      "explanation": "Water is oxidized to supply the electrons during oxygenic photosynthesis.",
       "objective_ids": [
         "LO-01"
       ],
-      "bloom_level": "understand"
+      "bloom_level": "understand",
+      "level": "understand",
+      "hint": "It is the liquid a plant absorbs from the soil.",
+      "wrong_options": [
+        {
+          "option": "Carbon dioxide",
+          "misconception_id": "M1",
+          "misconception": "Confusing carbon input with the electron source."
+        },
+        {
+          "option": "Glucose",
+          "misconception_id": "M2",
+          "misconception": "Thinking product is the initial donor."
+        },
+        {
+          "option": "Nitrogen",
+          "misconception_id": "M3",
+          "misconception": "Assuming atmospheric gases act as electron donors."
+        }
+      ],
+      "review_section_id": "SEC-03",
+      "correct_order": [],
+      "pairs": [],
+      "visual": null,
+      "accepted_answers": []
     },
     {
       "question_id": "Q-04",
-      "section_id": "SEC-08",
+      "section_id": "SEC-06",
       "kind": "final",
       "question_type": "multiple_choice",
-      "prompt": "What role does chlorophyll play when it absorbs a photon in the reaction center?",
+      "prompt": "What are the main organic carbohydrate products of photosynthesis?",
       "options": [
-        "It releases carbon dioxide into the air",
-        "It loses an electron through charge separation to start an electron transport chain",
-        "It splits water directly without sunlight",
-        "It converts light into stored soil nutrients"
+        "Sugars like glucose",
+        "Mineral salts",
+        "Amino acids",
+        "Fatty acids"
       ],
-      "answer_key": "It loses an electron through charge separation to start an electron transport chain",
-      "explanation": "When chlorophyll absorbs light energy, the absorbed energy transfers to an electron via charge separation, donating a high-energy electron to an electron transport chain.",
+      "answer_key": "Sugars like glucose",
+      "explanation": "Photosynthesis stores energy in carbohydrates such as glucose.",
+      "objective_ids": [
+        "LO-01"
+      ],
+      "bloom_level": "understand",
+      "level": "understand",
+      "hint": "Plants produce sweet organic compounds for energy storage.",
+      "wrong_options": [
+        {
+          "option": "Mineral salts",
+          "misconception_id": "M4",
+          "misconception": "Confusing soil nutrients with photosynthetic products."
+        },
+        {
+          "option": "Amino acids",
+          "misconception_id": "M5",
+          "misconception": "Thinking proteins are the primary direct output."
+        },
+        {
+          "option": "Fatty acids",
+          "misconception_id": "M6",
+          "misconception": "Confusing lipids with primary carbohydrate products."
+        }
+      ],
+      "review_section_id": "SEC-03",
+      "correct_order": [],
+      "pairs": [],
+      "visual": null,
+      "accepted_answers": []
+    },
+    {
+      "question_id": "Q-05",
+      "section_id": "SEC-06",
+      "kind": "final",
+      "question_type": "multiple_choice",
+      "prompt": "During carbon fixation, carbon dioxide is converted into what type of compound?",
+      "options": [
+        "Carbohydrates",
+        "Water vapor",
+        "Oxygen gas",
+        "Chlorophyll"
+      ],
+      "answer_key": "Carbohydrates",
+      "explanation": "Carbon fixation converts carbon dioxide into carbohydrates.",
+      "objective_ids": [
+        "LO-01"
+      ],
+      "bloom_level": "understand",
+      "level": "understand",
+      "hint": "Carbon is built into energy-rich sugars.",
+      "wrong_options": [
+        {
+          "option": "Water vapor",
+          "misconception_id": "M7",
+          "misconception": "Confusing carbon products with water."
+        },
+        {
+          "option": "Oxygen gas",
+          "misconception_id": "M8",
+          "misconception": "Thinking carbon dioxide turns directly into oxygen."
+        },
+        {
+          "option": "Chlorophyll",
+          "misconception_id": "M9",
+          "misconception": "Confusing pigments with carbon compounds."
+        }
+      ],
+      "review_section_id": "SEC-03",
+      "correct_order": [],
+      "pairs": [],
+      "visual": null,
+      "accepted_answers": []
+    },
+    {
+      "question_id": "Q-06",
+      "section_id": "SEC-06",
+      "kind": "final",
+      "question_type": "multiple_choice",
+      "prompt": "Which pigment in the reaction centre gives up an electron when it absorbs light?",
+      "options": [
+        "Chlorophyll a",
+        "Carotene",
+        "Anthocyanin",
+        "Melanin"
+      ],
+      "answer_key": "Chlorophyll a",
+      "explanation": "Chlorophyll a acts as the pigment in the reaction centre that gives up an electron when it absorbs light.",
       "objective_ids": [
         "LO-02"
       ],
-      "bloom_level": "understand"
+      "bloom_level": "understand",
+      "level": "understand",
+      "hint": "It is the specific main type of chlorophyll.",
+      "wrong_options": [
+        {
+          "option": "Carotene",
+          "misconception_id": "M10",
+          "misconception": "Confusing accessory pigments with the reaction center donor."
+        },
+        {
+          "option": "Anthocyanin",
+          "misconception_id": "M11",
+          "misconception": "Assuming flower pigments drive photosynthesis."
+        },
+        {
+          "option": "Melanin",
+          "misconception_id": "M12",
+          "misconception": "Confusing animal pigments with plant pigments."
+        }
+      ],
+      "review_section_id": "SEC-04",
+      "correct_order": [],
+      "pairs": [],
+      "visual": null,
+      "accepted_answers": []
+    },
+    {
+      "question_id": "Q-07",
+      "section_id": "SEC-06",
+      "kind": "final",
+      "question_type": "multiple_choice",
+      "prompt": "Why do plant tissues typically appear green to our eyes?",
+      "options": [
+        "Chlorophyll poorly absorbs green wavelengths and reflects them",
+        "Green light is the most useful wavelength for energy conversion",
+        "Plants absorb all green light completely",
+        "Chlorophyll destroys green light"
+      ],
+      "answer_key": "Chlorophyll poorly absorbs green wavelengths and reflects them",
+      "explanation": "Chlorophyll is a poor absorber of green light, reflecting it and making leaves look green.",
+      "objective_ids": [
+        "LO-02"
+      ],
+      "bloom_level": "understand",
+      "level": "understand",
+      "hint": "The color you see is the one that is reflected rather than absorbed.",
+      "wrong_options": [
+        {
+          "option": "Green light is the most useful wavelength for energy conversion",
+          "misconception_id": "M13",
+          "misconception": "Thinking reflected light is the most absorbed."
+        },
+        {
+          "option": "Plants absorb all green light completely",
+          "misconception_id": "M14",
+          "misconception": "Confusing absorption with reflection."
+        },
+        {
+          "option": "Chlorophyll destroys green light",
+          "misconception_id": "M15",
+          "misconception": "Assuming pigments destroy light instead of reflecting it."
+        }
+      ],
+      "review_section_id": "SEC-04",
+      "correct_order": [],
+      "pairs": [],
+      "visual": null,
+      "accepted_answers": []
+    },
+    {
+      "question_id": "Q-08",
+      "section_id": "SEC-06",
+      "kind": "final",
+      "question_type": "order_steps",
+      "prompt": "Order the steps of how light energy initiates photosynthesis:",
+      "options": [],
+      "answer_key": "Sunlight photon reaches leaf -> Chlorophyll absorbs photon -> Electron is loosened -> Electron transport chain starts",
+      "explanation": "Sunlight hits the leaf, chlorophyll absorbs the photon, releases an electron, and starts the transport chain.",
+      "objective_ids": [
+        "LO-02"
+      ],
+      "bloom_level": "apply",
+      "level": "apply",
+      "hint": "Start with light hitting the leaf and end with electron transport.",
+      "wrong_options": [],
+      "review_section_id": "SEC-04",
+      "correct_order": [
+        "Sunlight photon reaches leaf",
+        "Chlorophyll absorbs photon",
+        "Electron is loosened",
+        "Electron transport chain starts"
+      ],
+      "pairs": [],
+      "visual": null,
+      "accepted_answers": []
+    },
+    {
+      "question_id": "Q-09",
+      "section_id": "SEC-06",
+      "kind": "final",
+      "question_type": "match_pairs",
+      "prompt": "Match each photosynthetic component to its role:",
+      "options": [],
+      "answer_key": "Water = Electron donor; Carbon dioxide = Carbon source for sugars; Sunlight = Energy driver; Chlorophyll = Photon absorber",
+      "explanation": "Water donates electrons, carbon dioxide provides carbon, sunlight drives energy, and chlorophyll absorbs photons.",
+      "objective_ids": [
+        "LO-01",
+        "LO-02"
+      ],
+      "bloom_level": "apply",
+      "level": "apply",
+      "hint": "Match each input or catalyst with its direct function.",
+      "wrong_options": [],
+      "review_section_id": "SEC-03",
+      "correct_order": [],
+      "pairs": [
+        [
+          "Water",
+          "Electron donor"
+        ],
+        [
+          "Carbon dioxide",
+          "Carbon source for sugars"
+        ],
+        [
+          "Sunlight",
+          "Energy driver"
+        ],
+        [
+          "Chlorophyll",
+          "Photon absorber"
+        ]
+      ],
+      "visual": null,
+      "accepted_answers": []
+    },
+    {
+      "question_id": "Q-10",
+      "section_id": "SEC-06",
+      "kind": "final",
+      "question_type": "scenario",
+      "prompt": "A researcher places a plant in an airtight chamber with water and light, but removes all carbon dioxide. What happens to sugar production?",
+      "options": [
+        "Sugar production stops because carbon dioxide is needed for carbon fixation",
+        "Sugar production increases because water is abundant",
+        "Sugar production continues normally using only water",
+        "Sugar production shifts to making proteins instead"
+      ],
+      "answer_key": "Sugar production stops because carbon dioxide is needed for carbon fixation",
+      "explanation": "Without carbon dioxide, carbon fixation cannot occur to form carbohydrates.",
+      "objective_ids": [
+        "LO-01"
+      ],
+      "bloom_level": "apply",
+      "level": "apply",
+      "hint": "Carbon dioxide is an indispensable input for creating sugars.",
+      "wrong_options": [
+        {
+          "option": "Sugar production increases because water is abundant",
+          "misconception_id": "M16",
+          "misconception": "Thinking water alone can substitute for carbon dioxide."
+        },
+        {
+          "option": "Sugar production continues normally using only water",
+          "misconception_id": "M17",
+          "misconception": "Ignoring the necessity of carbon inputs."
+        },
+        {
+          "option": "Sugar production shifts to making proteins instead",
+          "misconception_id": "M18",
+          "misconception": "Assuming plants switch metabolic pathways randomly."
+        }
+      ],
+      "review_section_id": "SEC-03",
+      "correct_order": [],
+      "pairs": [],
+      "visual": null,
+      "accepted_answers": []
+    },
+    {
+      "question_id": "Q-11",
+      "section_id": "SEC-06",
+      "kind": "final",
+      "question_type": "scenario",
+      "prompt": "If a mutation causes a plant's chlorophyll to fail at absorbing violet-blue light, what direct consequence follows?",
+      "options": [
+        "The light-dependent reaction efficiency drops because photon absorption is impaired",
+        "The plant stops needing water entirely",
+        "Carbon dioxide absorption increases to compensate",
+        "Oxygen production doubles immediately"
+      ],
+      "answer_key": "The light-dependent reaction efficiency drops because photon absorption is impaired",
+      "explanation": "Chlorophyll absorption of light is critical for driving the light reactions.",
+      "objective_ids": [
+        "LO-02"
+      ],
+      "bloom_level": "apply",
+      "level": "apply",
+      "hint": "If the solar collector fails, energy capture decreases.",
+      "wrong_options": [
+        {
+          "option": "The plant stops needing water entirely",
+          "misconception_id": "M19",
+          "misconception": "Confusing light absorption with water uptake."
+        },
+        {
+          "option": "Carbon dioxide absorption increases to compensate",
+          "misconception_id": "M20",
+          "misconception": "Assuming carbon fixation can run without light energy."
+        },
+        {
+          "option": "Oxygen production doubles immediately",
+          "misconception_id": "M21",
+          "misconception": "Thinking impaired reactions increase output."
+        }
+      ],
+      "review_section_id": "SEC-04",
+      "correct_order": [],
+      "pairs": [],
+      "visual": null,
+      "accepted_answers": []
+    },
+    {
+      "question_id": "Q-12",
+      "section_id": "SEC-06",
+      "kind": "final",
+      "question_type": "scenario",
+      "prompt": "Evaluate how removing sunlight would impact both the light reactions and carbon fixation in a plant.",
+      "options": [
+        "Both processes eventually halt because light energy powers electron flow and sugar building",
+        "Only carbon fixation stops while light reactions continue indefinitely",
+        "Only light reactions stop while sugar building speeds up",
+        "Neither process is affected because plants store unlimited energy"
+      ],
+      "answer_key": "Both processes eventually halt because light energy powers electron flow and sugar building",
+      "explanation": "Sunlight drives the energy needed for both the light-dependent reactions and subsequent carbon fixation.",
+      "objective_ids": [
+        "LO-01",
+        "LO-02"
+      ],
+      "bloom_level": "analyze",
+      "level": "transfer",
+      "hint": "Light is the fundamental energy engine for the entire photosynthetic cycle.",
+      "wrong_options": [
+        {
+          "option": "Only carbon fixation stops while light reactions continue indefinitely",
+          "misconception_id": "M22",
+          "misconception": "Assuming light reactions do not depend on continuous light."
+        },
+        {
+          "option": "Only light reactions stop while sugar building speeds up",
+          "misconception_id": "M23",
+          "misconception": "Thinking sugar building can run without products from light reactions."
+        },
+        {
+          "option": "Neither process is affected because plants store unlimited energy",
+          "misconception_id": "M24",
+          "misconception": "Believing plants do not require ongoing sunlight."
+        }
+      ],
+      "review_section_id": "SEC-04",
+      "correct_order": [],
+      "pairs": [],
+      "visual": null,
+      "accepted_answers": []
     }
   ],
   "videos": [
     {
       "video_id": "VID-01",
-      "title": "Photosynthesis | The Dr. Binocs Show | Learn Videos For Kids",
-      "url": "https://www.youtube.com/watch?v=D1Ymc311XS8",
+      "title": "Photosynthesis 3D animation",
+      "url": "https://www.youtube.com/watch?v=-E4EL4bZbXU",
       "source_id": "SRC-007",
       "section_id": null,
-      "duration_minutes": 4,
+      "duration_minutes": 5,
       "is_mandatory": false
     },
     {
       "video_id": "VID-02",
-      "title": "Photosynthesis 3D animation",
-      "url": "https://www.youtube.com/watch?v=-E4EL4bZbXU",
+      "title": "Photosynthesis | The Dr. Binocs Show | Learn Videos For Kids",
+      "url": "https://www.youtube.com/watch?v=D1Ymc311XS8",
       "source_id": "SRC-008",
       "section_id": null,
-      "duration_minutes": 5,
+      "duration_minutes": 4,
       "is_mandatory": false
     },
     {
@@ -402,6 +1208,76 @@
       "section_id": null,
       "duration_minutes": 1,
       "is_mandatory": false
+    }
+  ],
+  "remedials": [
+    {
+      "objective_id": "LO-01",
+      "takeaway": "Inputs feed the reaction; outputs provide energy and oxygen.",
+      "visual": {
+        "type": "visual",
+        "content": "",
+        "items": [],
+        "label": null,
+        "visual_type": "flowchart",
+        "elements": [
+          "Raw Inputs: Water and CO2",
+          "Cellular Factory",
+          "Products: Sugars and Oxygen"
+        ],
+        "connections": [
+          "Raw Inputs: Water and CO2 -> Cellular Factory",
+          "Cellular Factory -> Products: Sugars and Oxygen"
+        ],
+        "rows": [],
+        "caption": "Simplified input and output pipeline.",
+        "alt_text": "Flowchart showing raw inputs entering a factory and products exiting."
+      },
+      "explanation": [
+        "Think of photosynthesis as a kitchen where water and carbon dioxide are raw ingredients.",
+        "The plant cooks these ingredients using light energy to bake sweet sugars.",
+        "Oxygen gas is released out the window as a clean byproduct."
+      ],
+      "common_mix_ups": [
+        {
+          "misconception": "Soil is the main input for plant mass.",
+          "correction": "Plants get the bulk of their mass from carbon dioxide and water, not soil."
+        }
+      ]
+    },
+    {
+      "objective_id": "LO-02",
+      "takeaway": "Sunlight and chlorophyll work together like a solar panel system.",
+      "visual": {
+        "type": "visual",
+        "content": "",
+        "items": [],
+        "label": null,
+        "visual_type": "analogy_scene",
+        "elements": [
+          "Sun as battery charger",
+          "Chlorophyll as solar cell",
+          "Electron as electrical spark"
+        ],
+        "connections": [
+          "Sun as battery charger -> Chlorophyll as solar cell",
+          "Chlorophyll as solar cell -> Electron as electrical spark"
+        ],
+        "rows": [],
+        "caption": "Analogy of chlorophyll as a solar cell.",
+        "alt_text": "Analogy scene showing the sun charging a chlorophyll solar cell."
+      },
+      "explanation": [
+        "Chlorophyll molecules act as tiny solar panels inside plant leaves.",
+        "When sunlight hits chlorophyll, it knocks electrons loose to start electrical energy flow.",
+        "Without chlorophyll or sunlight, the plant cannot jump-start this energy conversion."
+      ],
+      "common_mix_ups": [
+        {
+          "misconception": "Green light is absorbed best by leaves.",
+          "correction": "Green light is reflected, which is why leaves look green; blue and red light are absorbed."
+        }
+      ]
     }
   ]
 }

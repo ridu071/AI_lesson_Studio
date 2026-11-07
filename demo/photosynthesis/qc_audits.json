@@ -4,7 +4,7 @@
     "audit_type": "qc1",
     "lesson_id": "LES-001",
     "version": 2,
-    "content_hash": "610f9aa6b235688809869b911ad5e4e1adef4aa67da05f9feea7e8c51730c0c7",
+    "content_hash": "938c7dd3095412ef7c7bb929ca7b38fee8faa189f781354f6e4278ebe4545e63",
     "rubric_version": "0.1.0",
     "status": "passed",
     "score": 100.0,
@@ -63,7 +63,7 @@
             "note": null
           }
         ],
-        "explanation": "Claim CL-01 is supported: The passage states that photosynthesis is the process by which photopigment-bearing autotrophic organisms like plants, algae, and cyanobacteria convert sunlight into chemical energy."
+        "explanation": "Claim CL-01 is supported: The passage states that photosynthetic organisms convert light energy into chemical energy."
       },
       {
         "claim_id": "CL-02",
@@ -73,74 +73,31 @@
             "source_id": "SRC-001",
             "passage_id": "EV-001",
             "note": null
-          }
-        ],
-        "explanation": "Claim CL-02 is supported: The passage states that oxygenic photosynthesis releases oxygen as a byproduct of water splitting in most plants, algae, and cyanobacteria."
-      },
-      {
-        "claim_id": "CL-03",
-        "verdict": "supported",
-        "evidence": [
+          },
           {
             "source_id": "SRC-001",
             "passage_id": "EV-004",
             "note": null
           }
         ],
-        "explanation": "Claim CL-03 is supported: The passage states that carbon dioxide is converted into sugars in a process called carbon fixation."
+        "explanation": "Claim CL-02 is supported: The passage notes that photosynthesis releases oxygen and stores energy in carbohydrates derived from carbon."
       },
       {
-        "claim_id": "CL-04",
-        "verdict": "supported",
-        "evidence": [
-          {
-            "source_id": "SRC-001",
-            "passage_id": "EV-001",
-            "note": null
-          }
-        ],
-        "explanation": "Claim CL-04 is supported: The passage states that photosynthetic organisms store converted chemical energy within the bonds of intracellular organic compounds like carbohydrates, sugars, and cellulose."
-      },
-      {
-        "claim_id": "CL-05",
+        "claim_id": "CL-03",
         "verdict": "supported",
         "evidence": [
           {
             "source_id": "SRC-002",
-            "passage_id": "EV-020",
+            "passage_id": "EV-022",
             "note": null
           }
         ],
-        "explanation": "Claim CL-05 is supported: The passage defines chlorophyll as green pigments and photochemical catalysts found in cyanobacteria and chloroplasts of algae and plants."
-      },
-      {
-        "claim_id": "CL-06",
-        "verdict": "supported",
-        "evidence": [
-          {
-            "source_id": "SRC-002",
-            "passage_id": "EV-020",
-            "note": null
-          }
-        ],
-        "explanation": "Claim CL-06 is supported: The passage explicitly states that chlorophyll allows plants to absorb energy from light."
-      },
-      {
-        "claim_id": "CL-07",
-        "verdict": "supported",
-        "evidence": [
-          {
-            "source_id": "SRC-001",
-            "passage_id": "EV-008",
-            "note": null
-          }
-        ],
-        "explanation": "Claim CL-07 is supported: The passage describes chlorophyll absorbing photons and the water molecule ultimately being split in photolysis."
+        "explanation": "Claim CL-03 is supported: The passage explains that chlorophyll absorbs light energy and transfers it to an electron."
       }
     ],
     "coverage": [],
-    "started_at": "2026-11-07T11:11:18.659961Z",
-    "completed_at": "2026-11-07T11:11:22.594379Z",
+    "started_at": "2026-11-07T16:33:57.850668Z",
+    "completed_at": "2026-11-07T16:34:00.177226Z",
     "error_message": null
   },
   "qc2": {
@@ -148,7 +105,7 @@
     "audit_type": "qc2",
     "lesson_id": "LES-001",
     "version": 2,
-    "content_hash": "610f9aa6b235688809869b911ad5e4e1adef4aa67da05f9feea7e8c51730c0c7",
+    "content_hash": "938c7dd3095412ef7c7bb929ca7b38fee8faa189f781354f6e4278ebe4545e63",
     "rubric_version": "0.1.0",
     "status": "passed",
     "score": 100.0,
@@ -203,7 +160,7 @@
     ],
     "llm_model": "gemini-3.5-flash-lite",
     "prompt_versions": {
-      "qc2/llm_review": "0.2.0"
+      "qc2/llm_review": "0.3.0"
     },
     "issues": [],
     "claim_assessments": [],
@@ -223,14 +180,14 @@
         "assessed": true
       }
     ],
-    "started_at": "2026-11-07T11:11:22.595392Z",
-    "completed_at": "2026-11-07T11:11:25.401485Z",
+    "started_at": "2026-11-07T16:34:00.180263Z",
+    "completed_at": "2026-11-07T16:34:04.560947Z",
     "error_message": null
   },
   "release": {
     "lesson_id": "LES-001",
     "version": 2,
-    "content_hash": "610f9aa6b235688809869b911ad5e4e1adef4aa67da05f9feea7e8c51730c0c7",
+    "content_hash": "938c7dd3095412ef7c7bb929ca7b38fee8faa189f781354f6e4278ebe4545e63",
     "qc1_audit_id": "AUD-LES-001-V2-QC1",
     "qc2_audit_id": "AUD-LES-001-V2-QC2",
     "decision": "eligible_for_instructor_review",
@@ -239,6 +196,6 @@
       "QC2 passed with score 100.0."
     ],
     "blocking_issue_ids": [],
-    "decided_at": "2026-11-07T11:11:25.402991Z"
+    "decided_at": "2026-11-07T16:34:04.560947Z"
   }
 }

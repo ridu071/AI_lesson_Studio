@@ -1,6 +1,6 @@
 # QC2 - Instructional quality - audit report
 
-Lesson: **HTTP Requests and Responses** - version 2 - content hash `d8e3853320c3`
+Lesson: **HTTP Requests and Responses** - version 1 - content hash `2575a3c989ce`
 
 
 Status: **passed** - score: **100 / 100**
@@ -27,4 +27,4 @@ No issues found.
 
 ---
 
-Rubric 0.1.0 - model gemini-3.5-flash-lite - prompts: qc2/llm_review 0.2.0 - checks run: assessment_check, coverage_check, duration_check, instructional_review, structure_check
+Rubric 0.1.0 - model gemini-3.5-flash-lite - prompts: qc2/llm_review 0.3.0 - checks run: assessment_check, coverage_check, duration_check, instructional_review, structure_check

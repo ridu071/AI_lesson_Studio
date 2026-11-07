@@ -1,4 +1,4 @@
-"""Health check for the Step 1 environment.
+"""Health check for the local environment.
 
 Run from the backend folder:
     python scripts/check_setup.py
@@ -67,9 +67,9 @@ def check_settings() -> None:
         record("MAX_LESSON_MINUTES is 45", settings.max_lesson_minutes == 45,
                f"found {settings.max_lesson_minutes}")
         # Optional in Step 1, so this is information, not a pass/fail check.
-        print(f"[INFO] .env file found: {ENV_FILE.exists()} (optional in Step 1; defaults are used if missing)")
+        print(f"[INFO] .env file found: {ENV_FILE.exists()} (defaults are used if missing)")
         # Never print the key itself. Only report whether one is present.
-        print(f"[INFO] LLM key configured: {settings.llm_configured} (not required in Step 1)")
+        print(f"[INFO] LLM key configured: {settings.llm_configured} (needed to generate lessons)")
     except Exception as exc:  # noqa: BLE001 - we want to show any problem clearly
         record("Settings load without errors", False, f"{type(exc).__name__}: {exc}")
 
@@ -107,4 +107,4 @@ if __name__ == "__main__":
     if failed:
         print(f"{len(failed)} check(s) failed. Fix them and run this script again.")
         sys.exit(1)
-    print("All required checks passed. Step 1 environment is ready.")
+    print("All required checks passed. The environment is ready.")

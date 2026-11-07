@@ -1,35 +1,92 @@
 {
   "lesson_id": "LES-001",
-  "version": 2,
+  "version": 1,
   "title": "HTTP Requests and Responses",
   "learner_level": "beginner",
-  "stated_duration_minutes": 42,
+  "stated_duration_minutes": 45,
   "learning_objectives": [
     {
       "id": "LO-01",
-      "description": "Explain GET and POST methods.",
+      "description": "Explain GET and POST methods",
       "bloom_level": "understand"
     },
     {
       "id": "LO-02",
-      "description": "Distinguish between 2xx, 4xx, and 5xx response status categories.",
-      "bloom_level": "analyze"
+      "description": "Distinguish between 2xx, 4xx, and 5xx response status categories",
+      "bloom_level": "understand"
     }
   ],
   "sections": [
     {
       "section_id": "SEC-01",
       "section_type": "introduction",
-      "title": "Introduction to HTTP Protocols",
-      "duration_minutes": 5,
+      "title": "Intro and goal",
+      "duration_minutes": 4,
       "objective_ids": [
         "LO-01",
         "LO-02"
       ],
       "content_blocks": [
         {
-          "type": "explanation",
-          "content": "HTTP is a request-response protocol in the client-server model. A transaction starts with a client submitting a request to the server, and the server returns a response describing the disposition of the request."
+          "type": "takeaway",
+          "content": "Every time you load a webpage, your browser talks to a web server using HTTP messages.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "example",
+          "content": "Imagine typing a web address into your browser and pressing enter. Behind the scenes, your browser sends a request, and the server replies with the page you wanted.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "visual",
+          "content": "",
+          "items": [],
+          "label": null,
+          "visual_type": "flowchart",
+          "elements": [
+            "Client Browser",
+            "HTTP Request",
+            "Web Server",
+            "HTTP Response"
+          ],
+          "connections": [
+            "Client Browser -> HTTP Request: sends",
+            "HTTP Request -> Web Server: reaches",
+            "Web Server -> HTTP Response: returns",
+            "HTTP Response -> Client Browser: delivers"
+          ],
+          "rows": [],
+          "caption": "The basic client-server transaction cycle in HTTP.",
+          "alt_text": "A flowchart showing a client sending an HTTP request to a server, which returns an HTTP response."
+        },
+        {
+          "type": "bullets",
+          "content": "",
+          "items": [
+            "Explain GET and POST methods",
+            "Distinguish between 2xx, 4xx, and 5xx response status categories"
+          ],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
         }
       ],
       "source_ids": [
@@ -38,9 +95,386 @@
     },
     {
       "section_id": "SEC-02",
-      "section_type": "learning_objectives",
-      "title": "Lesson Objectives",
-      "duration_minutes": 2,
+      "section_type": "concept_explanation",
+      "title": "Overview of HTTP Protocol",
+      "duration_minutes": 3,
+      "objective_ids": [
+        "LO-01",
+        "LO-02"
+      ],
+      "content_blocks": [
+        {
+          "type": "takeaway",
+          "content": "HTTP is a stateless request-response protocol running in a client-server model.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "definition",
+          "content": "Protocol: A set of rules defining how messages are formatted and exchanged between computers.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "definition",
+          "content": "Client: The user agent, such as a web browser, that initiates requests.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "definition",
+          "content": "Server: The host system that receives requests, processes them, and returns responses.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "definition",
+          "content": "Stateless Protocol: A protocol where the server does not retain status information about each user across multiple requests.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "visual",
+          "content": "",
+          "items": [],
+          "label": null,
+          "visual_type": "concept_map",
+          "elements": [
+            "HTTP Protocol",
+            "Client",
+            "Server",
+            "Request",
+            "Response"
+          ],
+          "connections": [
+            "HTTP Protocol -> Client: uses",
+            "HTTP Protocol -> Server: uses",
+            "Client -> Request: sends",
+            "Server -> Response: returns"
+          ],
+          "rows": [],
+          "caption": "Core relationships within the HTTP architecture.",
+          "alt_text": "A concept map showing HTTP connecting clients, servers, requests, and responses."
+        }
+      ],
+      "source_ids": [
+        "SRC-001"
+      ]
+    },
+    {
+      "section_id": "SEC-03",
+      "section_type": "concept_explanation",
+      "title": "Core idea 1: Understanding GET and POST Methods",
+      "duration_minutes": 8,
+      "objective_ids": [
+        "LO-01"
+      ],
+      "content_blocks": [
+        {
+          "type": "takeaway",
+          "content": "Methods classify the desired action a client wants to perform on a resource.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "visual",
+          "content": "",
+          "items": [],
+          "label": null,
+          "visual_type": "table",
+          "elements": [],
+          "connections": [],
+          "rows": [
+            [
+              "Method",
+              "Primary Purpose",
+              "Cacheable?"
+            ],
+            [
+              "GET",
+              "Retrieve a resource",
+              "Yes"
+            ],
+            [
+              "POST",
+              "Submit data for processing",
+              "Yes"
+            ]
+          ],
+          "caption": "Comparison of GET and POST characteristics.",
+          "alt_text": "A table comparing GET and POST methods by purpose and cacheability."
+        },
+        {
+          "type": "explanation",
+          "content": "A request method is a verb in the start line of an HTTP request. GET is a safe method meant for read-only access. POST is used when you need to send data to the server.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "example",
+          "content": "Using GET is like reading a book from a library shelf. Using POST is like filling out a paper form and handing it to the librarian to create a new library card.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "visual",
+          "content": "",
+          "items": [],
+          "label": null,
+          "visual_type": "analogy_scene",
+          "elements": [
+            "Library Shelf",
+            "GET Request",
+            "Submission Form",
+            "POST Request"
+          ],
+          "connections": [
+            "Library Shelf -> GET Request: matches read-only action",
+            "Submission Form -> POST Request: matches data submission action"
+          ],
+          "rows": [],
+          "caption": "Analogy linking real-world actions to HTTP methods.",
+          "alt_text": "An analogy scene mapping reading a shelf to GET and submitting a form to POST."
+        }
+      ],
+      "source_ids": [
+        "SRC-001"
+      ]
+    },
+    {
+      "section_id": "SEC-04",
+      "section_type": "concept_explanation",
+      "title": "Core idea 2: Response Status Categories (2xx, 4xx, 5xx)",
+      "duration_minutes": 8,
+      "objective_ids": [
+        "LO-02"
+      ],
+      "content_blocks": [
+        {
+          "type": "takeaway",
+          "content": "HTTP response status codes tell the client whether a request succeeded or failed, and who is responsible.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "visual",
+          "content": "",
+          "items": [],
+          "label": null,
+          "visual_type": "labeled_diagram",
+          "elements": [
+            "Status Code Categories",
+            "2xx Success",
+            "4xx Client Error",
+            "5xx Server Error"
+          ],
+          "connections": [
+            "Status Code Categories -> 2xx Success: includes",
+            "Status Code Categories -> 4xx Client Error: includes",
+            "Status Code Categories -> 5xx Server Error: includes"
+          ],
+          "rows": [],
+          "caption": "The major response code categories.",
+          "alt_text": "A labeled diagram showing status categories broken into 2xx, 4xx, and 5xx."
+        },
+        {
+          "type": "explanation",
+          "content": "A 2xx status indicates that the client request was successfully received, understood, and accepted. A 4xx status indicates an error caused by the client. A 5xx status indicates the server encountered an error.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "example",
+          "content": "If you misspell a URL and get a 404, the client request had a problem. If the website crashes because its database is down, it returns a 500 server error.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "visual",
+          "content": "",
+          "items": [],
+          "label": null,
+          "visual_type": "table",
+          "elements": [],
+          "connections": [],
+          "rows": [
+            [
+              "Category",
+              "Meaning",
+              "Responsible Party"
+            ],
+            [
+              "2xx",
+              "Success",
+              "None"
+            ],
+            [
+              "4xx",
+              "Client Error",
+              "Client"
+            ],
+            [
+              "5xx",
+              "Server Error",
+              "Server"
+            ]
+          ],
+          "caption": "Breakdown of HTTP response status categories.",
+          "alt_text": "A table detailing 2xx, 4xx, and 5xx categories and who is responsible for the error."
+        }
+      ],
+      "source_ids": []
+    },
+    {
+      "section_id": "SEC-05",
+      "section_type": "worked_examples",
+      "title": "Worked example: Analyzing an HTTP Transaction",
+      "duration_minutes": 7,
+      "objective_ids": [
+        "LO-01",
+        "LO-02"
+      ],
+      "content_blocks": [
+        {
+          "type": "takeaway",
+          "content": "Tracing a request and response reveals how methods and status codes work together.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "visual",
+          "content": "",
+          "items": [],
+          "label": null,
+          "visual_type": "code_snippet",
+          "elements": [
+            "Request Line",
+            "Response Line"
+          ],
+          "connections": [],
+          "rows": [],
+          "caption": "Sample HTTP request and response start lines.",
+          "alt_text": "Code snippet showing GET request and 200 OK response lines."
+        },
+        {
+          "type": "bullets",
+          "content": "",
+          "items": [
+            "Step 1: Client prepares a GET request for /customer/123. (Why: Retrieves a specific resource safely.)",
+            "Step 2: Client sends the request over the established connection. (Why: Transmits the action verb and URI to the server.)",
+            "Step 3: Server receives and processes the request. (Why: Determines if the resource exists and if the user is authorized.)",
+            "Step 4: Server returns a response starting with HTTP/1.1 200 OK. (Why: Indicates success and that the requested resource entity is attached.)",
+            "Step 5: If the server encountered a bug, it would return a 5xx status instead. (Why: Signals that the server failed to fulfill a valid request.)"
+          ],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "visual",
+          "content": "",
+          "items": [],
+          "label": null,
+          "visual_type": "flowchart",
+          "elements": [
+            "GET /customer/123",
+            "Server Processing",
+            "200 OK Response"
+          ],
+          "connections": [
+            "GET /customer/123 -> Server Processing: triggers",
+            "Server Processing -> 200 OK Response: produces"
+          ],
+          "rows": [],
+          "caption": "Flow of the worked example transaction.",
+          "alt_text": "A flowchart showing GET request moving to server processing and ending in a 200 OK response."
+        }
+      ],
+      "source_ids": [
+        "SRC-001"
+      ]
+    },
+    {
+      "section_id": "SEC-06",
+      "section_type": "final_assessment",
+      "title": "Test",
+      "duration_minutes": 10,
       "objective_ids": [
         "LO-01",
         "LO-02"
@@ -48,69 +482,51 @@
       "content_blocks": [
         {
           "type": "explanation",
-          "content": "In this lesson, you will learn to explain GET and POST methods and distinguish between 2xx, 4xx, and 5xx response status categories."
+          "content": "This test consists of 10 questions covering GET/POST methods and status code categories. A hint is available for each question, and answers appear only after submission.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "visual",
+          "content": "",
+          "items": [],
+          "label": null,
+          "visual_type": "table",
+          "elements": [],
+          "connections": [],
+          "rows": [
+            [
+              "Objective",
+              "Tested Concepts",
+              "Question Count"
+            ],
+            [
+              "LO-01",
+              "GET and POST methods",
+              "5"
+            ],
+            [
+              "LO-02",
+              "Status code categories (2xx, 4xx, 5xx)",
+              "5"
+            ]
+          ],
+          "caption": "Test coverage overview.",
+          "alt_text": "A table mapping learning objectives to question counts in the final assessment."
         }
       ],
       "source_ids": []
     },
     {
-      "section_id": "SEC-03",
-      "section_type": "concept_explanation",
-      "title": "Understanding GET and POST Methods",
-      "duration_minutes": 8,
-      "objective_ids": [
-        "LO-01"
-      ],
-      "content_blocks": [
-        {
-          "type": "definition",
-          "content": "A request identifies a method to classify the desired action to be performed on a resource."
-        },
-        {
-          "type": "explanation",
-          "content": "The GET method requests a representation of a resource. The server should only retrieve data and not modify state. GET is preferred over POST for retrieving without making changes because it can be addressed through a URL, enabling bookmarking, sharing, and caching."
-        },
-        {
-          "type": "explanation",
-          "content": "The POST method is used for actions where data is sent to the server, and the response contains an entity describing or containing the result of the action."
-        },
-        {
-          "type": "example",
-          "content": "When a client sends a GET request for a customer resource, the request start line specifies method GET, URI /customer/123, and protocol version HTTP/1.1."
-        }
-      ],
-      "source_ids": [
-        "SRC-001",
-        "SRC-002"
-      ]
-    },
-    {
-      "section_id": "SEC-04",
-      "section_type": "concept_explanation",
-      "title": "Understanding Response Status Categories",
-      "duration_minutes": 8,
-      "objective_ids": [
-        "LO-02"
-      ],
-      "content_blocks": [
-        {
-          "type": "definition",
-          "content": "A response is sent to the client by the server, starting with a protocol version, a status code, and optionally a reason phrase."
-        },
-        {
-          "type": "explanation",
-          "content": "Standard 2xx responses indicate successful HTTP requests. A 4xx status code is for situations in which an error seems to have been caused by the client. A 5xx status code indicates that the server is aware that it has encountered an error or is otherwise incapable of performing the request."
-        }
-      ],
-      "source_ids": [
-        "SRC-001",
-        "SRC-002"
-      ]
-    },
-    {
-      "section_id": "SEC-05",
-      "section_type": "worked_examples",
-      "title": "Worked Examples of Requests and Responses",
+      "section_id": "SEC-07",
+      "section_type": "summary",
+      "title": "Recap",
       "duration_minutes": 5,
       "objective_ids": [
         "LO-01",
@@ -118,86 +534,101 @@
       ],
       "content_blocks": [
         {
-          "type": "example",
-          "content": "For a successful GET request, the server returns a 200 status code where the response contains an entity corresponding to the requested resource. For a POST request, the response contains an entity describing or containing the result of the action."
+          "type": "takeaway",
+          "content": "You now understand how HTTP requests use methods like GET and POST, and how responses categorize outcomes using 2xx, 4xx, and 5xx codes.",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "bullets",
+          "content": "",
+          "items": [
+            "HTTP is a stateless request-response protocol between clients and servers.",
+            "GET requests are safe, read-only operations used to retrieve resources.",
+            "POST requests submit data to the server for processing.",
+            "2xx codes denote success, 4xx client errors, and 5xx server errors."
+          ],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "visual",
+          "content": "",
+          "items": [],
+          "label": null,
+          "visual_type": "table",
+          "elements": [],
+          "connections": [],
+          "rows": [
+            [
+              "Concept",
+              "Key Summary"
+            ],
+            [
+              "GET",
+              "Safe, read-only retrieval"
+            ],
+            [
+              "POST",
+              "Submits data for action"
+            ],
+            [
+              "2xx",
+              "Successful request"
+            ],
+            [
+              "4xx",
+              "Client-side error"
+            ],
+            [
+              "5xx",
+              "Server-side error"
+            ]
+          ],
+          "caption": "Cheat-sheet table for HTTP methods and response codes.",
+          "alt_text": "A cheat-sheet table summarizing GET, POST, 2xx, 4xx, and 5xx."
+        },
+        {
+          "type": "takeaway",
+          "content": "Next steps:",
+          "items": [],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
+        },
+        {
+          "type": "bullets",
+          "content": "",
+          "items": [
+            "Explore browser developer tools to inspect live HTTP traffic.",
+            "Read about additional HTTP methods like PUT and DELETE."
+          ],
+          "label": null,
+          "visual_type": null,
+          "elements": [],
+          "connections": [],
+          "rows": [],
+          "caption": null,
+          "alt_text": null
         }
       ],
       "source_ids": [
-        "SRC-002"
-      ]
-    },
-    {
-      "section_id": "SEC-06",
-      "section_type": "practical_application",
-      "title": "Practical Application Activity",
-      "duration_minutes": 6,
-      "objective_ids": [
-        "LO-01",
-        "LO-02"
-      ],
-      "content_blocks": [
-        {
-          "type": "explanation",
-          "content": "Apply your knowledge by categorizing various HTTP transactions based on methods and status codes."
-        }
-      ],
-      "source_ids": [
-        "SRC-001",
-        "SRC-002"
-      ]
-    },
-    {
-      "section_id": "SEC-07",
-      "section_type": "knowledge_check",
-      "title": "Knowledge Check",
-      "duration_minutes": 3,
-      "objective_ids": [
-        "LO-01",
-        "LO-02"
-      ],
-      "content_blocks": [
-        {
-          "type": "explanation",
-          "content": "Answer the following questions to check your understanding of HTTP methods and status categories."
-        }
-      ],
-      "source_ids": []
-    },
-    {
-      "section_id": "SEC-08",
-      "section_type": "final_assessment",
-      "title": "Final Assessment",
-      "duration_minutes": 3,
-      "objective_ids": [
-        "LO-01",
-        "LO-02"
-      ],
-      "content_blocks": [
-        {
-          "type": "explanation",
-          "content": "Complete the final assessment questions to demonstrate your mastery of HTTP requests and responses."
-        }
-      ],
-      "source_ids": []
-    },
-    {
-      "section_id": "SEC-09",
-      "section_type": "summary",
-      "title": "Lesson Summary",
-      "duration_minutes": 2,
-      "objective_ids": [
-        "LO-01",
-        "LO-02"
-      ],
-      "content_blocks": [
-        {
-          "type": "explanation",
-          "content": "You have reviewed how GET and POST methods function and how to distinguish between 2xx, 4xx, and 5xx response status categories."
-        }
-      ],
-      "source_ids": [
-        "SRC-001",
-        "SRC-002"
+        "SRC-001"
       ]
     }
   ],
@@ -205,7 +636,7 @@
     {
       "claim_id": "CL-01",
       "section_id": "SEC-01",
-      "text": "HTTP is a request–response protocol in the client–server model.",
+      "text": "HTTP is a request-response protocol in the client-server model.",
       "claim_type": "factual",
       "source_ids": [
         "SRC-001"
@@ -213,9 +644,9 @@
     },
     {
       "claim_id": "CL-02",
-      "section_id": "SEC-03",
-      "text": "A request identifies a method to classify the desired action to be performed on a resource.",
-      "claim_type": "definition",
+      "section_id": "SEC-02",
+      "text": "HTTP is a stateless protocol that does not require the web server to retain user status across multiple requests.",
+      "claim_type": "factual",
       "source_ids": [
         "SRC-001"
       ]
@@ -223,7 +654,7 @@
     {
       "claim_id": "CL-03",
       "section_id": "SEC-03",
-      "text": "The server should only retrieve data; not modify state when handling GET.",
+      "text": "GET is defined as a safe, read-only request method.",
       "claim_type": "factual",
       "source_ids": [
         "SRC-001"
@@ -231,8 +662,8 @@
     },
     {
       "claim_id": "CL-04",
-      "section_id": "SEC-04",
-      "text": "A response is sent to the client by the server, and the start line consists of the protocol version, a status code and optionally a reason phrase.",
+      "section_id": "SEC-03",
+      "text": "POST is defined as a cacheable request method used to submit data.",
       "claim_type": "factual",
       "source_ids": [
         "SRC-001"
@@ -241,7 +672,7 @@
     {
       "claim_id": "CL-05",
       "section_id": "SEC-04",
-      "text": "A 4xx status code is for situations in which an error seems to have been caused by the client.",
+      "text": "A 2xx status indicates that the action requested by the client was received, understood, and accepted.",
       "claim_type": "factual",
       "source_ids": [
         "SRC-002"
@@ -250,7 +681,7 @@
     {
       "claim_id": "CL-06",
       "section_id": "SEC-04",
-      "text": "5xx status indicates that the server is aware that it has encountered an error or is otherwise incapable of performing the request.",
+      "text": "A 4xx status code is for situations where an error seems to have been caused by the client.",
       "claim_type": "factual",
       "source_ids": [
         "SRC-002"
@@ -258,8 +689,8 @@
     },
     {
       "claim_id": "CL-07",
-      "section_id": "SEC-05",
-      "text": "Standard response for successful HTTP requests is 2xx.",
+      "section_id": "SEC-04",
+      "text": "A 5xx status indicates that the server is aware it encountered an error or is incapable of performing the request.",
       "claim_type": "factual",
       "source_ids": [
         "SRC-002"
@@ -269,91 +700,487 @@
   "activities": [
     {
       "activity_id": "ACT-01",
-      "section_id": "SEC-06",
-      "title": "Analyze HTTP Transactions",
-      "instructions": "Examine a set of sample HTTP transaction logs. Identify whether each transaction uses a GET or POST method and categorize their return codes into 2xx, 4xx, or 5xx status categories. Analyze the following 6 sample transactions: 1. GET /index.html 200, 2. POST /submit 201, 3. GET /missing 404, 4. POST /update 400, 5. GET /error 500, 6. POST /fail 503.",
-      "duration_minutes": 6,
+      "section_id": "SEC-05",
+      "title": "Try it: Identify Method and Status Category",
+      "instructions": "Review a scenario where a client submits user profile updates using POST and receives a 500 error response. State which method was used and which status code category the error belongs to.",
+      "duration_minutes": 2,
       "objective_ids": [
         "LO-01",
         "LO-02"
       ],
-      "is_mandatory": true
+      "is_mandatory": true,
+      "hint": "Recall that sending new data uses POST, and 5xx codes indicate server-side issues.",
+      "answer": "Method: POST. Status category: 5xx server error."
     }
   ],
   "assessments": [
     {
       "question_id": "Q-01",
-      "section_id": "SEC-07",
+      "section_id": "SEC-03",
       "kind": "knowledge_check",
-      "question_type": "true_false",
-      "prompt": "The GET method is intended to modify the server's state.",
-      "options": [
-        "True",
-        "False"
-      ],
-      "answer_key": "False",
-      "explanation": "GET requests should only retrieve data and not modify state.",
+      "question_type": "short_answer",
+      "prompt": "What term describes a request method like GET that has no intended effect on the server state?",
+      "options": [],
+      "answer_key": "safe",
+      "explanation": "GET is defined as a safe method meant for read-only access.",
       "objective_ids": [
         "LO-01"
       ],
-      "bloom_level": "understand"
+      "bloom_level": "understand",
+      "level": "understand",
+      "hint": "Think about whether safe methods modify server data.",
+      "wrong_options": [],
+      "review_section_id": null,
+      "correct_order": [],
+      "pairs": [],
+      "visual": null,
+      "accepted_answers": []
     },
     {
       "question_id": "Q-02",
-      "section_id": "SEC-07",
+      "section_id": "SEC-04",
       "kind": "knowledge_check",
-      "question_type": "multiple_choice",
-      "prompt": "Which status code category indicates an error caused by the client?",
-      "options": [
-        "2xx",
-        "4xx",
-        "5xx",
-        "1xx"
-      ],
+      "question_type": "short_answer",
+      "prompt": "Which HTTP status code category indicates an error caused by the client?",
+      "options": [],
       "answer_key": "4xx",
-      "explanation": "A 4xx status code is for situations where an error seems to have been caused by the client.",
+      "explanation": "4xx status codes are designated for client-side errors.",
       "objective_ids": [
         "LO-02"
       ],
-      "bloom_level": "understand"
+      "bloom_level": "understand",
+      "level": "understand",
+      "hint": "Look for the category starting with number 4.",
+      "wrong_options": [],
+      "review_section_id": null,
+      "correct_order": [],
+      "pairs": [],
+      "visual": null,
+      "accepted_answers": []
     },
     {
       "question_id": "Q-03",
-      "section_id": "SEC-08",
-      "kind": "final",
-      "question_type": "scenario",
-      "prompt": "A client application attempts to fetch a user profile using a URL, but receives a 500-range status code back from the server. Based on this, how should you explain the outcome?",
-      "options": [
-        "The server encountered an internal error or is incapable of performing the request.",
-        "The client submitted an invalid URL.",
-        "The request was successful.",
-        "The client needs to send a POST method instead."
-      ],
-      "answer_key": "The server encountered an internal error or is incapable of performing the request.",
-      "explanation": "5xx status codes indicate that the server is aware that it has encountered an error or is otherwise incapable of performing the request.",
-      "objective_ids": [
-        "LO-02"
-      ],
-      "bloom_level": "analyze"
-    },
-    {
-      "question_id": "Q-04",
-      "section_id": "SEC-08",
+      "section_id": "SEC-06",
       "kind": "final",
       "question_type": "multiple_choice",
-      "prompt": "Why is GET preferred over POST when retrieving data without modifying state?",
+      "prompt": "Which HTTP method is defined as safe and intended for read-only resource retrieval?",
       "options": [
-        "Because GET requests can be addressed through a URL, enabling bookmarking, sharing, and caching.",
-        "Because POST cannot transmit data.",
-        "Because GET modifies the server state securely.",
-        "Because POST requests are always faster."
+        "POST",
+        "GET",
+        "PUT",
+        "DELETE"
       ],
-      "answer_key": "Because GET requests can be addressed through a URL, enabling bookmarking, sharing, and caching.",
-      "explanation": "GET is preferred for retrieving without making changes as it can be addressed through a URL, enabling bookmarking, sharing, and caching.",
+      "answer_key": "GET",
+      "explanation": "GET is a safe, read-only method.",
       "objective_ids": [
         "LO-01"
       ],
-      "bloom_level": "understand"
+      "bloom_level": "understand",
+      "level": "understand",
+      "hint": "Think about retrieving versus submitting data.",
+      "wrong_options": [
+        {
+          "option": "POST",
+          "misconception_id": "M1",
+          "misconception": "Confusing data submission with safe retrieval."
+        },
+        {
+          "option": "PUT",
+          "misconception_id": "M2",
+          "misconception": "Assuming updating methods are read-only."
+        },
+        {
+          "option": "DELETE",
+          "misconception_id": "M3",
+          "misconception": "Confusing deletion with reading."
+        }
+      ],
+      "review_section_id": "SEC-03",
+      "correct_order": [],
+      "pairs": [],
+      "visual": null,
+      "accepted_answers": []
+    },
+    {
+      "question_id": "Q-04",
+      "section_id": "SEC-06",
+      "kind": "final",
+      "question_type": "multiple_choice",
+      "prompt": "What is the primary purpose of the POST method in HTTP?",
+      "options": [
+        "To delete existing server resources",
+        "To submit data for server processing",
+        "To retrieve a read-only document",
+        "To check if a connection is alive"
+      ],
+      "answer_key": "To submit data for server processing",
+      "explanation": "POST is used to send data to the server.",
+      "objective_ids": [
+        "LO-01"
+      ],
+      "bloom_level": "understand",
+      "level": "understand",
+      "hint": "POST is associated with sending form data.",
+      "wrong_options": [
+        {
+          "option": "To delete existing server resources",
+          "misconception_id": "M4",
+          "misconception": "Confusing POST with DELETE."
+        },
+        {
+          "option": "To retrieve a read-only document",
+          "misconception_id": "M5",
+          "misconception": "Confusing POST with GET."
+        },
+        {
+          "option": "To check if a connection is alive",
+          "misconception_id": "M6",
+          "misconception": "Confusing POST with connection checks."
+        }
+      ],
+      "review_section_id": "SEC-03",
+      "correct_order": [],
+      "pairs": [],
+      "visual": null,
+      "accepted_answers": []
+    },
+    {
+      "question_id": "Q-05",
+      "section_id": "SEC-06",
+      "kind": "final",
+      "question_type": "multiple_choice",
+      "prompt": "Which response status category signifies that a request was successful?",
+      "options": [
+        "1xx",
+        "2xx",
+        "4xx",
+        "5xx"
+      ],
+      "answer_key": "2xx",
+      "explanation": "2xx status codes indicate success.",
+      "objective_ids": [
+        "LO-02"
+      ],
+      "bloom_level": "understand",
+      "level": "understand",
+      "hint": "Think of the category that includes 200 OK.",
+      "wrong_options": [
+        {
+          "option": "1xx",
+          "misconception_id": "M7",
+          "misconception": "Confusing informational status with success."
+        },
+        {
+          "option": "4xx",
+          "misconception_id": "M8",
+          "misconception": "Confusing client error with success."
+        },
+        {
+          "option": "5xx",
+          "misconception_id": "M9",
+          "misconception": "Confusing server error with success."
+        }
+      ],
+      "review_section_id": "SEC-04",
+      "correct_order": [],
+      "pairs": [],
+      "visual": null,
+      "accepted_answers": []
+    },
+    {
+      "question_id": "Q-06",
+      "section_id": "SEC-06",
+      "kind": "final",
+      "question_type": "multiple_choice",
+      "prompt": "An error status code caused by the client falls under which category?",
+      "options": [
+        "2xx",
+        "3xx",
+        "4xx",
+        "5xx"
+      ],
+      "answer_key": "4xx",
+      "explanation": "4xx codes indicate client-caused errors.",
+      "objective_ids": [
+        "LO-02"
+      ],
+      "bloom_level": "understand",
+      "level": "understand",
+      "hint": "Review who is responsible for 4xx errors.",
+      "wrong_options": [
+        {
+          "option": "2xx",
+          "misconception_id": "M10",
+          "misconception": "Confusing success with client errors."
+        },
+        {
+          "option": "3xx",
+          "misconception_id": "M11",
+          "misconception": "Confusing redirection with client errors."
+        },
+        {
+          "option": "5xx",
+          "misconception_id": "M12",
+          "misconception": "Confusing server errors with client errors."
+        }
+      ],
+      "review_section_id": "SEC-04",
+      "correct_order": [],
+      "pairs": [],
+      "visual": null,
+      "accepted_answers": []
+    },
+    {
+      "question_id": "Q-07",
+      "section_id": "SEC-06",
+      "kind": "final",
+      "question_type": "multiple_choice",
+      "prompt": "If a web server encounters an internal error and cannot fulfill a valid request, what status category is returned?",
+      "options": [
+        "2xx",
+        "3xx",
+        "4xx",
+        "5xx"
+      ],
+      "answer_key": "5xx",
+      "explanation": "5xx codes indicate server-side errors.",
+      "objective_ids": [
+        "LO-02"
+      ],
+      "bloom_level": "understand",
+      "level": "understand",
+      "hint": "Server faults are represented in the 5xx range.",
+      "wrong_options": [
+        {
+          "option": "2xx",
+          "misconception_id": "M13",
+          "misconception": "Thinking server crashes return success."
+        },
+        {
+          "option": "3xx",
+          "misconception_id": "M14",
+          "misconception": "Thinking server errors are redirections."
+        },
+        {
+          "option": "4xx",
+          "misconception_id": "M15",
+          "misconception": "Confusing server errors with client errors."
+        }
+      ],
+      "review_section_id": "SEC-04",
+      "correct_order": [],
+      "pairs": [],
+      "visual": null,
+      "accepted_answers": []
+    },
+    {
+      "question_id": "Q-08",
+      "section_id": "SEC-06",
+      "kind": "final",
+      "question_type": "scenario",
+      "prompt": "A user tries to fetch a product catalog page using a safe, cacheable method. Which method did they use?",
+      "options": [
+        "POST",
+        "GET",
+        "PUT",
+        "CONNECT"
+      ],
+      "answer_key": "GET",
+      "explanation": "GET is safe and cacheable for fetching resources.",
+      "objective_ids": [
+        "LO-01"
+      ],
+      "bloom_level": "apply",
+      "level": "apply",
+      "hint": "Look for the method defined as safe and read-only.",
+      "wrong_options": [
+        {
+          "option": "POST",
+          "misconception_id": "M16",
+          "misconception": "Assuming catalog fetches require POST."
+        },
+        {
+          "option": "PUT",
+          "misconception_id": "M17",
+          "misconception": "Confusing PUT with retrieval."
+        },
+        {
+          "option": "CONNECT",
+          "misconception_id": "M18",
+          "misconception": "Confusing tunneling with resource fetching."
+        }
+      ],
+      "review_section_id": "SEC-03",
+      "correct_order": [],
+      "pairs": [],
+      "visual": null,
+      "accepted_answers": []
+    },
+    {
+      "question_id": "Q-09",
+      "section_id": "SEC-06",
+      "kind": "final",
+      "question_type": "scenario",
+      "prompt": "An application submits new user registration details to a web server. Which HTTP method is appropriate here?",
+      "options": [
+        "GET",
+        "POST",
+        "TRACE",
+        "OPTIONS"
+      ],
+      "answer_key": "POST",
+      "explanation": "POST is used for submitting data to be processed.",
+      "objective_ids": [
+        "LO-01"
+      ],
+      "bloom_level": "apply",
+      "level": "apply",
+      "hint": "Registration sends new data to the server.",
+      "wrong_options": [
+        {
+          "option": "GET",
+          "misconception_id": "M19",
+          "misconception": "Using GET for data submission."
+        },
+        {
+          "option": "TRACE",
+          "misconception_id": "M20",
+          "misconception": "Confusing diagnostics with submission."
+        },
+        {
+          "option": "OPTIONS",
+          "misconception_id": "M21",
+          "misconception": "Confusing capability queries with submission."
+        }
+      ],
+      "review_section_id": "SEC-03",
+      "correct_order": [],
+      "pairs": [],
+      "visual": null,
+      "accepted_answers": []
+    },
+    {
+      "question_id": "Q-10",
+      "section_id": "SEC-06",
+      "kind": "final",
+      "question_type": "scenario",
+      "prompt": "A client requests a file, but the URL contains a typo resulting in a 404 Not Found. Who is responsible for this error?",
+      "options": [
+        "The client",
+        "The server",
+        "The proxy cache",
+        "The transport layer"
+      ],
+      "answer_key": "The client",
+      "explanation": "4xx errors are caused by the client request.",
+      "objective_ids": [
+        "LO-02"
+      ],
+      "bloom_level": "apply",
+      "level": "apply",
+      "hint": "Review the responsibility definition for 4xx status codes.",
+      "wrong_options": [
+        {
+          "option": "The server",
+          "misconception_id": "M22",
+          "misconception": "Assuming all errors are server faults."
+        },
+        {
+          "option": "The proxy cache",
+          "misconception_id": "M23",
+          "misconception": "Blaming intermediate caches for URL typos."
+        },
+        {
+          "option": "The transport layer",
+          "misconception_id": "M24",
+          "misconception": "Confusing application status with transport protocols."
+        }
+      ],
+      "review_section_id": "SEC-04",
+      "correct_order": [],
+      "pairs": [],
+      "visual": null,
+      "accepted_answers": []
+    },
+    {
+      "question_id": "Q-11",
+      "section_id": "SEC-06",
+      "kind": "final",
+      "question_type": "order_steps",
+      "prompt": "Order the steps of a basic HTTP request-response transaction.",
+      "options": [],
+      "answer_key": "Client sends HTTP request message -> Server processes request -> Server returns HTTP response message",
+      "explanation": "Transactions follow client request, server processing, and server response.",
+      "objective_ids": [
+        "LO-01",
+        "LO-02"
+      ],
+      "bloom_level": "apply",
+      "level": "apply",
+      "hint": "Think about who initiates the transaction.",
+      "wrong_options": [],
+      "review_section_id": null,
+      "correct_order": [
+        "Client sends HTTP request message",
+        "Server processes request",
+        "Server returns HTTP response message"
+      ],
+      "pairs": [],
+      "visual": {
+        "type": "visual",
+        "content": "",
+        "items": [],
+        "label": null,
+        "visual_type": "flowchart",
+        "elements": [
+          "Client sends HTTP request message",
+          "Server processes request",
+          "Server returns HTTP response message"
+        ],
+        "connections": [
+          "Client sends HTTP request message -> Server processes request",
+          "Server processes request -> Server returns HTTP response message"
+        ],
+        "rows": [],
+        "caption": "Transaction flow order.",
+        "alt_text": "Flowchart showing request, processing, and response."
+      },
+      "accepted_answers": []
+    },
+    {
+      "question_id": "Q-12",
+      "section_id": "SEC-06",
+      "kind": "final",
+      "question_type": "match_pairs",
+      "prompt": "Match each HTTP status category to its description.",
+      "options": [],
+      "answer_key": "2xx = Success; 4xx = Client error; 5xx = Server error",
+      "explanation": "2xx is success, 4xx is client error, 5xx is server error.",
+      "objective_ids": [
+        "LO-02"
+      ],
+      "bloom_level": "analyze",
+      "level": "transfer",
+      "hint": "Match category numbers to their outcome definitions.",
+      "wrong_options": [],
+      "review_section_id": null,
+      "correct_order": [],
+      "pairs": [
+        [
+          "2xx",
+          "Success"
+        ],
+        [
+          "4xx",
+          "Client error"
+        ],
+        [
+          "5xx",
+          "Server error"
+        ]
+      ],
+      "visual": null,
+      "accepted_answers": []
     }
   ],
   "videos": [
@@ -368,21 +1195,101 @@
     },
     {
       "video_id": "VID-02",
-      "title": "HTTP crash course | http Methods | http headers",
-      "url": "https://www.youtube.com/watch?v=qgZiUvV41TI",
+      "title": "31 HTTP Request Response structure",
+      "url": "https://www.youtube.com/watch?v=rZNdo9UjF94",
       "source_id": "SRC-007",
       "section_id": null,
-      "duration_minutes": 24,
+      "duration_minutes": 14,
       "is_mandatory": false
     },
     {
       "video_id": "VID-03",
-      "title": "31 HTTP Request Response structure",
-      "url": "https://www.youtube.com/watch?v=rZNdo9UjF94",
+      "title": "HTTP crash course | http Methods | http headers",
+      "url": "https://www.youtube.com/watch?v=qgZiUvV41TI",
       "source_id": "SRC-008",
       "section_id": null,
-      "duration_minutes": 14,
+      "duration_minutes": 24,
       "is_mandatory": false
+    }
+  ],
+  "remedials": [
+    {
+      "objective_id": "LO-01",
+      "takeaway": "GET retrieves data safely, while POST submits new data.",
+      "visual": {
+        "type": "visual",
+        "content": "",
+        "items": [],
+        "label": null,
+        "visual_type": "analogy_scene",
+        "elements": [
+          "Catalog Lookup",
+          "GET",
+          "Order Form Submission",
+          "POST"
+        ],
+        "connections": [
+          "Catalog Lookup -> GET: read-only",
+          "Order Form Submission -> POST: writes data"
+        ],
+        "rows": [],
+        "caption": "Remedial view of HTTP methods.",
+        "alt_text": "Analogy scene comparing catalog lookup to GET and order form submission to POST."
+      },
+      "explanation": [
+        "Think of GET as asking to view information without changing anything.",
+        "Think of POST as sending new information to be recorded or processed."
+      ],
+      "common_mix_ups": [
+        {
+          "misconception": "Believing GET can be used to submit large forms.",
+          "correction": "GET is for retrieving resources; POST is designed for submission."
+        }
+      ]
+    },
+    {
+      "objective_id": "LO-02",
+      "takeaway": "Status code ranges indicate who encountered or caused the issue.",
+      "visual": {
+        "type": "visual",
+        "content": "",
+        "items": [],
+        "label": null,
+        "visual_type": "table",
+        "elements": [],
+        "connections": [],
+        "rows": [
+          [
+            "Range",
+            "Target"
+          ],
+          [
+            "2xx",
+            "All good"
+          ],
+          [
+            "4xx",
+            "User fault"
+          ],
+          [
+            "5xx",
+            "System fault"
+          ]
+        ],
+        "caption": "Remedial breakdown of status ranges.",
+        "alt_text": "Table summarizing status code ranges by fault ownership."
+      },
+      "explanation": [
+        "2xx means everything worked as expected.",
+        "4xx means the client made a mistake in the request.",
+        "5xx means the server failed to complete a valid request."
+      ],
+      "common_mix_ups": [
+        {
+          "misconception": "Thinking 5xx errors are caused by user typos.",
+          "correction": "Typos cause 4xx errors; 5xx errors mean the server itself crashed or failed."
+        }
+      ]
     }
   ]
 }
