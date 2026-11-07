@@ -108,7 +108,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="radio"
   .duck .body {font-size: 2.2rem;}
 }
 /* ================= sidebar lesson list ================= */
-.side-brand {font-weight: 800; font-size: 1.05rem; color: #1F2937; margin: 0 0 .6rem .1rem;}
+.side-brand {font-weight: 800; font-size: 1.05rem; color: #1F2937; margin: -.2rem 0 .6rem .1rem;}
 
 /* 14. "New lesson": the only solid indigo button */
 .st-key-newlesson button {background: #4F46E5; border: 1px solid #4F46E5; color: #fff; border-radius: 10px;}
@@ -123,8 +123,15 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="radio"
 /* One scrollbar only: the sidebar itself never scrolls; the lesson list fills the space left
    under the brand, "New lesson" and search, and scrolls on its own. */
 [data-testid="stSidebarContent"] {overflow: hidden !important;}
-[data-testid="stSidebarUserContent"] {padding-bottom: .5rem !important;}
-.st-key-llist {max-height: calc(100vh - 250px); overflow-y: auto; overflow-x: hidden; padding: 0 .35rem .6rem 0;
+/* Less empty space at the top: a slim header row holding the always-visible « button */
+[data-testid="stSidebarHeader"] {height: auto !important; min-height: 0 !important;
+  padding: .55rem .8rem 0 .8rem !important; margin-bottom: 0 !important; justify-content: flex-end;}
+[data-testid="stSidebarCollapseButton"] {display: inline-flex !important; visibility: visible !important;
+  opacity: 1 !important;}
+[data-testid="stSidebarCollapseButton"] button {color: #4B5563;}
+[data-testid="stSidebarCollapseButton"] button:hover {color: #4F46E5; background: #EEF2FF;}
+[data-testid="stSidebarUserContent"] {padding-top: 0 !important; padding-bottom: .5rem !important;}
+.st-key-llist {max-height: calc(100vh - 205px); overflow-y: auto; overflow-x: hidden; padding: 0 .35rem .6rem 0;
   scrollbar-width: thin; scrollbar-color: #C7D2FE transparent;}
 .st-key-llist::-webkit-scrollbar {width: 6px;}
 .st-key-llist::-webkit-scrollbar-thumb {background: #C7D2FE; border-radius: 6px;}
@@ -605,29 +612,72 @@ def _fill_example() -> None:
         st.session_state["in_title"], st.session_state["in_objective"] = picked, goal
 
 
+@st.fragment
+def landing_form() -> None:
+    """The input box. A fragment: clicking a level, an example or typing re-runs ONLY this box,
+    not the whole page (sidebar cards etc.), so it responds immediately."""
+    with st.container(border=True):
+        st.pills("Try an example", [t for t, _ in EXAMPLES], key="example_pick", on_change=_fill_example)
+        c_topic, c_level = st.columns([3, 2])
+        title = c_topic.text_input("Topic", key="in_title",
+                                   placeholder="e.g. Photosynthesis, Binary search, The French Revolution")
+        level_name = c_level.segmented_control("Level", list(LEVELS), key="in_level",
+                                               default="Beginner") or "Beginner"
+        c_level.caption(f"**{level_name}:** {LEVELS[level_name]}")
+        objective = st.text_area("After this lesson, I want to be able to...", key="in_objective",
+                                 placeholder="e.g. Describe the inputs and outputs of photosynthesis "
+                                             "and explain the role of chlorophyll.", height=76)
+        st.markdown('<div class="you-get"><b>You&#39;ll get:</b> clear explanations · worked examples · '
+                    'a hands-on activity · quiz questions with instant feedback · a summary · '
+                    'videos and references</div>', unsafe_allow_html=True)
+        submitted = st.button("Create my lesson", type="primary", use_container_width=True)
+        if not (title or "").strip() or not (objective or "").strip():
+            st.caption("Add a topic and a goal to start - or pick an example above.")
+
+    def create_and_build() -> None:
+        try:
+            inputs = validate_inputs(title, objective, level_name.lower())
+        except InputError as exc:
+            st.warning(f"Please check your input: {exc}")
+            return
+        new = Project.create(inputs)
+        st.session_state["last_title"], st.session_state["last_objective"] = title, objective
+        start_building(new.meta["project_id"])
+        st.rerun(scope="app")  # switch the whole page to the build screen
+
+    if submitted:
+        try:
+            match = Project.find_existing(validate_inputs(title, objective, level_name.lower()))
+        except InputError as exc:
+            st.warning(f"Please check your input: {exc}")
+            return
+        if match is None:
+            create_and_build()
+            return
+        st.session_state["duplicate"] = match.meta["project_id"]  # ask first (shown below)
+
+    duplicate = st.session_state.get("duplicate")
+    existing = next((p for p in Project.list_all() if p.meta["project_id"] == duplicate), None) if duplicate else None
+    if existing:
+        with st.container(border=True):
+            st.markdown(f"You already have a **{existing.inputs.learner_level}** lesson on "
+                        f"**{escape(existing.display_name)}**.")
+            d1, d2 = st.columns(2)
+            if d1.button("Open existing lesson", type="primary", use_container_width=True):
+                st.session_state.pop("duplicate")
+                go(existing.meta["project_id"])  # full-page rerun
+            if d2.button("Create a new one anyway", use_container_width=True):
+                st.session_state.pop("duplicate")
+                create_and_build()
+
+
 if project is None:
     _, middle, _ = st.columns([0.6, 4, 0.6])
     with middle:
         st.markdown('<div class="landing-title">What do you want to learn today?</div>'
                     '<div class="landing-sub">Give a topic and a goal. We research trusted sources and '
                     'build a 45-minute lesson, double-checked for accuracy.</div>', unsafe_allow_html=True)
-        with st.container(border=True):
-            st.pills("Try an example", [t for t, _ in EXAMPLES], key="example_pick", on_change=_fill_example)
-            c_topic, c_level = st.columns([3, 2])
-            title = c_topic.text_input("Topic", key="in_title",
-                                       placeholder="e.g. Photosynthesis, Binary search, The French Revolution")
-            level_name = c_level.segmented_control("Level", list(LEVELS), key="in_level",
-                                                   default="Beginner") or "Beginner"
-            c_level.caption(f"**{level_name}:** {LEVELS[level_name]}")
-            objective = st.text_area("After this lesson, I want to be able to...", key="in_objective",
-                                     placeholder="e.g. Describe the inputs and outputs of photosynthesis "
-                                                 "and explain the role of chlorophyll.", height=76)
-            st.markdown('<div class="you-get"><b>You\'ll get:</b> clear explanations · worked examples · '
-                        'a hands-on activity · quiz questions with instant feedback · a summary · '
-                        'videos and references</div>', unsafe_allow_html=True)
-            submitted = st.button("Create my lesson", type="primary", use_container_width=True)
-            if not (title or "").strip() or not (objective or "").strip():
-                st.caption("Add a topic and a goal to start - or pick an example above.")
+        landing_form()
         st.markdown(
             '<div class="features">'
             '<span title="Facts come from Wikipedia articles, quoted word for word; books and YouTube '
@@ -637,26 +687,8 @@ if project is None:
             '<span title="Check 1 compares every fact with its source. Check 2 makes sure the lesson '
             'really teaches your goal, clearly and in a good order.">✅ Double-checked ⓘ</span></div>',
             unsafe_allow_html=True)
-        problem = st.empty()
-
-        duplicate = st.session_state.get("duplicate")
-        if duplicate:
-            existing = next((p for p in Project.list_all() if p.meta["project_id"] == duplicate), None)
-            if existing:
-                with problem.container(border=True):
-                    st.markdown(f"You already have a **{existing.inputs.learner_level}** lesson on "
-                                f"**{escape(existing.display_name)}**.")
-                    d1, d2 = st.columns(2)
-                    if d1.button("Open existing lesson", type="primary", use_container_width=True):
-                        st.session_state.pop("duplicate")
-                        go(existing.meta["project_id"])
-                    if d2.button("Create a new one anyway", use_container_width=True):
-                        st.session_state.pop("duplicate")
-                        st.session_state["force_new"] = True
-                        submitted = True
-
         recent = [p for p in Project.list_all() if p.next_step() is None][:3]
-        if recent and not duplicate:
+        if recent:
             st.markdown('<div class="group-label" style="text-align:center;margin-top:1rem">'
                         'Continue where you left off</div>', unsafe_allow_html=True)
             cols = st.columns(len(recent))
@@ -664,21 +696,6 @@ if project is None:
                 if col.button(p.display_name, key=f"recent-{p.meta['project_id']}", use_container_width=True,
                               help=f"{p.inputs.learner_level.capitalize()} · {_when(p.meta['created_at'])[1]}"):
                     go(p.meta["project_id"])
-
-    if submitted:
-        try:
-            inputs = validate_inputs(title, objective, level_name.lower())
-        except InputError as exc:
-            problem.warning(f"Please check your input: {exc}")
-            st.stop()
-        existing = None if st.session_state.pop("force_new", False) else Project.find_existing(inputs)
-        if existing:
-            st.session_state["duplicate"] = existing.meta["project_id"]
-            st.rerun()
-        new = Project.create(inputs)
-        st.session_state["last_title"], st.session_state["last_objective"] = title, objective
-        start_building(new.meta["project_id"])
-        st.rerun()
     st.stop()
 
 # ------------------------------------------------------------ lesson page
